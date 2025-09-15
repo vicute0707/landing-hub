@@ -1,0 +1,16 @@
+{
+  "name": "@landinghub/shared",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "echo 'Build shared module'"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-native": "^0.72.0",
+    "@react-oauth/google": "^0.12.0",
+    "axios": "^1.6.0",
+    "lodash": "^4.17.21",
+    "prop-types": "^15.8.1"
+  }
+}

@@ -22,5 +22,5 @@ Landing Hub là nền tảng SaaS hỗ trợ tạo landing page, marketplace, AI
 - MongoDB
 
 ## Liên Hệ
-- Tác giả: Nguyen Thi Tuong Vi - Tuan Kiet
+- Tác giả: Nguyen Thi Tuong Vi - Tan Kiet
 - GitHub: [vicute0707/landing-hub](https://github.com/vicute0707/landing-hub)
