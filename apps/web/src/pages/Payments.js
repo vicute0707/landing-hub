@@ -130,12 +130,39 @@ export default function Payment() {
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN") + "đ"
   }
+const [paymentData, setPaymentData] = useState(null)
 
   const getPaymentAmount = () => {
     if (!selectedPlan) return 0
     const multiplier = Number.parseInt(selectedDuration)
     return selectedPlan.price * multiplier
   }
+  // 🔥 Gọi API fake backend VNPay
+  const handlePayment = async () => {
+  try {
+    const res = await fetch("http://localhost:5000/api/payment/create-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: getPaymentAmount(),
+        planId: selectedPlan?.id,
+        duration: selectedDuration,
+        customer: formData,
+      }),
+    });
+
+    const data = await res.json();
+    if (data.paymentUrl) {
+      window.location.href = data.paymentUrl; // Redirect sang VNPay sandbox
+    } else {
+      alert("Không tạo được giao dịch!");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Lỗi khi tạo giao dịch!");
+  }
+};
+
 
   const DurationModal = () => (
     <div className="modal-overlay" onClick={closeModal}>
@@ -247,60 +274,35 @@ export default function Payment() {
   )
 
   const PaymentModal = () => (
-    <div className="modal-overlay" onClick={closeModal}>
-      <div className="modal-content payment-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={closeModal}>
-          ×
-        </button>
-        <div className="modal-header">
-          <h2>Nâng cấp/Gia hạn tài khoản LadiPage {selectedPlan?.name.toUpperCase()}</h2>
-        </div>
-        <div className="payment-content">
-          <div className="qr-section">
-            <h3>Quét mã QR thanh toán</h3>
-            <div className="qr-container">
-              <div className="qr-code">
-                <div className="qr-placeholder">QR Code</div>
-              </div>
-              <p>Mở app ngân hàng hoặc ví điện tử của bạn sau đó chọn quét mã QR để thực hiện thanh toán.</p>
-            </div>
-          </div>
-          <div className="bank-section">
-            <h3>Chuyển khoản thủ công theo thông tin</h3>
-            <div className="bank-logo">
-              <span className="techcombank-logo">TECHCOMBANK</span>
-            </div>
-            <div className="bank-details">
-              <div className="detail-row">
-                <span>Ngân hàng</span>
-                <span>Ngân hàng TMCP Kỹ thương Việt Nam</span>
-              </div>
-              <div className="detail-row">
-                <span>Thụ hưởng</span>
-                <span>CTCP CN LADIPAGE VIET NAM</span>
-              </div>
-              <div className="detail-row">
-                <span>Số tài khoản</span>
-                <span>19036184902015</span>
-              </div>
-              <div className="detail-row">
-                <span>Số tiền</span>
-                <span className="amount">{formatPrice(getPaymentAmount())}</span>
-              </div>
-              <div className="detail-row">
-                <span>Nội dung CK</span>
-                <span>CAMPTUCKptankiet1712gmail.com</span>
-              </div>
-            </div>
-            <div className="payment-note">
-              <strong>Lưu ý:</strong> Vui lòng ghi nguyên nội dung <strong>CAMPTUCKptankiet1712gmail.com</strong> để xác
-              nhận thanh toán tự động.
-            </div>
-          </div>
-        </div>
+  <div className="modal-overlay" onClick={closeModal}>
+    <div className="modal-content payment-modal" onClick={e => e.stopPropagation()}>
+      <button className="modal-close" onClick={closeModal}>×</button>
+
+      <div className="modal-header">
+        <h2>Xác nhận thanh toán gói {selectedPlan?.name}</h2>
       </div>
+
+      <div className="payment-summary">
+        <p><strong>Khách hàng:</strong> {formData.name}</p>
+        <p><strong>Email:</strong> {formData.email}</p>
+        <p><strong>Số điện thoại:</strong> {formData.phone}</p>
+        <p><strong>Số tiền:</strong> {formatPrice(getPaymentAmount())}</p>
+      </div>
+
+      <button className="btn-pay" onClick={handlePayment}>
+        Thanh toán qua VNPay →
+      </button>
+
+      {paymentData?.paymentUrl && (
+        <p className="payment-note">
+          Nhấn thanh toán để chuyển sang sandbox VNPay. Sau khi test thành công, bạn sẽ quay về FE.
+        </p>
+      )}
     </div>
-  )
+  </div>
+)
+
+  
 
   return (
     <div className="payment-panel">
