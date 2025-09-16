@@ -10,14 +10,15 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-native-web": "^0.19.0",
-    "react-router-dom": "^7.9.0",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "dev": "tailwindcss -i ./src/index.css -o ./src/output.css --watch",
+    "build:css": "tailwindcss -i ./src/index.css -o ./src/output.css"
   },
   "browserslist": {
     "production": [
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0"
+    "@testing-library/react": "^16.3.0",
+    "react-router-dom": "^7.9.0"
   }
 }
