@@ -1,0 +1,430 @@
+/* ===========================
+   General
+=========================== */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f6f8fb;
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===========================
+   Kanban
+=========================== */
+.kanban-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  padding: 8px;
+}
+
+.kanban-column {
+  background-color: #fefefe;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s;
+}
+
+.kanban-column:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.kanban-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.lead-count {
+  background-color: rgba(0,0,0,0.05);
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.kanban-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kanban-card {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.kanban-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #f87171;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+/* ===========================
+   Lead List
+=========================== */
+.lead-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.lead-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.lead-table th,
+.lead-table td {
+  padding: 12px 8px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.lead-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.lead-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.lead-table select,
+.lead-table input {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.lead-table input:focus,
+.lead-table select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* ===========================
+   Popup Modal (LeadEditModal)
+=========================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 12px;
+  backdrop-filter: blur(2px);
+}
+/* Khi popup hiển thị */
+.modal-content.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.modal-content {
+   background-color: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 450px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: all 0.25s ease-out;
+}
+
+.modal-content h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-content label {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.modal-content input,
+.modal-content select,
+.modal-content textarea {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-content input:focus,
+.modal-content select:focus,
+.modal-content textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.modal-content textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.modal-content .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.modal-content .modal-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-content .modal-actions .cancel-btn {
+  background-color: #e5e7eb;
+}
+
+.modal-content .modal-actions .cancel-btn:hover {
+  background-color: #d1d5db;
+}
+
+.modal-content .modal-actions .save-btn {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.modal-content .modal-actions .save-btn:hover {
+  background-color: #2563eb;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 768px) {
+  .kanban-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .lead-table th, .lead-table td {
+    font-size: 13px;
+    padding: 10px 6px;
+  }
+}
+/* =========================
+   +New Button
+========================= */
+.button-new {
+  background-color: #10b981; /* xanh lá nổi bật */
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.button-new:hover {
+  background-color: #059669; /* xanh đậm hơn khi hover */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.button-new:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.25);
+}
+
+.button-new:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+/* =========================
+   Button view (Kanban/List)
+========================= */
+.button-view {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-view:hover {
+  background-color: #e5e7eb;
+  transform: translateY(-1px);
+}
+
+.button-view.active {
+  background-color: #3b82f6;
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.25);
+}
+
+.button-view:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* =========================
+   Header container cho 3 nút
+========================= */
+.header-leads {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* +New bên trái, view bên phải */
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.header-leads .view-buttons {
+  display: flex;
+  gap: 8px; /* khoảng cách giữa 2 nút Kanban/List */
+}
+
+
+/* =========================
+   Modal Overlay
+========================= */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  padding: 12px;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(0);
+  opacity: 1;
+  transition: all 0.25s ease-out;
+}
+
+/* =========================
+   Form Inputs inside Modal
+========================= */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.error-message {
+  font-size: 12px;
+  color: #f87171;
+}
+
+/* Modal action buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cancel-btn {
+  background-color: #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background-color: #d1d5db;
+}
+
+.save-btn {
+  background-color: #3b82f6;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background-color: #2563eb;
+}
+
+/* =========================
+   Responsive
+========================= */
+@media (max-width: 640px) {
+  .flex.justify-between {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .flex.justify-between > div {
+    justify-content: flex-start;
+  }
+}
+
