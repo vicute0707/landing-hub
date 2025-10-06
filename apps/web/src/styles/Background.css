@@ -1,11 +1,14 @@
-/* Background.css */
+/* ================== BACKGROUND CONTAINER ================== */
 .background-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #fafafa 0%, #f4f4f5 100%);
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden; /* tránh scroll ngang */
 }
 
+/* ================== SHAPES ================== */
 .background-shapes {
     position: absolute;
     inset: 0;
@@ -66,74 +69,117 @@
     z-index: 1;
 }
 
-/* Navigation */
+/* ================== NAVIGATION ================== */
 .navbar {
     position: relative;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .navbar-container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 5px 5px;
+    padding: 10px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 30px;
 }
 
+/* Logo */
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
-
 .logo-image {
-    width: 100px;
+    width: 90px;
     height: auto;
     border-radius: 8px;
 }
 
+/* Menu */
 .menu-items {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 32px;
+    flex-grow: 1;
+    justify-content: center;
 }
 
 .menu-link {
-    color: #4b5563;
+    position: relative;
+    color: #374151;
     text-decoration: none;
     font-size: 15px;
     font-weight: 500;
     font-family: system-ui, -apple-system, sans-serif;
-    transition: color 0.2s ease;
+    transition: color 0.3s ease;
+    padding: 6px 0;
 }
 
+/* Hover */
 .menu-link:hover {
     color: #3b82f6;
 }
 
+/* Active */
+.menu-link.active {
+    color: #2563eb;
+    font-weight: 600;
+}
+.menu-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 2px;
+    background: #2563eb;
+    border-radius: 2px;
+}
+
+/* Hover underline effect */
+.menu-link::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background: #3b82f6;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+.menu-link:hover::after {
+    width: 100%;
+}
+
+/* Language Selector */
 .language-selector {
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     padding: 6px 12px;
-    color: #4b5563;
+    color: #374151;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     outline: none;
     font-family: system-ui, -apple-system, sans-serif;
-    transition: border-color 0.2s ease;
+    transition: all 0.2s ease;
 }
-
 .language-selector:hover {
-    border-color: #3b82f6;
+    border-color: #2563eb;
+    background: #f9fafb;
 }
 
-/* Main Content Area */
+/* ================== MAIN CONTENT ================== */
 .main-content {
     position: relative;
     z-index: 10;
@@ -141,14 +187,27 @@
     align-items: center;
     justify-content: center;
     min-height: calc(80vh - 60px);
-    padding: 10px 5px;
+    padding: 0;
 }
 
+/* Full width khi bật prop fullWidth */
+.main-content.full-width {
+    justify-content: flex-start;
+}
+
+.main-content.full-width .content-wrapper {
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+}
+
+/* Content wrapper mặc định */
 .content-wrapper {
     width: 100%;
-    max-width: 440px;
+    max-width: 440px; /* giữ layout chuẩn cho các trang khác */
 }
 
+/* ================== FORM CONTAINER ================== */
 .form-container {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
@@ -157,7 +216,7 @@
     overflow: hidden;
 }
 
-/* Responsive Design */
+/* ================== RESPONSIVE ================== */
 @media (max-width: 768px) {
     .navbar-container {
         padding: 12px 20px;
@@ -165,10 +224,11 @@
     }
 
     .menu-items {
-        gap: 24px;
+        gap: 20px;
+        flex-wrap: wrap; /* menu xuống hàng nếu hẹp */
+        justify-content: flex-start;
     }
 
-    /* Stack forms vertically on mobile */
     .content-wrapper {
         flex-direction: column;
         max-width: 440px;
@@ -180,5 +240,123 @@
     .register-form {
         min-width: unset;
         width: 100%;
+    }
+}
+
+/* ================== MARKETPLACE GRID ================== */
+.marketplace-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 24px;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    width: 100%;
+}
+
+.project-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.thumbnail-wrapper {
+    position: relative;
+}
+.thumbnail {
+    width: 100%;
+    object-fit: cover;
+}
+.badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #3b82f6;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.hot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ef4444;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.project-info {
+    padding: 16px;
+}
+.project-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+.location, .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.tag {
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.actions {
+    display: flex;
+    gap: 8px;
+}
+.btn-outline {
+    border: 1px solid #3b82f6;
+    background: transparent;
+    color: #3b82f6;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-outline:hover {
+    background: #3b82f6;
+    color: white;
+}
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    background: #2563eb;
+}
+
+/* ================== RESPONSIVE MARKETPLACE ================== */
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     }
 }

@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import api from "@landinghub/api"; // sử dụng api giống Leads.js
+import api from "@landinghub/api";
+import Background from './Background';
+import '../styles/CustomerForm.css';
+import { CheckCircle2 } from "lucide-react"; // icon đẹp cho success
 
 const CustomerForm = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", notes: "" });
@@ -22,6 +25,7 @@ const CustomerForm = () => {
       await api.post("/api/leads", { ...form, status: "new" });
       setSubmitted(true);
       setForm({ name: "", email: "", phone: "", notes: "" });
+      setTimeout(() => setSubmitted(false), 4000); // success message tự biến mất
     } catch (err) {
       console.error("Submit form error:", err);
       alert("Gửi thông tin thất bại. Vui lòng thử lại.");
@@ -29,45 +33,21 @@ const CustomerForm = () => {
   };
 
   return (
-    <div className="customer-form p-6 bg-white rounded shadow max-w-md mx-auto">
-      {submitted && <p className="text-green-600 mb-4">Cảm ơn! Chúng tôi đã nhận thông tin của bạn.</p>}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          name="name"
-          placeholder="Tên"
-          value={form.name}
-          onChange={handleChange}
-          className="border rounded p-2"
-          required
-        />
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="border rounded p-2"
-          required
-        />
-        <input
-          name="phone"
-          placeholder="Số điện thoại"
-          value={form.phone}
-          onChange={handleChange}
-          className="border rounded p-2"
-        />
-        <textarea
-          name="notes"
-          placeholder="Ghi chú"
-          value={form.notes}
-          onChange={handleChange}
-          className="border rounded p-2 min-h-[80px]"
-        />
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Gửi thông tin
-        </button>
-      </form>
+     <Background>
+    <div className="customer-form-page">
+      <div className="customer-form-card">
+        <h2>Liên hệ với chúng tôi</h2>
+        {submitted && <p className="success-message">Cảm ơn! Chúng tôi đã nhận thông tin của bạn.</p>}
+        <form onSubmit={handleSubmit}>
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Tên" required />
+          <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email" required />
+          <input name="phone" value={form.phone} onChange={handleChange} placeholder="Số điện thoại" />
+          <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Ghi chú" />
+          <button type="submit">Gửi thông tin</button>
+        </form>
+      </div>
     </div>
+  </Background>
   );
 };
 

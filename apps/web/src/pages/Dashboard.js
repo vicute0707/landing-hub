@@ -1,67 +1,55 @@
-import React, { Suspense, useState, useEffect, useContext } from 'react';
-import { UserContext } from '../context/UserContext';
-import Header from '../components/Header';
-import Sidebar from '../components/Sidebar';
-import { jwtDecode } from 'jwt-decode';
-import '../styles/Dashboard.css';
-import { useLocation } from 'react-router-dom';
-import DogLoader from "../components/DogLoader";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';  // chỉ import 1 lần
 
-const UserDashboard = React.lazy(() => import('../components/UserDashboard'));
-const AdminDashboard = React.lazy(() => import('../components/AdminDashboard'));
-const Dashboard = () => {
-    const { user } = useContext(UserContext);
-    const [loading, setLoading] = useState(true);
-    const [userRole, setUserRole] = useState(null);
-    const location = useLocation();
+const UserDashboard = () => {
+  const [landings, setLandings] = useState([]);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (user?.role) {
-            setUserRole(user.role);
-        } else if (localStorage.getItem('token')) {
-            try {
-                const { jwtDecode } = require('jwt-decode');
-                const decodedToken = jwtDecode(localStorage.getItem('token'));
-                setUserRole(decodedToken.role);
-            } catch (err) {
-                console.error('Error decoding token:', err);
-            }
-        }
-        setLoading(false);
-    }, [user]);
+  useEffect(() => {
+    api.get('/user/landings')
+      .then(res => setLandings(res.data))
+      .catch(err => console.error(err));
+  }, []);
 
-    const renderDashboard = () => {
-        if (loading) return <DogLoader />;
+  return (
+    <div className="p-6 w-full">
+      <div className="mb-6 flex justify-end">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+          onClick={() => navigate('/browser')}
+        >
+          Back to Browser
+        </button>
+      </div>
 
-        switch (userRole) {
-            case 'admin':
-                return (
-                    <Suspense>
-                        <AdminDashboard />
-                    </Suspense>
-                );
-            case 'user':
-                return (
-                    <Suspense >
-                        <UserDashboard />
-                    </Suspense>
-                );
-            default:
-                return <div>Role không hợp lệ hoặc chưa đăng nhập</div>;
-        }
-    };
-
-    const isCompact = location.pathname !== '/dashboard';
-
-    return (
-        <div className="dashboard-container">
-            <Header role={userRole} />
-            <div className="dashboard-main">
-                <Sidebar role={userRole} isCompact={isCompact} />
-                <div className="dashboard-content">{renderDashboard()}</div>
+      <h2 className="text-2xl font-bold mb-4">Your Landing Pages</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {landings.map(l => (
+          <div
+            key={l.id}
+            className="bg-white rounded-lg shadow hover:shadow-lg transform hover:scale-105 transition overflow-hidden"
+          >
+            <img
+              src={l.thumbnail || 'https://via.placeholder.com/300x160'}
+              alt={l.title}
+              className="w-full h-40 object-cover"
+            />
+            <div className="p-4">
+              <h3 className="text-lg font-bold mb-2">{l.title}</h3>
+              <p className="text-gray-500 mb-4 line-clamp-2">{l.description}</p>
+              <button
+                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                onClick={() => navigate(`/editor/${l.id}`)}
+              >
+                Edit
+              </button>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default React.memo(Dashboard);
+export default UserDashboard;

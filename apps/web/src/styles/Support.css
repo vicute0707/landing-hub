@@ -1,0 +1,347 @@
+/* ===========================
+   SUPPORT PAGE - LANDINGHUB
+   =========================== */
+.support-container {
+  width: 100%;
+  font-family: "Inter", sans-serif;
+  color: #1a1a1a;
+}
+
+/* === HERO SECTION === */
+.support-hero {
+  text-align: center;
+  padding: 100px 20px 80px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.support-hero .hero-inner {
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+.support-hero h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.support-hero p {
+  color: #475569;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* === FAQ SECTION === */
+.faq-section {
+  padding: 70px 20px;
+  background: #ffffff;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.faq-section h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: #0f172a;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.faq-item {
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.faq-item:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+}
+
+.faq-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 22px;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.faq-icon {
+  transition: transform 0.3s ease;
+  color: #64748b;
+}
+
+.faq-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.faq-body {
+  padding: 0 22px 18px;
+  font-size: 0.97rem;
+  color: #475569;
+  line-height: 1.6;
+  display: none;
+}
+
+.faq-item.open .faq-body {
+  display: block;
+}
+
+/* === CONTACT FORM SECTION === */
+.contact-section {
+  background: linear-gradient(180deg, #f9fafb 0%, #f1f5f9 100%);
+  padding: 80px 20px;
+}
+
+.contact-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.contact-info h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+.contact-info p {
+  color: #475569;
+  line-height: 1.7;
+  margin-bottom: 25px;
+}
+
+.contact-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-benefits li {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.contact-benefits li:hover {
+  transform: translateX(5px);
+  background: #f8fafc;
+}
+
+/* === FORM === */
+.contact-form-modern {
+  background: #fff;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #0f172a;
+}
+
+.form-group input,
+.form-group textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  outline: none;
+}
+
+.btn-submit-modern {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-modern:hover {
+  background: linear-gradient(135deg, #1e40af, #1d4ed8);
+  transform: translateY(-1px);
+}
+
+/* === SUCCESS MESSAGE === */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 10px 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+/* === CTA FOOTER === */
+.cta-support {
+  text-align: center;
+  background: #0f172a;
+  color: white;
+  padding: 80px 20px;
+  margin-top: 60px;
+}
+
+.cta-inner h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.cta-inner p {
+  font-size: 1.05rem;
+  opacity: 0.85;
+  margin-bottom: 24px;
+}
+
+.cta-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  font-size: 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .contact-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .support-hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .faq-section {
+    padding: 60px 16px;
+  }
+}
+/* === HERO BACKGROUND ANIMATION === */
+.support-hero-animated {
+  background: linear-gradient(120deg, #e0f2fe, #f1f5f9, #e0f2fe);
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+  text-align: center;
+  padding: 110px 20px 90px;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* === FAQ ICON === */
+.faq-icon-wrapper {
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+/* === CHAT MODAL === */
+.chat-modal {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+}
+
+.chat-box {
+  width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease;
+}
+
+.chat-header {
+  background: #2563eb;
+  color: white;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-body {
+  padding: 16px;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.chat-placeholder {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 25px;
+  text-align: center;
+  margin-top: 12px;
+  font-style: italic;
+  color: #64748b;
+}
+
+.chat-close {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}

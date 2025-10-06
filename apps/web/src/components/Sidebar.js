@@ -137,6 +137,13 @@ const Sidebar = ({ role }) => {
                         </div>
                         <span className="sidebar-status-text">System Online</span>
                     </div>
+                    {/* Back to Browser button */}
+                    <Link to="/gioithieu" className="sidebar-back-browser">
+                        <svg className="sidebar-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        <span>Back to Browser</span>
+                    </Link>
                 </div>
             )}
         </aside>

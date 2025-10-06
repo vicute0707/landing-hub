@@ -1,0 +1,114 @@
+/* Container full-page */
+.customer-form-page {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 1rem;
+  background: linear-gradient(135deg, #f0f4ff, #ffffff); /* soft gradient */
+  box-sizing: border-box;
+}
+
+/* Card form */
+.customer-form-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  width: 100%;
+  max-width: 500px;
+  padding: 3rem 2rem;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.customer-form-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.12);
+}
+
+/* Title */
+.customer-form-card h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1f2937; /* gray-800 */
+}
+
+/* Success message */
+.customer-form-card .success-message {
+  text-align: center;
+  color: #10b981; /* green-500 */
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Form fields */
+.customer-form-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.customer-form-card input,
+.customer-form-card textarea {
+  border: 1px solid #d1d5db; /* gray-300 */
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background-color: #f9fafb;
+}
+
+.customer-form-card input:focus,
+.customer-form-card textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+}
+
+/* Textarea */
+.customer-form-card textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Submit button */
+.customer-form-card button {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+}
+
+.customer-form-card button:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+}
+
+.customer-form-card button:active {
+  transform: translateY(0) scale(1);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .customer-form-card {
+    padding: 2rem 1.5rem;
+  }
+  .customer-form-card h2 {
+    font-size: 1.75rem;
+  }
+}
