@@ -33,23 +33,33 @@ const AuthPage = () => {
         role: 'user',
         name: decoded.name || decoded.given_name || decoded.email.split('@')[0],
         userId: decoded.sub,
+        email: decoded.email,
       };
 
-      // Lưu token + userInfo vào localStorage
+      // 🔒 Lưu token + userInfo vào localStorage
       localStorage.setItem('token', credentialResponse.credential);
       localStorage.setItem('userInfo', JSON.stringify(userData));
 
-      // Gửi lên backend
-      await api.post('/auth/google-callback', { email: decoded.email, name: userData.name });
+      // ⚙️ Gửi lên backend để tạo/tìm user
+      await api.post('/auth/google-callback', {
+        email: decoded.email,
+        name: userData.name,
+      });
+
+      // ⚙️ Lấy lại thông tin user từ backend (đã có _id thật trong MongoDB)
       const res = await api.get('/user/info');
       const backendUser = res.data;
 
+      // ✅ Lưu userId thực tế từ backend (MongoDB _id)
+      localStorage.setItem('userId', backendUser._id);
+
+      // Cập nhật context để toàn app nhận được
       setUser({ ...backendUser, userId: backendUser._id });
 
-      // Chuyển hướng SPA
+      // ✅ Chuyển hướng SPA
       navigate('/dashboard');
     } catch (err) {
-      console.error(err);
+      console.error('❌ Đăng nhập thất bại:', err);
       setError('Đăng nhập thất bại: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
@@ -66,12 +76,28 @@ const AuthPage = () => {
       <div className="auth-page">
         {loading && <LoadingDog />}
         <div className="tab-container">
-          <label className={`tab_label ${activeTab === 'login' ? 'active' : ''}`} onClick={() => setActiveTab('login')}>Login</label>
-          <label className={`tab_label ${activeTab === 'register' ? 'active' : ''}`} onClick={() => setActiveTab('register')}>Register</label>
+          <label
+            className={`tab_label ${activeTab === 'login' ? 'active' : ''}`}
+            onClick={() => setActiveTab('login')}
+          >
+            Login
+          </label>
+          <label
+            className={`tab_label ${activeTab === 'register' ? 'active' : ''}`}
+            onClick={() => setActiveTab('register')}
+          >
+            Register
+          </label>
           <div className={`indicator ${activeTab}`}></div>
         </div>
         <div className="tab-content">
-          {activeTab === 'login' && <Login onGoogleSuccess={handleGoogleSuccess} onGoogleFailure={handleGoogleFailure} error={error} />}
+          {activeTab === 'login' && (
+            <Login
+              onGoogleSuccess={handleGoogleSuccess}
+              onGoogleFailure={handleGoogleFailure}
+              error={error}
+            />
+          )}
           {activeTab === 'register' && <Register />}
         </div>
         <div className="google-login-container">

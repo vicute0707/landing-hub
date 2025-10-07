@@ -1,39 +1,41 @@
 // src/context/UserContext.js
 import React, { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode'; // ✅ named export mới
+import {jwtDecode }from 'jwt-decode'; // ✅ sửa import đúng
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // check token loading
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decodedToken = jwtDecode(token);
-                setUser({
-                    userId: decodedToken.sub || decodedToken.userId,
-                    role: decodedToken.role || 'user',
-                    name: decodedToken.name || decodedToken.given_name || decodedToken.email?.split('@')[0],
-                    subscription: decodedToken.subscription || null,
-                });
-            } catch (err) {
-                console.error('Invalid token:', err);
-                localStorage.removeItem('token');
-            }
-        }
-    }, []);
-
-    const logout = () => {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setUser({
+          userId: decoded.sub || decoded.userId || null,
+          role: decoded.role || 'user',
+          name: decoded.name || decoded.given_name || decoded.email?.split('@')[0] || 'Unknown',
+          subscription: decoded.subscription || null,
+        });
+      } catch (err) {
+        console.error('Invalid token:', err);
         localStorage.removeItem('token');
-        localStorage.removeItem('userInfo');
         setUser(null);
-    };
+      }
+    }
+    setLoading(false);
+  }, []);
 
-    return (
-        <UserContext.Provider value={{ user, setUser, logout }}>
-            {children}
-        </UserContext.Provider>
-    );
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  return (
+    <UserContext.Provider value={{ user, setUser, logout, loading }}>
+      {children}
+    </UserContext.Provider>
+  );
 };

@@ -1,0 +1,90 @@
+:root {
+  --primary-color: #4f46e5;
+  --card-bg: #ffffff;
+  --card-hover-bg: #f9f9ff;
+  --text-color: #1f2937;
+  --muted-color: #6b7280;
+  --border-radius: 12px;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s ease;
+}
+
+.mylibrary {
+  padding: 48px 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.mylibrary h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.landing-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+}
+
+.landing-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: center;
+  transition: var(--transition);
+  border: 1px solid #e5e7eb;
+}
+
+.landing-card:hover {
+  background-color: var(--card-hover-bg);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.thumbnail {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+}
+
+.landing-card h3 {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--text-color);
+}
+
+.landing-card a {
+  display: inline-block;
+  padding: 10px 18px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  transition: var(--transition);
+}
+
+.landing-card a:hover {
+  background-color: #4338ca;
+}
+
+.no-landing {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--muted-color);
+}
+
+.no-landing h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}

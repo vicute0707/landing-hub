@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Filter, Save, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Background from "../components/Background";
@@ -7,20 +7,21 @@ import api from "../services/api";
 import "../styles/Marketplace.css";
 import { UserContext } from "../context/UserContext";
 
-const templates = [
-  { id: 1, name: "Landing môi giới cá nhân", type: "Môi giới cá nhân", style: "Hiện đại", thumbnail: "/images/template1.png", previewUrl: "https://example.com/landing1" },
-  { id: 2, name: "Landing công ty môi giới", type: "Công ty môi giới", style: "Tối giản", thumbnail: "/images/template2.png", previewUrl: "https://example.com/landing2" },
-  { id: 3, name: "Landing dự án cao cấp", type: "Dự án BĐS", style: "Luxury", thumbnail: "/images/template3.png", previewUrl: "https://example.com/landing3" },
-  { id: 4, name: "Landing căn hộ thông minh", type: "Căn hộ", style: "Hiện đại", thumbnail: "/images/template4.png", previewUrl: "https://example.com/landing4" },
-  { id: 5, name: "Landing giới thiệu dự án xanh", type: "Giới thiệu dự án", style: "Thiên nhiên", thumbnail: "/images/template5.png", previewUrl: "https://example.com/landing5" },
-];
-
 const Marketplace = () => {
+  const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [filters, setFilters] = useState({ type: [], style: [] });
   const [toast, setToast] = useState(null);
+  const [iframeError, setIframeError] = useState(false);
   const navigate = useNavigate();
-  const { user } = useContext(UserContext); // ✅ dùng UserContext
+  const { user } = useContext(UserContext);
+
+  // === Fetch templates thật từ server ===
+  useEffect(() => {
+    api.get("/templates")
+      .then(res => setTemplates(res.data))
+      .catch(err => console.error("❌ Lỗi fetch template:", err));
+  }, []);
 
   const toggleFilter = (category, value) => {
     setFilters(prev => {
@@ -37,35 +38,36 @@ const Marketplace = () => {
     return matchType && matchStyle;
   });
 
- const handleSaveToLibrary = async (template) => {
-  if (!user?.userId) {
-    setToast("⚠️ Bạn cần đăng nhập để lưu vào kho!");
-    setTimeout(() => {
-      setToast(null);
-      navigate("/auth");
-    }, 2000);
-    return;
-  }
+  // === Lưu template vào thư viện người dùng ===
+  const handleSaveToLibrary = async (template) => {
+    if (!user?.userId) {
+      setToast("⚠️ Bạn cần đăng nhập để lưu vào kho!");
+      setTimeout(() => {
+        setToast(null);
+        navigate("/auth");
+      }, 2000);
+      return;
+    }
 
-  try {
-    setToast("⏳ Đang lưu vào kho...");
-    const res = await api.post("/landing/clone", {
-      userId: user.userId,
-      templateId: template.id,
-      name: template.name,
-    });
+    try {
+      setToast("⏳ Đang lưu vào kho...");
+      await api.post("/landing/clone", {
+        userId: user.userId,
+        templateId: template._id,
+        name: template.name,
+      });
 
-    setToast("✅ Đã lưu vào kho cá nhân!");
-    setTimeout(() => {
-      setToast(null);
-      navigate("/mylibrary");
-    }, 2000);
-  } catch (err) {
-    console.error(err);
-    setToast("❌ Lưu thất bại, vui lòng thử lại sau!");
-    setTimeout(() => setToast(null), 2500);
-  }
-};
+      setToast("✅ Đã lưu vào kho cá nhân!");
+      setTimeout(() => {
+        setToast(null);
+        navigate("/mylibrary");
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setToast("❌ Lưu thất bại, vui lòng thử lại sau!");
+      setTimeout(() => setToast(null), 2500);
+    }
+  };
 
   return (
     <Background showShapes={false} fullWidth={true}>
@@ -105,17 +107,27 @@ const Marketplace = () => {
           </div>
         </section>
 
+        {/* === Templates Grid === */}
         <section className="templates-section">
           <div className="templates-grid">
             {filteredTemplates.map(template => (
-              <div key={template.id} className="template-card fade-in">
-                <div className="template-thumb"><img src={template.thumbnail} alt={template.name} /></div>
+              <div key={template._id} className="template-card fade-in">
+                <div className="template-thumb">
+                  <img src={`${process.env.REACT_APP_API_URL}${template.thumbnail}`} alt={template.name} />
+                </div>
                 <div className="template-info">
                   <h3>{template.name}</h3>
                   <p>{template.type} • {template.style}</p>
                   <div className="card-actions">
-                    <button className="btn-outline" onClick={() => setSelectedTemplate(template)}><Eye size={16} /> Xem trước</button>
-                    <button className="btn-primary" onClick={() => handleSaveToLibrary(template)}><Save size={16} /> Lưu vào kho</button>
+                    <button className="btn-outline" onClick={() => {
+                      setIframeError(false);
+                      setSelectedTemplate(template);
+                    }}>
+                      <Eye size={16} /> Xem trước
+                    </button>
+                    <button className="btn-primary" onClick={() => handleSaveToLibrary(template)}>
+                      <Save size={16} /> Lưu vào kho
+                    </button>
                   </div>
                 </div>
               </div>
@@ -123,7 +135,33 @@ const Marketplace = () => {
           </div>
         </section>
 
-        {selectedTemplate && <ProjectModal template={selectedTemplate} onClose={() => setSelectedTemplate(null)} />}
+        {/* === Preview Modal === */}
+        {selectedTemplate && (
+          <ProjectModal template={selectedTemplate} onClose={() => setSelectedTemplate(null)}>
+            {iframeError ? (
+              <div style={{
+                padding: "40px",
+                textAlign: "center",
+                color: "#888",
+                fontSize: "16px"
+              }}>
+                ❌ Không thể tải preview cho mẫu này.
+                <br />
+                <small>Vui lòng kiểm tra lại đường dẫn hoặc backend server.</small>
+              </div>
+            ) : (
+              <iframe
+                src={`${process.env.REACT_APP_API_URL}${selectedTemplate.filePath}`}
+                title={selectedTemplate.name}
+                width="100%"
+                height="600px"
+                style={{ border: "none" }}
+                onError={() => setIframeError(true)}
+              />
+            )}
+          </ProjectModal>
+        )}
+
         {toast && <div className="toast-message">{toast}</div>}
       </div>
     </Background>
