@@ -8,6 +8,8 @@ const LandingSchema = new mongoose.Schema({
   type: { type: String },
   style: { type: String },
   createdAt: { type: Date, default: Date.now },
+  landingId: { type: mongoose.Schema.Types.ObjectId, ref: 'Landing' },
+
 });
 
 module.exports = mongoose.model("Landing", LandingSchema);

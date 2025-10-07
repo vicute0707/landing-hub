@@ -153,6 +153,8 @@ app.get("/", (req, res) => {
     <a href="/api/templates">Xem templates</a>
   `);
 });
+const reportRoutes = require('./routes/reports');
+app.use('/api/reports', reportRoutes);
 
 // ====== Start Server ======
 const PORT = process.env.PORT || 5000;

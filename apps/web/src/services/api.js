@@ -5,19 +5,17 @@ const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 // === Axios instance chung cho tất cả API ===
 const commonAPI = axios.create({
   baseURL: `${API_BASE}/api`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 // === Interceptor gửi token từ localStorage ===
 commonAPI.interceptors.request.use(
-  (config) => {
+  config => {
     const token = localStorage.getItem('token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // === Tin tức ===
@@ -37,8 +35,8 @@ export const fetchArticle = async (id) => {
     const res = await commonAPI.get(`/news/${id}`);
     return res.data.article;
   } catch (error) {
-    console.error('Lỗi khi tải bài viết:', error);
     if (error.response?.status === 404) throw new Error('Bài viết không tồn tại');
+    console.error('Lỗi khi tải bài viết:', error);
     throw error;
   }
 };
@@ -57,14 +55,15 @@ export const cloneLanding = async ({ userId, templateId, name }) => {
 export const getMyLandingPages = async (userId) => {
   try {
     const res = await commonAPI.get(`/landing/my/${userId}`);
-    return res.data;
+    // Backend trả { success, data }
+    return res.data?.data || [];
   } catch (error) {
     console.error('Lỗi lấy kho landing:', error);
     return [];
   }
 };
 
-// === Auth (Register / Login / Logout) ===
+// === Auth ===
 export const registerUser = async ({ name, email, password }) => {
   try {
     const res = await commonAPI.post('/auth/register', { name, email, password });
@@ -83,15 +82,26 @@ export const loginUser = async ({ email, password }) => {
   }
 };
 
-// Logout: chỉ xóa token localStorage
 export const logoutUser = () => {
   localStorage.removeItem('token');
 };
 
-// === Leads API (giữ nguyên nếu cần) ===
-export const leadsAPI = axios.create({
-  baseURL: `${API_BASE}/api`,
-});
+// === Leads API ===
+// Sử dụng commonAPI để có token auth
+export const leadsAPI = commonAPI;
 
+// === Reports API ===
+// Backend phải có route GET /api/reports/:userId
+export const fetchReport = async (userId) => {
+  if (!userId) return { totalLeads: 0, leadStatus: [], lpStats: [] };
+  try {
+    const res = await commonAPI.get(`/reports/${userId}`);
+    return res.data;
+  } catch (error) {
+    console.error('Lỗi tải báo cáo:', error);
+    return { totalLeads: 0, leadStatus: [], lpStats: [] };
+  }
+};
 
+// === Export default instance chung ===
 export default commonAPI;
