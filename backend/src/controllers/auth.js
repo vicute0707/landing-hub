@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.json({ token });
+        res.json({ token, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {
         console.error('Register error:', err);
         res.status(500).json({ msg: 'Server error' });
@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.json({ token });
+        res.json({ token, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ msg: 'Server error' });
@@ -52,7 +52,6 @@ exports.login = async (req, res) => {
 
 exports.googleCallback = async (req, res) => {
     const { email, name } = req.body;
-    console.log('Received email and name:', { email, name });
     try {
         if (!email || !name) return res.status(400).json({ msg: 'Missing user info' });
 
@@ -61,7 +60,7 @@ exports.googleCallback = async (req, res) => {
             user = new User({
                 email,
                 name,
-                password: null, // Không hash password cho Google login
+                password: null,
                 role: 'user',
                 subscription: 'free',
             });
@@ -76,9 +75,9 @@ exports.googleCallback = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
-        res.json({ token: jwtToken });
+        res.json({ token: jwtToken, user: { _id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (err) {
-        console.error('Google callback error details:', err);
+        console.error('Google callback error:', err);
         res.status(500).json({ msg: 'Google authentication failed' });
     }
 };

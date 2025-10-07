@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';  // chỉ import 1 lần
+import api from '../services/api';
 
 const UserDashboard = () => {
   const [landings, setLandings] = useState([]);
@@ -12,12 +12,17 @@ const UserDashboard = () => {
       .catch(err => console.error(err));
   }, []);
 
+  const handleBackToBrowser = () => {
+    // ✅ Không xóa userId, chỉ điều hướng
+    navigate('/');
+  };
+
   return (
     <div className="p-6 w-full">
       <div className="mb-6 flex justify-end">
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          onClick={() => navigate('/browser')}
+          onClick={handleBackToBrowser}
         >
           Back to Browser
         </button>

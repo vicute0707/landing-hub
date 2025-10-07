@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import api from '@landinghub/api';
 import { useNavigate } from 'react-router-dom';
-import '../styles/register.css'
+import { UserContext } from '../context/UserContext';
+import '../styles/register.css';
+
 const Register = () => {
+    const { setUser } = useContext(UserContext);
     const [form, setForm] = useState({ name: '', email: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -17,18 +20,25 @@ const Register = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await api.post('/api/auth/register', form);
+            // Chỉ gọi /auth/register vì baseURL trong api.js đã là /api
+            const res = await api.post('/auth/register', form);
+
+            // Lưu token
             localStorage.setItem('token', res.data.token);
+
+            // Set user vào context để app biết
+            if (res.data.user) setUser(res.data.user);
+
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.msg || 'Register failed');
+            setError(err.response?.data?.msg || 'Đăng ký thất bại');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="register-container" >
+        <div className="register-container">
             <form className="form" onSubmit={handleRegister}>
                 <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Đăng Ký</h2>
 

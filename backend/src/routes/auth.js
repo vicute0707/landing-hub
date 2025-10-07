@@ -1,22 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const { check } = require('express-validator');
+const { body } = require('express-validator');
 const authController = require('../controllers/auth');
-const User = require('../models/User');
-const {OAuth2Client} = require("google-auth-library");
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-router.post('/register', [
-    check('email', 'Invalid email').isEmail(),
-    check('password', 'Password must be at least 6 chars').isLength({ min: 6 }),
-    check('name', 'Name is required').notEmpty()
-], authController.register);
+// Register
+router.post(
+  '/register',
+  [
+    body('email').isEmail().withMessage('Email không hợp lệ'),
+    body('password').isLength({ min: 6 }).withMessage('Mật khẩu ít nhất 6 ký tự'),
+    body('name').notEmpty().withMessage('Tên không được bỏ trống'),
+  ],
+  authController.register
+);
 
-router.post('/login', [
-    check('email', 'Invalid email').isEmail(),
-    check('password', 'Password is required').notEmpty()
-], authController.login);
+// Login
+router.post(
+  '/login',
+  [
+    body('email').isEmail().withMessage('Email không hợp lệ'),
+    body('password').notEmpty().withMessage('Mật khẩu không được bỏ trống'),
+  ],
+  authController.login
+);
 
-router.post('/google/callback', authController.googleCallback);
+// Google callback
+router.post('/google-callback', authController.googleCallback);
 
 module.exports = router;
