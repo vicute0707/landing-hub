@@ -636,3 +636,67 @@ body {
   padding-top: 0;
   border-top: none;
 }
+/* ===========================
+   Filter Container
+=========================== */
+.filter-container {
+  display: flex;
+  flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.filter-input,
+.filter-select,
+.filter-date {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-input:focus,
+.filter-select:focus,
+.filter-date:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.filter-input {
+  flex-grow: 2; /* Cho ô tìm kiếm rộng hơn */
+  min-width: 200px;
+}
+
+.filter-select {
+  flex-grow: 1;
+  min-width: 150px;
+}
+
+.filter-date {
+  flex-grow: 1;
+  min-width: 130px;
+}
+
+.filter-reset-btn {
+  padding: 8px 16px;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  background-color: #fee2e2;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-reset-btn:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}

@@ -5,11 +5,50 @@ const router = express.Router();
 const Lead = require('../models/Lead');
 
 // =====================
-// GET /api/leads - Lấy tất cả leads
+// GET /api/leads - Lấy tất cả leads VỚI CHỨC NĂNG LỌC
 // =====================
 router.get('/', async (req, res) => {
   try {
-    const leads = await Lead.find().sort({ createdAt: -1 }); 
+    const { searchTerm, source, status, startDate, endDate } = req.query;
+    let filterQuery = {};
+
+    // 1. Lọc theo từ khóa (name, email, phone, company)
+    if (searchTerm) {
+      const regex = new RegExp(searchTerm, 'i'); // 'i' để không phân biệt hoa thường
+      filterQuery.$or = [
+        { name: regex },
+        { email: regex },
+        { phone: regex },
+        { company: regex },
+      ];
+    }
+
+    // 2. Lọc theo Nguồn
+    if (source) {
+      filterQuery.source = source;
+    }
+
+    // 3. Lọc theo Trạng thái
+    if (status) {
+      filterQuery.status = status;
+    }
+
+    // 4. Lọc theo Khoảng thời gian
+    if (startDate || endDate) {
+      filterQuery.createdAt = {};
+      if (startDate) {
+        // Bắt đầu từ 00:00:00 của ngày bắt đầu
+        filterQuery.createdAt.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        // Kết thúc vào 23:59:59 của ngày kết thúc
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+        filterQuery.createdAt.$lte = endOfDay;
+      }
+    }
+
+    const leads = await Lead.find(filterQuery).sort({ createdAt: -1 });
     res.json(leads);
   } catch (error) {
     console.error('❌ Get leads error:', error);
