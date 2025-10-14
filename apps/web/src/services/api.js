@@ -102,6 +102,38 @@ export const fetchReport = async (userId) => {
     return { totalLeads: 0, leadStatus: [], lpStats: [] };
   }
 };
+export const fetchDashboardData = async () => {
+  return {
+    totalLeads: 120,
+    totalLandingPages: 15,
+    conversionRate: 0.35,
+    leadsStats: [
+      { date: '2025-10-01', count: 5 },
+      { date: '2025-10-02', count: 8 },
+      { date: '2025-10-03', count: 6 },
+      { date: '2025-10-04', count: 10 },
+      { date: '2025-10-05', count: 12 },
+    ],
+    leadsStatus: [
+      { status: 'New', count: 20 },
+      { status: 'Contacted', count: 15 },
+      { status: 'Converted', count: 10 },
+    ],
+    landingPageStats: [
+      { week: '2025-W40', count: 3 },
+      { week: '2025-W41', count: 5 },
+      { week: '2025-W42', count: 7 },
+    ],
+    recentLeads: [
+      { id: 1, name: 'Nguyen Van A', email: 'a@example.com', created_at: '2025-10-07T10:00:00Z' },
+      { id: 2, name: 'Tran Thi B', email: 'b@example.com', created_at: '2025-10-07T09:30:00Z' },
+    ],
+    recentLandingPages: [
+      { id: 1, title: 'Landing Page 1', created_at: '2025-10-06T08:00:00Z' },
+      { id: 2, title: 'Landing Page 2', created_at: '2025-10-05T14:00:00Z' },
+    ],
+  };
+};
 
 // === Export default instance chung ===
 export default commonAPI;

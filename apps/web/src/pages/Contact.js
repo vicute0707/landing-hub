@@ -15,7 +15,7 @@ const Contact = () => {
     newsletter: false,
   });
   const [submitted, setSubmitted] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setForm((prev) => ({
@@ -25,31 +25,25 @@ const Contact = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.email || !form.subject || !form.notes) {
-      alert("Vui lòng điền đầy đủ thông tin bắt buộc!");
-      return;
-    }
-    try {
-      await api.post("/api/leads", { ...form, status: "new" });
-      setSubmitted(true);
-      setForm({
-        name: "",
-        email: "",
-        phone: "",
-        company: "",
-        subject: "",
-        notes: "",
-        newsletter: false,
-      });
-      setTimeout(() => setSubmitted(false), 4000);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+  e.preventDefault();
+  if (!form.name || !form.email ) {
+    alert("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    return;
+  }
+  try {
+    // Chuẩn hóa payload: Thêm 'source', bỏ 'status'
+    const leadDataToSend = { ...form, source: 'Contact Page' };
+    delete leadDataToSend.status; // Xóa key không cần thiết
+
+    await api.post("/api/leads", leadDataToSend);
+    setSubmitted(true);
     } catch (err) {
       console.error(err);
       alert("Gửi thông tin thất bại. Vui lòng thử lại.");
+    } finally {
+      setLoading(false); // Dừng loading dù thành công hay thất bại
     }
   };
-
   return (
     <Background showShapes={false} fullWidth={true}>
       <div className="contact-page">
@@ -115,14 +109,14 @@ const Contact = () => {
               <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Email" required />
               <input type="text" name="phone" value={form.phone} onChange={handleChange} placeholder="Số điện thoại" />
               <input type="text" name="company" value={form.company} onChange={handleChange} placeholder="Tên công ty" />
-              <select name="subject" value={form.subject} onChange={handleChange} required>
+              <select name="subject" value={form.subject} onChange={handleChange} >
                 <option value="">Chọn chủ đề...</option>
                 <option value="sales">Tư vấn bán hàng</option>
                 <option value="support">Hỗ trợ kỹ thuật</option>
                 <option value="partnership">Hợp tác đối tác</option>
                 <option value="other">Khác</option>
               </select>
-              <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Nội dung tin nhắn" required />
+              <textarea name="notes" value={form.notes} onChange={handleChange} placeholder="Nội dung tin nhắn" />
               <div className="form-check">
                 <input type="checkbox" name="newsletter" checked={form.newsletter} onChange={handleChange} id="newsletter" />
                 <label htmlFor="newsletter">Tôi muốn nhận thông tin về sản phẩm và khuyến mãi</label>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import "../styles/accountMenu.css";
 
 const MenuItems = () => {
   const navigate = useNavigate();

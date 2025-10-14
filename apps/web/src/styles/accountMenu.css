@@ -1,0 +1,88 @@
+/* accountMenu.css */
+
+/* Container menu chính */
+.menu-items {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+  z-index: 1000;
+}
+
+/* Link menu */
+.menu-link {
+  position: relative;
+  padding: 0.5rem 1rem;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-link:hover {
+  background-color: #f5f5f5;
+  color: #111;
+  transform: translateY(-2px);
+}
+
+.menu-link.active {
+  color: #1d4ed8; /* màu xanh nổi bật */
+  font-weight: 600;
+}
+
+/* Menu tài khoản */
+.menu-items .relative button.menu-link {
+  cursor: pointer;
+  background-color: #fff;
+  border: none;
+  outline: none;
+}
+
+/* Dropdown tài khoản */
+.menu-items .relative > div.absolute {
+  top: 100%;
+  right: 0;
+  width: 12rem;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 50;
+}
+
+/* Nội dung dropdown */
+.menu-items .relative div.absolute div,
+.menu-items .relative div.absolute button {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.2s ease-in-out;
+}
+
+.menu-items .relative div.absolute button:hover,
+.menu-items .relative div.absolute div:hover {
+  background-color: #f3f4f6;
+}
+
+/* User name */
+.menu-items .relative div.absolute div {
+  font-weight: 500;
+  cursor: default;
+}
+
+/* Animation fadeIn dropdown */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

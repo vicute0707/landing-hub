@@ -1,102 +1,118 @@
+// routes/leads.js (PHIÊN BẢN HOÀN CHỈNH)
+
 const express = require('express');
 const router = express.Router();
 const Lead = require('../models/Lead');
 
 // =====================
-// 📌 GET /api/leads - Lấy danh sách tất cả leads
+// GET /api/leads - Lấy tất cả leads
 // =====================
 router.get('/', async (req, res) => {
   try {
-    console.log('📥 [GET] /api/leads');
-    const leads = await Lead.find().sort({ createdAt: -1 });
-    res.json({
-      success: true,
-      count: leads.length,
-      data: leads,
-    });
+    const leads = await Lead.find().sort({ createdAt: -1 }); 
+    res.json(leads);
   } catch (error) {
     console.error('❌ Get leads error:', error);
-    res.status(500).json({ success: false, message: 'Lấy leads thất bại', error: error.message });
+    res.status(500).json({ message: 'Lỗi server khi lấy leads' });
   }
 });
 
 // =====================
-// 📌 POST /api/leads - Tạo mới lead
+// POST /api/leads - Tạo lead mới với logic chấm điểm
 // =====================
 router.post('/', async (req, res) => {
   try {
-    const { name, email, phone } = req.body;
+    const { name, email, phone, notes, source, company, subject, newsletter } = req.body;
 
-    // Validate cơ bản
-    if (!name || !email || !phone) {
-      return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc (name, email, phone)' });
+    if (!name || !email) {
+      return res.status(400).json({ message: 'Tên và Email là bắt buộc' });
     }
 
-    const lead = new Lead(req.body);
-    await lead.save();
+    // --- Logic chấm điểm chi tiết ---
+    let score = 1;
+    if (source === 'Contact Page') {
+      if (company && company.trim() !== '') score++;
+      if (subject && subject.trim() !== '') score++;
+      if (notes && notes.trim().length > 0) score++;
+      if (newsletter === true) score++;
+    } else {
+      if (notes && notes.trim().length > 0) score++;
+    }
+    const finalScore = Math.min(score, 5);
+    // --- Kết thúc logic chấm điểm ---
+    
+    const initialActivity = notes ? [{ type: 'NOTE', content: notes.trim() }] : [];
 
-    res.status(201).json({
-      success: true,
-      message: 'Tạo lead thành công',
-      data: lead,
+    const newLead = new Lead({
+      name, email, phone, company, subject, newsletter,
+      source: source || 'Unknown',
+      score: finalScore,
+      activities: initialActivity,
+      status: 'new',
     });
+
+    await newLead.save();
+    console.log(`✅ Lead từ '${source}' được tạo với ${finalScore} điểm.`);
+    res.status(201).json(newLead);
+
   } catch (error) {
-    console.error('❌ Create lead error:', error);
-    res.status(400).json({ success: false, message: 'Tạo lead thất bại', error: error.message });
+    console.error('❌ Lỗi khi tạo lead:', error);
+    res.status(400).json({ message: 'Tạo lead thất bại', error: error.message });
   }
 });
 
 // =====================
-// PUT /api/leads/:id - Cập nhật lead (status, hoặc thông tin)
+// PUT /api/leads/:id - Cập nhật thông tin Lead
+// =====================
 router.put('/:id', async (req, res) => {
-    console.log("📩 PUT /api/leads/:id nhận được:", req.params.id, req.body); // 🧠 Debug
-
   try {
-    const { name, email, phone, status, notes } = req.body;
-
-    const lead = await Lead.findByIdAndUpdate(
-      req.params.id,
-      { name, email, phone, status, notes },
-      { new: true, runValidators: true }
-    );
-
-    if (!lead) {
-      return res.status(404).json({ success: false, message: 'Lead không tồn tại' });
-    }
-
-    res.json({
-      success: true,
-      message: 'Cập nhật lead thành công',
-      data: lead,
-    });
+    const updatedLead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    if (!updatedLead) return res.status(404).json({ message: 'Không tìm thấy lead' });
+    console.log('🔄 Lead updated:', updatedLead._id);
+    res.json(updatedLead);
   } catch (error) {
     console.error('❌ Update lead error:', error);
-    res.status(500).json({ success: false, message: 'Cập nhật thất bại', error: error.message });
+    res.status(500).json({ message: 'Cập nhật lead thất bại', error: error.message });
   }
 });
 
+// =====================
+// POST /api/leads/:id/activities - Thêm một hoạt động mới cho Lead
+// =====================
+router.post('/:id/activities', async (req, res) => {
+  try {
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) return res.status(404).json({ message: 'Không tìm thấy lead' });
 
+    const newActivity = {
+      type: req.body.type || 'NOTE',
+      content: req.body.content,
+    };
+    
+    lead.activities.push(newActivity);
+    await lead.save();
+
+    console.log('📝 Activity added to lead:', lead._id);
+    res.status(201).json(lead.activities[lead.activities.length - 1]);
+  } catch (error) {
+    console.error('❌ Add activity error:', error);
+    res.status(500).json({ message: 'Thêm hoạt động thất bại', error: error.message });
+  }
+});
 
 // =====================
-// 📌 DELETE /api/leads/:id - Xóa lead
+// DELETE /api/leads/:id - Xóa một lead
 // =====================
 router.delete('/:id', async (req, res) => {
-  try {
-    console.log(`🗑 [DELETE] /api/leads/${req.params.id}`);
-    const lead = await Lead.findByIdAndDelete(req.params.id);
-
-    if (!lead) {
-      return res.status(404).json({ success: false, message: 'Lead không tồn tại' });
+    try {
+        const deletedLead = await Lead.findByIdAndDelete(req.params.id);
+        if (!deletedLead) return res.status(404).json({ message: 'Không tìm thấy lead' });
+        console.log('🗑️ Lead deleted:', req.params.id);
+        res.json({ message: 'Xóa lead thành công' });
+    } catch (error) {
+        console.error('❌ Delete lead error:', error);
+        res.status(500).json({ message: 'Xóa lead thất bại', error: error.message });
     }
-
-    res.json({
-      success: true,
-      message: 'Xóa lead thành công',
-    });
-  } catch (error) {
-    console.error('❌ Delete lead error:', error);
-    res.status(500).json({ success: false, message: 'Xóa thất bại', error: error.message });
-  }
 });
 
 module.exports = router;

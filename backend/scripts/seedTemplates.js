@@ -18,14 +18,14 @@ const templates = [
     name: "Landing Căn hộ hiện đại",
     type: "Căn hộ",
     style: "Hiện đại",
-    thumbnail: "/landing-pages/landing1-thumb.jpg",
+    thumbnail: "/backend/public/assets/feature1.png",
     filePath: "/landing-pages/landing1.html",
   },
   {
     name: "Landing Dự án Luxury",
     type: "Dự án BĐS",
     style: "Luxury",
-    thumbnail: "/landing-pages/landing2-thumb.jpg",
+    thumbnail: "../public/assets/feature1.png",
     filePath: "/landing-pages/landing2.html",
   },
 ];

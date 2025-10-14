@@ -33,11 +33,15 @@ const Support = () => {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.email) return alert("Tên và Email là bắt buộc!");
-    try {
-      await api.post("/api/leads", { ...form, status: "new" });
-      setSubmitted(true);
+  e.preventDefault();
+  if (!form.name || !form.email) return alert("Tên và Email là bắt buộc!");
+  try {
+    // Chuẩn hóa payload: Thêm 'source', bỏ 'status'
+    const leadDataToSend = { ...form, source: 'Support Form' };
+    delete leadDataToSend.status; // Xóa key không cần thiết
+
+    await api.post("/api/leads", leadDataToSend);
+    setSubmitted(true);
       setForm({ name: "", email: "", phone: "", notes: "" });
       setTimeout(() => setSubmitted(false), 4000);
     } catch {

@@ -1,60 +1,123 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import '../styles/Dashboard.css';
+import { fetchDashboardData } from '../services/api';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
+} from 'recharts';
+import { FaRocket, FaUserPlus, FaFileAlt, FaMoon, FaSun } from 'react-icons/fa';
 
-const UserDashboard = () => {
-  const [landings, setLandings] = useState([]);
-  const navigate = useNavigate();
+const COLORS = ['#4ade80', '#facc15', '#60a5fa'];
+
+const StatCard = ({ title, value, icon }) => (
+  <div className="stat-card">
+    <div className="stat-icon">{icon}</div>
+    <p className="stat-title">{title}</p>
+    <p className="stat-value">{value}</p>
+  </div>
+);
+
+const QuickActions = ({ darkMode, toggleDarkMode }) => (
+  <div className="quick-actions">
+    <button className="action-btn bg-gradient-blue"><FaRocket /> Tạo Landing Page</button>
+    <button className="action-btn bg-gradient-green"><FaUserPlus /> Tìm kiếm Lead</button>
+    <button className="action-btn bg-gradient-purple"><FaFileAlt /> Xuất báo cáo</button>
+    <button onClick={toggleDarkMode} className="action-btn bg-gray-600">
+      {darkMode ? <FaSun /> : <FaMoon />} {darkMode ? 'Light Mode' : 'Dark Mode'}
+    </button>
+  </div>
+);
+
+const Dashboard = () => {
+  const [data, setData] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
 
   useEffect(() => {
-    api.get('/user/landings')
-      .then(res => setLandings(res.data))
-      .catch(err => console.error(err));
+    fetchDashboardData().then(setData);
   }, []);
 
-  const handleBackToBrowser = () => {
-    // ✅ Không xóa userId, chỉ điều hướng
-    navigate('/');
-  };
+  if (!data) return <p className="loading">Loading...</p>;
 
   return (
-    <div className="p-6 w-full">
-      <div className="mb-6 flex justify-end">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          onClick={handleBackToBrowser}
-        >
-          Back to Browser
-        </button>
+    <div className={`dashboard-container ${darkMode ? 'dark' : ''}`}>
+      <QuickActions darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+
+      <div className="stat-grid">
+        <StatCard title="Tổng Leads" value={data.totalLeads} icon={<FaUserPlus />} />
+        <StatCard title="Tổng Landing Page" value={data.totalLandingPages} icon={<FaRocket />} />
+        <StatCard title="Tỷ lệ chuyển đổi" value={`${(data.conversionRate*100).toFixed(1)}%`} icon={<FaFileAlt />} />
       </div>
 
-      <h2 className="text-2xl font-bold mb-4">Your Landing Pages</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {landings.map(l => (
-          <div
-            key={l.id}
-            className="bg-white rounded-lg shadow hover:shadow-lg transform hover:scale-105 transition overflow-hidden"
-          >
-            <img
-              src={l.thumbnail || 'https://via.placeholder.com/300x160'}
-              alt={l.title}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-lg font-bold mb-2">{l.title}</h3>
-              <p className="text-gray-500 mb-4 line-clamp-2">{l.description}</p>
-              <button
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
-                onClick={() => navigate(`/editor/${l.id}`)}
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        ))}
+      <div className="charts-grid">
+        <div className="chart-card">
+          <h3>Leads theo thời gian</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={data.leadsStats}>
+              <CartesianGrid stroke="#f0f0f0" strokeDasharray="3 3" />
+              <XAxis dataKey="date" stroke={darkMode ? '#e5e7eb' : '#1f2937'} />
+              <YAxis stroke={darkMode ? '#e5e7eb' : '#1f2937'} />
+              <Tooltip />
+              <Line type="monotone" dataKey="count" stroke="#4ade80" strokeWidth={3} animationDuration={1500} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="chart-card">
+          <h3>Tình trạng Leads</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie data={data.leadsStatus} dataKey="count" nameKey="status" outerRadius={80} label animationDuration={1500}>
+                {data.leadsStatus.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="chart-card">
+        <h3>Tăng trưởng Landing Page</h3>
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={data.landingPageStats}>
+            <CartesianGrid stroke="#f0f0f0" strokeDasharray="3 3" />
+            <XAxis dataKey="week" stroke={darkMode ? '#e5e7eb' : '#1f2937'} />
+            <YAxis stroke={darkMode ? '#e5e7eb' : '#1f2937'} />
+            <Tooltip />
+            <Line type="monotone" dataKey="count" stroke="#60a5fa" strokeWidth={3} animationDuration={1500} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="recent-activity-grid">
+        <div className="recent-card">
+          <h3>Recent Leads</h3>
+          <ul>
+            {data.recentLeads.map(lead => (
+              <li key={lead.id}>
+                <span className="lead-name">{lead.name}</span>
+                <span className="lead-email">{lead.email}</span>
+                <span className="lead-time">{new Date(lead.created_at).toLocaleString()}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="recent-card">
+          <h3>Recent Landing Pages</h3>
+          <ul>
+            {data.recentLandingPages.map(lp => (
+              <li key={lp.id}>
+                <span className="lp-title">{lp.title}</span>
+                <span className="lp-time">{new Date(lp.created_at).toLocaleString()}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
 };
 
-export default UserDashboard;
+export default Dashboard;
