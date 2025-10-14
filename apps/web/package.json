@@ -2,11 +2,13 @@
   "name": "landinghub-web",
   "version": "0.1.0",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@landinghub/api": "file:..\\..\\packages\\api",
     "@landinghub/shared": "workspace:*",
     "@react-oauth/google": "^0.12.0",
     "axios": "^1.12.1",
     "crypto": "^1.0.1",
+    "dotenv": "^17.2.2",
     "framer-motion": "^12.23.22",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.544.0",

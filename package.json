@@ -22,10 +22,13 @@
     "pnpm": "^9.0.0"
   },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "@anthropic-ai/sdk": "^0.65.0",
+    "@google/generative-ai": "^0.24.1",
+    "@react-oauth/google": "^0.12.0",
     "axios": "^1.6.0",
-    "@react-oauth/google": "^0.12.0"
+    "openai": "^6.3.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "repository": {
     "type": "git",

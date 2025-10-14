@@ -113,12 +113,13 @@ const authRoutes = require("./routes/auth");
 const templateRoutes = require("./routes/template");
 const leadsRoutes = require("./routes/leads");
 const landingRoutes = require("./routes/landingRoutes");
+const chatRoutes = require('./routes/chat');
 
 app.use("/api/auth", authRoutes);
 app.use("/api/templates", templateRoutes);
 app.use("/api/leads", leadsRoutes);
 app.use("/api/landing", landingRoutes);
-
+app.use('/api/chat', chatRoutes);
 // ====== News APIs ======
 app.get("/api/news", (req, res) => {
   try {
