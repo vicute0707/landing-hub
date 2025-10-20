@@ -291,7 +291,62 @@ const generateEventRuntime = (events, popups) => {
                 LPB.popups.closeAll();
             }
         });
-        
+
+        // ========== RESPONSIVE POSITIONING HANDLER ==========
+        LPB.responsive = {
+            currentBreakpoint: 'desktop',
+
+            getBreakpoint: function() {
+                const width = window.innerWidth;
+                if (width <= 480) return 'mobile';
+                if (width <= 768) return 'tablet';
+                return 'desktop';
+            },
+
+            updateElementPositions: function() {
+                const breakpoint = this.getBreakpoint();
+                if (breakpoint === this.currentBreakpoint) return;
+
+                this.currentBreakpoint = breakpoint;
+                console.log('[LPB] Breakpoint changed to:', breakpoint);
+
+                // Update sections
+                const sections = document.querySelectorAll('.lpb-section[data-mobile-y]');
+                sections.forEach(section => {
+                    const y = section.getAttribute(\`data-\${breakpoint}-y\`) || section.getAttribute('data-desktop-y') || 0;
+                    if (breakpoint !== 'desktop') {
+                        section.style.setProperty('top', \`\${y}px\`, 'important');
+                    }
+                });
+
+                // Update child elements
+                const elements = document.querySelectorAll('.lpb-element[data-mobile-x]');
+                elements.forEach(element => {
+                    const x = element.getAttribute(\`data-\${breakpoint}-x\`) || element.getAttribute('data-desktop-x') || 0;
+                    const y = element.getAttribute(\`data-\${breakpoint}-y\`) || element.getAttribute('data-desktop-y') || 0;
+
+                    if (breakpoint === 'mobile' || breakpoint === 'tablet') {
+                        element.style.setProperty('left', \`\${x}px\`, 'important');
+                        element.style.setProperty('top', \`\${y}px\`, 'important');
+                    }
+                });
+            }
+        };
+
+        // Initialize responsive positions on load
+        document.addEventListener('DOMContentLoaded', function() {
+            LPB.responsive.updateElementPositions();
+        });
+
+        // Update on window resize (debounced)
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                LPB.responsive.updateElementPositions();
+            }, 150);
+        });
+
         console.log('[LPB] Runtime loaded');
     })();
     `;
@@ -426,12 +481,23 @@ const renderElementHTML = (element, isChild = false) => {
         })
         .join(';');
 
+    // Position data attributes for responsive positioning
+    const positionDataAttrs = isChild ? `
+        data-desktop-x="${position.desktop?.x || 0}"
+        data-desktop-y="${position.desktop?.y || 0}"
+        data-tablet-x="${position.tablet?.x || position.desktop?.x || 0}"
+        data-tablet-y="${position.tablet?.y || position.desktop?.y || 0}"
+        data-mobile-x="${position.mobile?.x || position.desktop?.x || 0}"
+        data-mobile-y="${position.mobile?.y || position.desktop?.y || 0}"
+    ` : '';
+
     // Base attributes
     const baseAttrs = `
         id="${id}"
         data-element-id="${id}"
         data-type="${type}"
         class="lpb-element lpb-${type}"
+        ${positionDataAttrs}
     `;
 
     // Position styles cho child elements
@@ -450,7 +516,7 @@ const renderElementHTML = (element, isChild = false) => {
 
         case 'button':
             return `
-                <button 
+                <button
                     ${baseAttrs}
                     style="${inlineStyles}; ${positionStyles}"
                 >
@@ -461,7 +527,7 @@ const renderElementHTML = (element, isChild = false) => {
         case 'heading':
             const HeadingTag = componentData.level || 'h2';
             return `
-                <${HeadingTag} 
+                <${HeadingTag}
                     ${baseAttrs}
                     style="${inlineStyles}; ${positionStyles}"
                 >
@@ -471,7 +537,7 @@ const renderElementHTML = (element, isChild = false) => {
 
         case 'paragraph':
             return `
-                <p 
+                <p
                     ${baseAttrs}
                     style="${inlineStyles}; ${positionStyles}"
                 >
@@ -481,7 +547,7 @@ const renderElementHTML = (element, isChild = false) => {
 
         case 'image':
             return `
-                <img 
+                <img
                     ${baseAttrs}
                     src="${componentData.src || componentData.imageUrl || 'https://via.placeholder.com/150'}"
                     alt="${componentData.alt || 'Image'}"
@@ -492,7 +558,7 @@ const renderElementHTML = (element, isChild = false) => {
         case 'icon':
             const isSvg = componentData.icon?.startsWith('<svg');
             return `
-                <div 
+                <div
                     ${baseAttrs}
                     style="${inlineStyles}; ${positionStyles}"
                     title="${componentData.title || ''}"
@@ -513,7 +579,7 @@ const renderElementHTML = (element, isChild = false) => {
 
         default:
             return `
-                <div 
+                <div
                     ${baseAttrs}
                     style="${inlineStyles}; ${positionStyles}"
                 >
@@ -603,10 +669,13 @@ const renderSectionHTML = (section) => {
     ).join('\n');
 
     return `
-        <section 
+        <section
             id="${id}"
             data-element-id="${id}"
             class="lpb-section ladi-section"
+            data-desktop-y="${position.desktop?.y || 0}"
+            data-tablet-y="${position.tablet?.y || position.desktop?.y || 0}"
+            data-mobile-y="${position.mobile?.y || position.desktop?.y || 0}"
             style="
                 position: absolute;
                 top: ${position.desktop?.y || 0}px;
@@ -626,7 +695,7 @@ const renderSectionHTML = (section) => {
                 background-size: cover;
                 background-position: center;
             "></div>
-            
+
             <!-- Overlay -->
             <div class="ladi-overlay" style="
                 position: absolute;
@@ -635,7 +704,7 @@ const renderSectionHTML = (section) => {
                 background-color: ${componentData.overlayColor || 'transparent'};
                 opacity: ${componentData.overlayOpacity || 0};
             "></div>
-            
+
             <!-- Container -->
             <div class="ladi-container" style="
                 position: relative;
@@ -658,14 +727,21 @@ const generateCSS = (pageData) => {
         * {
             box-sizing: border-box;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
-        
+
         .lpb-element {
             transition: all 0.3s ease;
+        }
+
+        /* Base responsive images */
+        .lpb-element img {
+            max-width: 100%;
+            height: auto;
         }
     `;
 
@@ -713,6 +789,58 @@ const generateCSS = (pageData) => {
             });
         }
     });
+
+    // Generate responsive positioning CSS for all elements with data attributes
+    css += `\n\n/* Responsive Tablet (≤768px) */`;
+    css += `\n@media (max-width: 768px) {`;
+
+    pageData.elements.forEach(element => {
+        if (element.type === 'section') {
+            css += `\n    #${element.id} { top: var(--tablet-y-${element.id}, ${element.position?.tablet?.y || element.position?.desktop?.y || 0}px); }`;
+
+            // Process children positioning
+            if (element.children) {
+                element.children.forEach(child => {
+                    const tabletX = child.position?.tablet?.x || child.position?.desktop?.x || 0;
+                    const tabletY = child.position?.tablet?.y || child.position?.desktop?.y || 0;
+                    css += `\n    #${child.id} { left: ${tabletX}px; top: ${tabletY}px; }`;
+                });
+            }
+        }
+    });
+
+    css += `\n}`;
+
+    // Generate responsive positioning CSS for mobile
+    css += `\n\n/* Responsive Mobile (≤480px) */`;
+    css += `\n@media (max-width: 480px) {`;
+
+    pageData.elements.forEach(element => {
+        if (element.type === 'section') {
+            css += `\n    #${element.id} { top: var(--mobile-y-${element.id}, ${element.position?.mobile?.y || element.position?.desktop?.y || 0}px); }`;
+
+            // Process children positioning
+            if (element.children) {
+                element.children.forEach(child => {
+                    const mobileX = child.position?.mobile?.x || child.position?.desktop?.x || 0;
+                    const mobileY = child.position?.mobile?.y || child.position?.desktop?.y || 0;
+                    css += `\n    #${child.id} { left: ${mobileX}px; top: ${mobileY}px; }`;
+                });
+            }
+        }
+    });
+
+    css += `\n}`;
+
+    // Generate responsive CSS for very small screens (≤360px)
+    css += `\n\n/* Responsive Very Small Screens (≤360px) */`;
+    css += `\n@media (max-width: 360px) {`;
+    css += `\n    /* Scale down font sizes for very small screens */`;
+    css += `\n    .lpb-heading, h1, h2, h3, h4, h5, h6 { font-size: 85% !important; }`;
+    css += `\n    .lpb-paragraph, p { font-size: 90% !important; line-height: 1.4 !important; }`;
+    css += `\n    .lpb-button { font-size: 85% !important; padding: 8px 16px !important; }`;
+    css += `\n    .ladi-container { padding: 12px !important; }`;
+    css += `\n}`;
 
     return css;
 };
@@ -833,15 +961,160 @@ export const renderStaticHTML = (pageData) => {
             100% { transform: rotate(360deg); }
         }
         
-        /* Responsive */
+        /* ========== RESPONSIVE STYLES ========== */
+
+        /* Tablet (≤1024px) */
+        @media (max-width: 1024px) {
+            .lpb-section {
+                width: 95% !important;
+                max-width: 768px !important;
+            }
+
+            .ladi-container {
+                padding: 16px !important;
+            }
+        }
+
+        /* Mobile (≤768px) */
         @media (max-width: 768px) {
             .lpb-section {
                 width: 100% !important;
+                max-width: 100% !important;
+                left: 0 !important;
+                transform: none !important;
             }
-            
+
+            .ladi-container {
+                padding: 16px !important;
+            }
+
             .lpb-popup-container {
                 width: 90% !important;
                 max-width: 90vw !important;
+                min-height: auto !important;
+            }
+
+            .lpb-popup-body {
+                padding: 16px !important;
+            }
+
+            /* Scale down typography */
+            .lpb-heading, h1 {
+                font-size: clamp(24px, 5vw, 32px) !important;
+            }
+
+            .lpb-heading, h2 {
+                font-size: clamp(20px, 4.5vw, 28px) !important;
+            }
+
+            .lpb-heading, h3 {
+                font-size: clamp(18px, 4vw, 24px) !important;
+            }
+
+            .lpb-paragraph, p {
+                font-size: clamp(14px, 3.5vw, 16px) !important;
+                line-height: 1.6 !important;
+            }
+
+            .lpb-button {
+                font-size: clamp(14px, 3.5vw, 16px) !important;
+                padding: 10px 20px !important;
+            }
+
+            /* Responsive images and galleries */
+            .lpb-gallery {
+                width: 100% !important;
+                height: auto !important;
+            }
+
+            .lpb-image, .lpb-element img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        }
+
+        /* Small Mobile (≤480px) */
+        @media (max-width: 480px) {
+            .ladi-container {
+                padding: 12px !important;
+            }
+
+            .lpb-popup-body {
+                padding: 12px !important;
+            }
+
+            .lpb-heading, h1 {
+                font-size: clamp(20px, 5vw, 28px) !important;
+            }
+
+            .lpb-heading, h2 {
+                font-size: clamp(18px, 4.5vw, 24px) !important;
+            }
+
+            .lpb-heading, h3 {
+                font-size: clamp(16px, 4vw, 20px) !important;
+            }
+
+            .lpb-paragraph, p {
+                font-size: clamp(13px, 3.5vw, 15px) !important;
+            }
+
+            .lpb-button {
+                padding: 8px 16px !important;
+                min-height: 40px !important;
+            }
+        }
+
+        /* Very Small Screens (≤360px) */
+        @media (max-width: 360px) {
+            body {
+                font-size: 14px !important;
+            }
+
+            .ladi-container {
+                padding: 10px !important;
+            }
+
+            .lpb-popup-container {
+                width: 95% !important;
+                border-radius: 8px !important;
+            }
+
+            .lpb-popup-body {
+                padding: 10px !important;
+            }
+
+            .lpb-popup-header {
+                padding: 12px 16px !important;
+            }
+
+            .lpb-heading, h1 {
+                font-size: clamp(18px, 5vw, 24px) !important;
+            }
+
+            .lpb-heading, h2 {
+                font-size: clamp(16px, 4.5vw, 20px) !important;
+            }
+
+            .lpb-heading, h3, h4 {
+                font-size: clamp(15px, 4vw, 18px) !important;
+            }
+
+            .lpb-paragraph, p {
+                font-size: clamp(12px, 3.5vw, 14px) !important;
+                line-height: 1.5 !important;
+            }
+
+            .lpb-button {
+                font-size: 13px !important;
+                padding: 8px 12px !important;
+                min-height: 36px !important;
+            }
+
+            /* Reduce icon sizes */
+            .lpb-icon {
+                width: 80% !important;
+                height: 80% !important;
             }
         }
     </style>
