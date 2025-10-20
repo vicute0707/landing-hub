@@ -10,12 +10,14 @@ import ButtonPropertiesPanel from './create-page/properties/ButtonPropertiesPane
 import IconPropertiesPanel from './create-page/properties/IconPropertiesPanel';
 import ImagePropertiesPanel from './create-page/properties/ImagePropertiesPanel';
 import Toolbar from './create-page/Toolbar';
+import ResponsiveToolbar from './create-page/ResponsiveToolbar';
 import SectionPopup from '../components/create-page/SectionPopup';
 import LayerManager from './create-page/LayerManager';
 import api from '@landinghub/api';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { parseHTMLToPageData, renderStaticHTML } from '../utils/pageUtils';
+import { syncElementBetweenModes } from '../utils/responsiveSync';
 import { ErrorBoundary } from './create-page/ErrorBoundary';
 import DogLoader from './Loader'; // Import the DogLoader component
 import '../styles/CreateLanding.css';
@@ -199,30 +201,34 @@ const CreateLanding = () => {
         toast.success(childId ? 'Đã cập nhật khóa child!' : 'Đã cập nhật khóa element!');
     }, [history, historyIndex]);
 
-    // View mode change
+    // View mode change with responsive sync
     const handleViewModeChange = useCallback((mode) => {
         setViewMode(mode);
         setPageData((prev) => {
-            const canvasWidth = mode === 'desktop' ? 1200 : 375;
-            const newElements = prev.elements.map((element) => ({
-                ...element,
-                size: { ...element.size, width: mode === 'mobile' ? 375 : element.size.width || 1200 },
-                position: {
-                    ...element.position,
-                    [mode]: { x: mode === 'mobile' && element.type === 'section' ? 0 : element.position[mode]?.x || 0, y: element.position[mode]?.y || 0 },
-                },
-            }));
+            const canvasWidth = mode === 'desktop' ? 1200 : mode === 'tablet' ? 768 : 375;
+
+            // Sync elements để đảm bảo responsive data được cập nhật
+            const syncedElements = prev.elements.map((element) => {
+                // Nếu element chưa có responsive data, sync ngay
+                if (!element.position?.mobile || !element.position?.tablet) {
+                    return syncElementBetweenModes(element, 'desktop');
+                }
+                return element;
+            });
+
             const newPageData = {
                 ...prev,
                 canvas: { ...prev.canvas, width: canvasWidth },
-                elements: newElements,
+                elements: syncedElements,
                 meta: { ...prev.meta, updated_at: new Date().toISOString() }
             };
             setHistory([...history.slice(0, historyIndex + 1), newPageData]);
             setHistoryIndex(historyIndex + 1);
             return newPageData;
         });
-        toast.info(`Đã chuyển sang chế độ ${mode === 'desktop' ? 'Desktop' : 'Mobile'}`);
+
+        const modeLabel = mode === 'desktop' ? 'Desktop' : mode === 'tablet' ? 'Tablet' : 'Mobile';
+        toast.info(`Đã chuyển sang chế độ ${modeLabel}`);
     }, [history, historyIndex]);
 
     // Add section
@@ -1066,6 +1072,18 @@ const CreateLanding = () => {
                             onDeleteElement={handleDeleteElement}
                             onShowAddSectionGuide={handleShowAddSectionPopup}
                             className="bg-white p-4 shadow-sm"
+                        />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                        <ResponsiveToolbar
+                            viewMode={viewMode}
+                            onViewModeChange={handleViewModeChange}
+                            pageData={pageData}
+                            onUpdatePageData={(newData) => {
+                                setPageData(newData);
+                                setHistory([...history.slice(0, historyIndex + 1), newData]);
+                                setHistoryIndex(historyIndex + 1);
+                            }}
                         />
                     </ErrorBoundary>
                     <ErrorBoundary>

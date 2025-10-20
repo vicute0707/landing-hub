@@ -10,6 +10,7 @@ import { Element } from './Element';
 import { ItemTypes, getCanvasPosition, snapToGrid, getElementBounds, renderComponentContent } from './helpers';
 import AddSectionButton from './AddSectionButton';
 import eventController from '../../utils/EventUtils';
+import { getResponsiveValues } from '../../utils/responsiveSync';
 
 const Canvas = React.memo(({
                                pageData,
@@ -361,16 +362,17 @@ const Canvas = React.memo(({
         ids.forEach((id) => {
             const element = pageData.elements.find((el) => el.id === id);
             if (element && element.type !== 'section' && element.type !== 'popup' && element.type !== 'modal') {
-                const newY = e.key === 'ArrowUp' ? Math.max(0, (element.position[viewMode]?.y || 0) - step) : (element.position[viewMode]?.y || 0) + step;
-                const newX = e.key === 'ArrowLeft' ? Math.max(0, (element.position[viewMode]?.x || 0) - step) : (element.position[viewMode]?.x || 0) + step;
+                const { position: currentPos } = getResponsiveValues(element, viewMode);
+                const newY = e.key === 'ArrowUp' ? Math.max(0, (currentPos.y || 0) - step) : (currentPos.y || 0) + step;
+                const newX = e.key === 'ArrowLeft' ? Math.max(0, (currentPos.x || 0) - step) : (currentPos.x || 0) + step;
                 switch (e.key) {
                     case 'ArrowUp':
                     case 'ArrowDown':
-                        onUpdatePosition(id, { [viewMode]: { x: element.position[viewMode]?.x || 0, y: newY } }, 'absolute');
+                        onUpdatePosition(id, { [viewMode]: { x: currentPos.x || 0, y: newY, z: currentPos.z || 1 } }, 'absolute');
                         break;
                     case 'ArrowLeft':
                     case 'ArrowRight':
-                        onUpdatePosition(id, { [viewMode]: { x: newX, y: element.position[viewMode]?.y || 0 } }, 'absolute');
+                        onUpdatePosition(id, { [viewMode]: { x: newX, y: currentPos.y || 0, z: currentPos.z || 1 } }, 'absolute');
                         break;
                     case 'Delete':
                     case 'Backspace':
