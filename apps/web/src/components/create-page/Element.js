@@ -1357,6 +1357,182 @@ export const renderComponentContent = (
                 </video>
             );
 
+        case 'iframe':
+            const iframeStyles = {
+                pointerEvents: 'auto',
+                cursor: 'pointer',
+                width: '100%',
+                height: '100%',
+                border: componentData.frameBorder !== undefined ? `${componentData.frameBorder}px solid #ccc` : 'none',
+                borderRadius: styles.borderRadius || '0px',
+                ...styles,
+            };
+
+            return (
+                <iframe
+                    src={componentData.src || 'about:blank'}
+                    title={componentData.title || 'Iframe'}
+                    style={iframeStyles}
+                    data-element-id={childId}
+                    allowFullScreen={componentData.allowFullscreen !== false}
+                    frameBorder={componentData.frameBorder || 0}
+                    allow={componentData.allow || 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'}
+                    loading={componentData.loading || 'lazy'}
+                    sandbox={componentData.sandbox || undefined}
+                    referrerPolicy={componentData.referrerPolicy || 'no-referrer-when-downgrade'}
+                    onError={(e) => {
+                        console.error('Iframe load error:', e);
+                    }}
+                />
+            );
+
+        case 'form':
+            const formFields = componentData.fields || [];
+            const formStyles = {
+                width: '100%',
+                height: '100%',
+                padding: styles.padding || '24px',
+                backgroundColor: styles.backgroundColor || '#ffffff',
+                borderRadius: styles.borderRadius || '8px',
+                boxShadow: styles.boxShadow || '0 2px 8px rgba(0, 0, 0, 0.1)',
+                ...styles,
+            };
+
+            const fieldStyles = {
+                marginBottom: '16px',
+                width: '100%',
+            };
+
+            const labelStyles = {
+                display: 'block',
+                marginBottom: '6px',
+                fontWeight: '500',
+                fontSize: '14px',
+                color: '#374151',
+            };
+
+            const inputStyles = {
+                width: '100%',
+                padding: '10px 12px',
+                fontSize: '14px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box',
+            };
+
+            const buttonStyles = {
+                width: '100%',
+                padding: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#ffffff',
+                backgroundColor: componentData.buttonColor || '#2563eb',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                marginTop: '8px',
+            };
+
+            return (
+                <form
+                    style={formStyles}
+                    data-element-id={childId}
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        if (componentData.onSubmit) {
+                            componentData.onSubmit(e);
+                        }
+                    }}
+                >
+                    {componentData.title && (
+                        <h3 style={{
+                            marginTop: 0,
+                            marginBottom: '16px',
+                            fontSize: '20px',
+                            fontWeight: '600',
+                            color: '#111827',
+                        }}>
+                            {componentData.title}
+                        </h3>
+                    )}
+
+                    {formFields.map((field, index) => (
+                        <div key={index} style={fieldStyles}>
+                            {field.label && (
+                                <label style={labelStyles}>
+                                    {field.label}
+                                    {field.required && <span style={{ color: '#ef4444' }}>*</span>}
+                                </label>
+                            )}
+
+                            {field.type === 'textarea' ? (
+                                <textarea
+                                    name={field.name}
+                                    placeholder={field.placeholder}
+                                    required={field.required}
+                                    rows={field.rows || 4}
+                                    style={{
+                                        ...inputStyles,
+                                        resize: 'vertical',
+                                        fontFamily: 'inherit',
+                                    }}
+                                />
+                            ) : field.type === 'select' ? (
+                                <select
+                                    name={field.name}
+                                    required={field.required}
+                                    style={inputStyles}
+                                >
+                                    <option value="">{field.placeholder || 'Chọn...'}</option>
+                                    {field.options && field.options.map((opt, i) => (
+                                        <option key={i} value={opt.value || opt}>
+                                            {opt.label || opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : field.type === 'checkbox' ? (
+                                <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        name={field.name}
+                                        required={field.required}
+                                        style={{ marginRight: '8px', width: 'auto' }}
+                                    />
+                                    <span style={{ fontSize: '14px', color: '#374151' }}>
+                                        {field.placeholder || field.label}
+                                    </span>
+                                </label>
+                            ) : (
+                                <input
+                                    type={field.type || 'text'}
+                                    name={field.name}
+                                    placeholder={field.placeholder}
+                                    required={field.required}
+                                    style={inputStyles}
+                                />
+                            )}
+                        </div>
+                    ))}
+
+                    <button type="submit" style={buttonStyles}>
+                        {componentData.buttonText || 'Gửi'}
+                    </button>
+
+                    {componentData.successMessage && (
+                        <p style={{
+                            marginTop: '12px',
+                            fontSize: '14px',
+                            color: '#10b981',
+                            display: 'none',
+                        }} className="form-success-message">
+                            {componentData.successMessage}
+                        </p>
+                    )}
+                </form>
+            );
+
         case 'section':
             return (
                 <div className="ladi-section" style={{ position: 'relative', width: '100%', height: '100%', overflow: 'visible' }}>
