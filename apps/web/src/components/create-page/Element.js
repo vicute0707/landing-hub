@@ -61,6 +61,7 @@ const ChildElement = React.memo(
          locked = false,
          onDeleteChild,
          onUpdateChildSize,
+         onUpdateChildPosition,
          element,
          zoomLevel = 1,
      }) => {
@@ -121,18 +122,19 @@ const ChildElement = React.memo(
 
         const handleResize = useCallback(
             ({ width, height, x, y }) => {
-                if (typeof onUpdateChildSize === 'function' && !locked && !componentData.locked) {
-                    // Update both size and position if position changed (for resize from left/top)
-                    if (x !== responsivePosition.x || y !== responsivePosition.y) {
-                        // We need to update position too, but we don't have onUpdateChildPosition here
-                        // For now, just update the size
-                        onUpdateChildSize(parentId, id, { width, height });
-                    } else {
+                if (!locked && !componentData.locked) {
+                    // Update both size and position if position changed (for resize from left/top corners)
+                    if ((x !== responsivePosition.x || y !== responsivePosition.y) && typeof onUpdateChildPosition === 'function') {
+                        // Update position first
+                        onUpdateChildPosition(parentId, id, { x, y });
+                    }
+                    // Update size
+                    if (typeof onUpdateChildSize === 'function') {
                         onUpdateChildSize(parentId, id, { width, height });
                     }
                 }
             },
-            [parentId, id, onUpdateChildSize, locked, componentData.locked, responsivePosition]
+            [parentId, id, onUpdateChildSize, onUpdateChildPosition, locked, componentData.locked, responsivePosition]
         );
 
         useEffect(() => {
