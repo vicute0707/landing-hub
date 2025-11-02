@@ -280,13 +280,27 @@ export const resolveCollision = (element, collidingElement, direction = 'down') 
  * Scale element from one viewport to another
  * Algorithm: newX = oldX * (newWidth / baseWidth)
  *
+ * IMPROVED: Better scaling with more options
+ *
  * @param {Object} element - Element with position and size
  * @param {string} fromMode - Source viewport (desktop/tablet/mobile)
  * @param {string} toMode - Target viewport (desktop/tablet/mobile)
+ * @param {Object} options - Scaling options
+ * @param {boolean} options.preserveAspectRatio - Keep aspect ratio (default: true)
+ * @param {boolean} options.centerHorizontally - Center on mobile (default: true)
+ * @param {number} options.minWidth - Minimum element width (default: 50)
+ * @param {number} options.maxWidthPercent - Max % of viewport (default: 90)
  * @returns {Object} Scaled position and size
  */
-export const scaleToViewport = (element, fromMode = 'desktop', toMode = 'mobile') => {
+export const scaleToViewport = (element, fromMode = 'desktop', toMode = 'mobile', options = {}) => {
     if (!element) return null;
+
+    const {
+        preserveAspectRatio = true,
+        centerHorizontally = true,
+        minWidth = 50,
+        maxWidthPercent = 90,
+    } = options;
 
     const fromWidth = BREAKPOINTS[fromMode] || BREAKPOINTS.desktop;
     const toWidth = BREAKPOINTS[toMode] || BREAKPOINTS.mobile;
@@ -295,37 +309,55 @@ export const scaleToViewport = (element, fromMode = 'desktop', toMode = 'mobile'
     const sourcePos = element.position?.[fromMode] || { x: 0, y: 0, z: 1 };
     const sourceSize = element.size || { width: 200, height: 100 };
 
-    // Scale position
-    let scaledX = Math.round(sourcePos.x * scaleFactor);
-    let scaledY = Math.round(sourcePos.y * scaleFactor);
-
-    // Scale size
+    // More intelligent scaling
     let scaledWidth = Math.round(sourceSize.width * scaleFactor);
     let scaledHeight = Math.round(sourceSize.height * scaleFactor);
 
-    // Apply constraints for mobile (center horizontally, add padding)
-    if (toMode === 'mobile') {
-        const padding = 20;
-        const maxWidth = toWidth - padding * 2;
+    // Apply min/max constraints
+    const maxWidth = Math.round(toWidth * (maxWidthPercent / 100));
+    scaledWidth = Math.max(minWidth, Math.min(scaledWidth, maxWidth));
 
-        if (scaledWidth > maxWidth) {
-            scaledWidth = maxWidth;
-        }
-
-        // Center horizontally
-        scaledX = Math.max(padding, (toWidth - scaledWidth) / 2);
+    if (preserveAspectRatio) {
+        const aspectRatio = sourceSize.height / sourceSize.width;
+        scaledHeight = Math.round(scaledWidth * aspectRatio);
     }
 
-    // Apply constraints for tablet
+    // Position scaling
+    let scaledX = Math.round(sourcePos.x * scaleFactor);
+    let scaledY = Math.round(sourcePos.y * scaleFactor);
+
+    // Mobile-specific adjustments
+    if (toMode === 'mobile') {
+        const padding = 20;
+
+        if (centerHorizontally) {
+            // Center smaller elements
+            if (scaledWidth < toWidth - padding * 2) {
+                scaledX = Math.round((toWidth - scaledWidth) / 2);
+            } else {
+                // Full width with padding
+                scaledWidth = toWidth - padding * 2;
+                scaledX = padding;
+            }
+        } else {
+            // Clamp to bounds
+            scaledX = Math.max(padding, Math.min(scaledX, toWidth - scaledWidth - padding));
+        }
+    }
+
+    // Tablet-specific adjustments
     if (toMode === 'tablet') {
         const padding = 30;
-        const maxWidth = toWidth - padding * 2;
+        const maxW = toWidth - padding * 2;
 
-        if (scaledWidth > maxWidth) {
-            scaledWidth = maxWidth;
+        if (scaledWidth > maxW) {
+            scaledWidth = maxW;
+            if (preserveAspectRatio) {
+                const aspectRatio = sourceSize.height / sourceSize.width;
+                scaledHeight = Math.round(scaledWidth * aspectRatio);
+            }
         }
 
-        // Clamp X position
         scaledX = Math.max(padding, Math.min(scaledX, toWidth - scaledWidth - padding));
     }
 
@@ -345,9 +377,25 @@ export const scaleToViewport = (element, fromMode = 'desktop', toMode = 'mobile'
 /**
  * Auto-scale element to all viewports
  * Creates desktop, tablet, and mobile positions
+ *
+ * IMPROVED: Uses enhanced scaleToViewport with options
+ *
+ * @param {Object} element - Element to scale
+ * @param {Object} options - Scaling options (passed to scaleToViewport)
+ * @returns {Object} Element with all viewport positions
  */
-export const autoScale = (element) => {
+export const autoScale = (element, options = {}) => {
     if (!element) return element;
+
+    // Default options for auto-scaling
+    const defaultOptions = {
+        preserveAspectRatio: true,
+        centerHorizontally: element.type !== 'section', // Don't center sections
+        minWidth: 50,
+        maxWidthPercent: element.type === 'section' ? 100 : 90,
+    };
+
+    const mergedOptions = { ...defaultOptions, ...options };
 
     // Assume desktop is the source
     const desktopPos = element.position?.desktop || { x: 0, y: 0, z: 1 };
@@ -357,14 +405,16 @@ export const autoScale = (element) => {
     const tablet = scaleToViewport(
         { position: { desktop: desktopPos }, size: desktopSize },
         'desktop',
-        'tablet'
+        'tablet',
+        mergedOptions
     );
 
     // Scale to mobile
     const mobile = scaleToViewport(
         { position: { desktop: desktopPos }, size: desktopSize },
         'desktop',
-        'mobile'
+        'mobile',
+        mergedOptions
     );
 
     return {
@@ -517,6 +567,38 @@ export const getDragOffset = (mouseX, mouseY, elementX, elementY) => {
     };
 };
 
+/**
+ * Calculate smooth drag position with momentum
+ * Reduces jitter and improves feel
+ *
+ * @param {Object} currentPos - Current position {x, y}
+ * @param {Object} targetPos - Target position {x, y}
+ * @param {number} smoothing - Smoothing factor 0-1 (default: 0.3)
+ * @returns {Object} Smoothed position {x, y}
+ */
+export const smoothDragPosition = (currentPos, targetPos, smoothing = 0.3) => {
+    return {
+        x: Math.round(currentPos.x + (targetPos.x - currentPos.x) * smoothing),
+        y: Math.round(currentPos.y + (targetPos.y - currentPos.y) * smoothing),
+    };
+};
+
+/**
+ * Detect if drag should activate
+ * Prevents accidental drags on click
+ *
+ * @param {Object} dragStartPos - Initial position {x, y}
+ * @param {Object} currentPos - Current position {x, y}
+ * @param {number} threshold - Distance threshold in pixels (default: 5)
+ * @returns {boolean} True if should activate drag
+ */
+export const shouldActivateDrag = (dragStartPos, currentPos, threshold = 5) => {
+    const dx = currentPos.x - dragStartPos.x;
+    const dy = currentPos.y - dragStartPos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return distance >= threshold;
+};
+
 // ============================================
 // UTILITIES
 // ============================================
@@ -587,6 +669,8 @@ export default {
     throttle,
     rafThrottle,
     getDragOffset,
+    smoothDragPosition,
+    shouldActivateDrag,
 
     // Utilities
     distance,

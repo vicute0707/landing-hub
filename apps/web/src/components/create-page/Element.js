@@ -342,7 +342,19 @@ const Element = React.memo(
 
         const [{ isDragging }, drag, preview] = useDrag({
             type: ItemTypes.EXISTING_ELEMENT,
-            canDrag: () => !locked && type !== 'section' && type !== 'popup',
+            canDrag: () => {
+                // Locked elements cannot drag
+                if (locked) return false;
+
+                // Popups can always drag (floating elements)
+                if (type === 'popup') return true;
+
+                // Sections can drag for reordering
+                if (type === 'section') return true;
+
+                // All other elements can drag freely
+                return true;
+            },
             item: () => {
                 if (locked) {
                     toast.warning('Element đã bị khóa!');
@@ -350,6 +362,7 @@ const Element = React.memo(
                 }
                 return {
                     id,
+                    type, // Include type for better drag handling
                     elementSize: responsiveSize,
                     elementPosition: responsivePosition,
                     isExisting: true,
