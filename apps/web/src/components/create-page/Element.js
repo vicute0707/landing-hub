@@ -86,10 +86,19 @@ const ChildElement = React.memo(
                     toast.warning('Child element đã bị khóa!');
                     return null;
                 }
-                return { childId: id, parentId, isExisting: true, position: responsivePosition, size: responsiveSize };
+                // FREE DRAG: Include full element data for conversion to top-level
+                return {
+                    childId: id,
+                    parentId,
+                    isExisting: true,
+                    position: responsivePosition,
+                    size: responsiveSize,
+                    element: element, // Full element data
+                    freeDrag: true, // Enable free drag mode
+                };
             },
             collect: (monitor) => ({ isDragging: monitor.isDragging() }),
-        }, [id, parentId, responsivePosition, responsiveSize, locked, componentData.locked]);
+        }, [id, parentId, responsivePosition, responsiveSize, locked, componentData.locked, element]);
 
         const handleClick = useCallback(
             (e) => {
@@ -373,9 +382,12 @@ const Element = React.memo(
         const [{ isOverContainer, canDropContainer }, dropSection] = useDrop({
             accept: [ItemTypes.ELEMENT, ItemTypes.CHILD_ELEMENT],
             canDrop: (item, monitor) => {
-                // FREE MODE: Allow drop in sections and popups
-                if (type !== 'section' && type !== 'popup') return false;
-                // Allow moving between parents (LadiPage-style free drag)
+                // FREE MODE: More permissive drop zones
+                // Allow drop in sections, popups, and containers
+                if (type !== 'section' && type !== 'popup' && type !== 'container') {
+                    return false;
+                }
+                // Allow all drag types for maximum flexibility
                 return true;
             },
             drop: (item, monitor) => {

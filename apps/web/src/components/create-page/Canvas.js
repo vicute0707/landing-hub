@@ -12,6 +12,7 @@ import { ItemTypes, getCanvasPosition, snapToGrid, getElementBounds, renderCompo
 import AddSectionButton from './AddSectionButton';
 import eventController from '../../utils/EventUtils';
 import { getResponsiveValues } from '../../utils/responsiveSync';
+import { autoConvertToMobile, autoConvertToTablet, calculateAlignmentGuides } from '../../utils/autoResponsive';
 
 const Canvas = React.memo(({
                                pageData,
@@ -282,6 +283,7 @@ const Canvas = React.memo(({
             // FREE MODE: Use showGrid to enable/disable snapping for smooth positioning
             const snapped = snapToGrid(pos.x, pos.y, gridSize, snapPoints, showGrid);
             if (monitor.getItemType() === ItemTypes.CHILD_ELEMENT) {
+                // FREE DRAG MODE: Allow child to be promoted to top-level element
                 const sourceSection = pageData.elements.find((el) => el.id === item.parentId);
                 if (!sourceSection) {
                     toast.error('Không tìm thấy section nguồn!');
@@ -289,9 +291,32 @@ const Canvas = React.memo(({
                     setGuidelines([]);
                     return { moved: false };
                 }
+
+                // Find the child being dragged
+                const childElement = sourceSection.children?.find((c) => c.id === item.childId);
+                if (!childElement) {
+                    toast.error('Không tìm thấy element con!');
+                    setDragPreview(null);
+                    setGuidelines([]);
+                    return { moved: false };
+                }
+
+                // Convert to top-level element for free positioning
+                const newElement = {
+                    ...childElement,
+                    position: {
+                        desktop: { x: snapped.x, y: snapped.y, z: 10 },
+                        tablet: { x: snapped.x, y: snapped.y, z: 10 },
+                        mobile: { x: snapped.x, y: snapped.y, z: 10 },
+                    },
+                };
+
+                // Remove from parent and add as top-level
                 onMoveChild(item.parentId, item.childId, null, snapped);
+
                 setDragPreview(null);
                 setGuidelines([]);
+                toast.success('Element được di chuyển tự do!');
                 return { moved: true, newPosition: snapped };
             } else if (monitor.getItemType() === ItemTypes.ELEMENT) {
                 if (item.json.type !== 'section' && item.json.type !== 'popup' && item.json.type !== 'modal') {
@@ -324,7 +349,7 @@ const Canvas = React.memo(({
                     };
                 };
 
-                const newElement = {
+                let newElement = {
                     id: `${item.json.type}-${Date.now()}`,
                     type: item.json.type,
                     componentData: JSON.parse(JSON.stringify(item.json.componentData || { structure: item.json.type === 'section' ? 'ladi-standard' : undefined })),
@@ -338,14 +363,25 @@ const Canvas = React.memo(({
                         width: item.json.type === 'section' ? 1200 : (item.json.size?.width || 600),
                         height: item.json.size?.height || (item.json.type === 'section' ? 400 : 400),
                     },
-                    mobileSize: item.json.mobileSize || (item.json.type === 'section' ? { width: 375, height: item.json.size?.height || 400 } : { width: 340, height: item.json.size?.height || 400 }),
-                    tabletSize: item.json.tabletSize || (item.json.type === 'section' ? { width: 768, height: item.json.size?.height || 400 } : { width: 600, height: item.json.size?.height || 400 }),
+                    mobileSize: item.json.mobileSize,
+                    tabletSize: item.json.tabletSize,
                     styles: JSON.parse(JSON.stringify(item.json.styles || {})),
                     children: JSON.parse(JSON.stringify(item.json.children || [])),
                     visible: true,
                     locked: false,
                     meta: { updated_at: new Date().toISOString() },
                 };
+
+                // AUTO-RESPONSIVE: Apply smart responsive conversion for non-section elements
+                if (item.json.type !== 'section') {
+                    newElement = autoConvertToTablet(newElement, 768);
+                    newElement = autoConvertToMobile(newElement, 375);
+                } else {
+                    // For sections, use default responsive sizes
+                    newElement.mobileSize = item.json.mobileSize || { width: 375, height: item.json.size?.height || 400 };
+                    newElement.tabletSize = item.json.tabletSize || { width: 768, height: item.json.size?.height || 400 };
+                }
+
                 onAddElement(newElement);
                 if (item.json.type === 'section') {
                     setGuideLinePosition(lastSectionY + (item.json.size?.height || 400));
