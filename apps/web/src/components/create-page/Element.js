@@ -501,22 +501,30 @@ const Element = React.memo(
             const bgType = componentData.backgroundType ||
                 (bgImage ? 'image' : 'color');
 
-            console.log(`Section ${id} - BG Type: ${bgType}, Image: ${bgImage}`);
+            console.log(`Section ${id} (${viewMode}) - BG Type: ${bgType}, Canvas Width: ${canvasWidth}px`);
+
+            // FIXED: Use responsive size based on viewMode
+            const sectionHeight = viewMode === 'mobile' && element.mobileSize?.height
+                ? element.mobileSize.height
+                : viewMode === 'tablet' && element.tabletSize?.height
+                    ? element.tabletSize.height
+                    : responsiveSize.height || element.size?.height || 400;
 
             return {
                 position: 'absolute',
                 top: responsivePosition.y || 0,
                 width: `${canvasWidth}px`,
-                height: responsiveSize.height,
+                height: `${sectionHeight}px`,
                 left: '50%',
                 transform: 'translateX(-50%)',
                 zIndex: responsivePosition.z || 1,
                 userSelect: 'none',
                 overflow: 'visible',
+                boxSizing: 'border-box',
                 ...responsiveStyles,
                 // ✅ SIMPLIFIED BACKGROUND LOGIC
                 backgroundColor: bgType === 'color' ?
-                    (componentData.backgroundColor || '#ffffff') :
+                    (componentData.backgroundColor || responsiveStyles.backgroundColor || '#ffffff') :
                     'transparent',
                 backgroundImage: bgType === 'image' && bgImage ?
                     `url("${bgImage}")` :
@@ -532,20 +540,33 @@ const Element = React.memo(
                 ...animationStyles,
                 ...lockedStyles,
             };
-        }, [responsivePosition, responsiveSize, canvasWidth, componentData, responsiveStyles, animationStyles, lockedStyles]);
+        }, [responsivePosition, responsiveSize, canvasWidth, componentData, responsiveStyles, animationStyles, lockedStyles, viewMode, element]);
 
-        const popupStyles = useMemo(
-            () => ({
+        const popupStyles = useMemo(() => {
+            // FIXED: Better responsive popup sizing
+            const popupWidth = viewMode === 'mobile' && element.mobileSize?.width
+                ? element.mobileSize.width
+                : viewMode === 'tablet' && element.tabletSize?.width
+                    ? element.tabletSize.width
+                    : responsiveSize.width || 600;
+
+            const popupHeight = viewMode === 'mobile' && element.mobileSize?.height
+                ? element.mobileSize.height
+                : viewMode === 'tablet' && element.tabletSize?.height
+                    ? element.tabletSize.height
+                    : responsiveSize.height || 400;
+
+            return {
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: viewMode === 'mobile' ? '90%' : responsiveSize.width || 600,
-                maxWidth: viewMode === 'mobile' ? '90%' : '600px',
-                minHeight: responsiveSize.height || 400,
+                width: viewMode === 'mobile' ? `min(${popupWidth}px, 90%)` : `${popupWidth}px`,
+                maxWidth: viewMode === 'mobile' ? '90%' : '100%',
+                minHeight: `${popupHeight}px`,
                 maxHeight: '90vh',
                 zIndex: 1001,
-                background: componentData.background || 'rgba(255, 255, 255, 0.95)',
+                background: componentData.background || responsiveStyles.background || 'rgba(255, 255, 255, 0.95)',
                 borderRadius: componentData.borderRadius || '12px',
                 boxShadow: isSelected ? '0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 3px #3b82f6' : '0 8px 32px rgba(0, 0, 0, 0.25)',
                 overflow: 'hidden',
@@ -555,12 +576,12 @@ const Element = React.memo(
                 opacity: 1,
                 transformOrigin: 'center',
                 cursor: locked ? 'not-allowed' : 'default',
+                boxSizing: 'border-box',
                 ...responsiveStyles,
                 ...lockedStyles,
                 ...animationStyles,
-            }),
-            [viewMode, responsiveSize, componentData, isSelected, responsiveStyles, lockedStyles, animationStyles]
-        );
+            };
+        }, [viewMode, responsiveSize, componentData, isSelected, responsiveStyles, lockedStyles, animationStyles, element]);
 
         useEffect(() => {
             preview(getEmptyImage(), { captureDraggingState: true });

@@ -34,32 +34,40 @@ const toKebabCase = (str) =>
 
 /**
  * Calculates precise coordinates within a canvas or section
+ * FIXED: Better handling of zoom, scroll, and negative positions
  * @param {number} mouseX - Mouse X coordinate
  * @param {number} mouseY - Mouse Y coordinate
  * @param {HTMLElement} containerElement - The container element
  * @param {number} zoomLevel - Zoom level percentage
  * @returns {Object} Coordinates { x, y }
  */
-export const getCanvasPosition = (mouseX, mouseY, containerElement, zoomLevel) => {
+export const getCanvasPosition = (mouseX, mouseY, containerElement, zoomLevel = 100) => {
     if (!containerElement) {
         console.error('Container element is null in getCanvasPosition');
         return { x: 0, y: 0 };
     }
 
     const rect = containerElement.getBoundingClientRect();
-    const scrollX = containerElement.scrollLeft || 0;
-    const scrollY = containerElement.scrollTop || 0;
+    const scrollX = window.scrollX || window.pageXOffset || 0;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
 
-    const rawX = (mouseX - rect.left + scrollX) / (zoomLevel / 100);
-    const rawY = (mouseY - rect.top + scrollY) / (zoomLevel / 100);
+    // Calculate position relative to container, accounting for zoom and scroll
+    const zoom = zoomLevel / 100;
+    const rawX = ((mouseX - rect.left) / zoom);
+    const rawY = ((mouseY - rect.top) / zoom);
 
-    return { x: Math.max(0, rawX), y: Math.max(0, rawY) };
+    // Allow negative positions but round to avoid sub-pixel issues
+    return {
+        x: Math.round(rawX),
+        y: Math.round(rawY)
+    };
 };
 
 
 /**
  * Snaps coordinates to grid or nearby snap points
  * FREE MODE: Pass enableSnap = false for pixel-perfect free positioning
+ * FIXED: Better snapping tolerance and grid handling
  * @param {number} x - X coordinate
  * @param {number} y - Y coordinate
  * @param {number} gridSize - Size of the grid
@@ -67,23 +75,32 @@ export const getCanvasPosition = (mouseX, mouseY, containerElement, zoomLevel) =
  * @param {boolean} enableSnap - Enable/disable snapping (default: true)
  * @returns {Object} Snapped or free coordinates { x, y }
  */
-export const snapToGrid = (x, y, gridSize, snapPoints = [], enableSnap = true) => {
+export const snapToGrid = (x, y, gridSize = 1, snapPoints = [], enableSnap = true) => {
+    // Round to avoid sub-pixel issues
+    const roundedX = Math.round(x);
+    const roundedY = Math.round(y);
+
     // Free positioning mode - return exact coordinates
     if (!enableSnap || gridSize <= 1) {
-        return { x: Math.round(x), y: Math.round(y) };
+        return { x: roundedX, y: roundedY };
     }
 
     // Snap to grid
-    let snappedX = Math.round(x / gridSize) * gridSize;
-    let snappedY = Math.round(y / gridSize) * gridSize;
+    let snappedX = Math.round(roundedX / gridSize) * gridSize;
+    let snappedY = Math.round(roundedY / gridSize) * gridSize;
 
-    // Snap to nearby points (guidelines)
+    // Snap to nearby points (guidelines) - with 10px tolerance
+    const SNAP_TOLERANCE = 10;
     snapPoints.forEach((point) => {
-        if (Math.abs(x - point.x) < 15) snappedX = point.x;
-        if (Math.abs(y - point.y) < 15) snappedY = point.y;
+        if (point && typeof point.x === 'number' && Math.abs(roundedX - point.x) < SNAP_TOLERANCE) {
+            snappedX = point.x;
+        }
+        if (point && typeof point.y === 'number' && Math.abs(roundedY - point.y) < SNAP_TOLERANCE) {
+            snappedY = point.y;
+        }
     });
 
-    return { x: snappedX, y: snappedY };
+    return { x: Math.round(snappedX), y: Math.round(snappedY) };
 };
 
 /**

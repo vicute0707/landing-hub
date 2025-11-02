@@ -299,7 +299,8 @@ const Canvas = React.memo(({
                     setGuidelines([]);
                     return { moved: false };
                 }
-                // LUÔN dùng desktop mode để tính Y position
+
+                // FIXED: Calculate position for current viewMode, but always use desktop for section stacking
                 const lastSectionY = pageData.elements
                     .filter((el) => el.type === 'section')
                     .reduce((maxY, el) => {
@@ -307,33 +308,38 @@ const Canvas = React.memo(({
                         const height = el.size?.height || 400;
                         return Math.max(maxY, y + height);
                     }, 0);
+
+                // For sections, use lastSectionY for all viewModes (sections stack vertically)
+                // For popups/modals, use snapped position adjusted per viewMode
+                const getResponsivePosition = (mode) => {
+                    if (item.json.type === 'section') {
+                        return { x: 0, y: lastSectionY, z: 1 };
+                    }
+                    // For popups/modals, center them or use drop position
+                    const canvasWidth = getCanvasWidth(mode);
+                    return {
+                        x: Math.max(0, Math.min(snapped.x, canvasWidth - (item.json.size?.width || 600))),
+                        y: Math.max(0, snapped.y),
+                        z: 1001
+                    };
+                };
+
                 const newElement = {
                     id: `${item.json.type}-${Date.now()}`,
                     type: item.json.type,
                     componentData: JSON.parse(JSON.stringify(item.json.componentData || { structure: item.json.type === 'section' ? 'ladi-standard' : undefined })),
                     position: {
-                        desktop: {
-                            x: item.json.type === 'section' ? 0 : snapped.x,
-                            y: item.json.type === 'section' ? lastSectionY : snapped.y,
-                            z: item.json.type === 'section' ? 1 : 10,
-                        },
-                        tablet: {
-                            x: item.json.type === 'section' ? 0 : snapped.x,
-                            y: item.json.type === 'section' ? lastSectionY : snapped.y,
-                            z: item.json.type === 'section' ? 1 : 10,
-                        },
-                        mobile: {
-                            x: item.json.type === 'section' ? 0 : snapped.x,
-                            y: item.json.type === 'section' ? lastSectionY : snapped.y,
-                            z: item.json.type === 'section' ? 1 : 10,
-                        },
+                        desktop: getResponsivePosition('desktop'),
+                        tablet: getResponsivePosition('tablet'),
+                        mobile: getResponsivePosition('mobile'),
                     },
                     size: {
                         ...item.json.size,
-                        width: item.json.type === 'section' ? 1200 : 600,
+                        width: item.json.type === 'section' ? 1200 : (item.json.size?.width || 600),
+                        height: item.json.size?.height || (item.json.type === 'section' ? 400 : 400),
                     },
-                    mobileSize: item.json.mobileSize || (item.json.type === 'section' ? { width: 375, height: item.json.size?.height || 400 } : null),
-                    tabletSize: item.json.tabletSize || (item.json.type === 'section' ? { width: 768, height: item.json.size?.height || 400 } : null),
+                    mobileSize: item.json.mobileSize || (item.json.type === 'section' ? { width: 375, height: item.json.size?.height || 400 } : { width: 340, height: item.json.size?.height || 400 }),
+                    tabletSize: item.json.tabletSize || (item.json.type === 'section' ? { width: 768, height: item.json.size?.height || 400 } : { width: 600, height: item.json.size?.height || 400 }),
                     styles: JSON.parse(JSON.stringify(item.json.styles || {})),
                     children: JSON.parse(JSON.stringify(item.json.children || [])),
                     visible: true,
@@ -577,13 +583,17 @@ const Canvas = React.memo(({
                 }`}
                 onClick={handleCanvasClick}
                 style={{
-                    width: '100%',
-                    height: pageData.canvas.height ? `${pageData.canvas.height}px` : 'auto',
-                    background: pageData.canvas.background,
+                    // FIXED: Set explicit width based on viewMode for proper responsive layout
+                    width: `${getCanvasWidth(viewMode)}px`,
+                    minHeight: pageData.canvas.height ? `${pageData.canvas.height}px` : '800px',
+                    height: 'auto',
+                    background: pageData.canvas.background || '#ffffff',
                     transform: `scale(${zoomLevel / 100})`,
                     transformOrigin: 'top center',
                     margin: '0 auto',
                     position: 'relative',
+                    boxSizing: 'border-box',
+                    overflow: 'visible',
                 }}
             >
                 <Guidelines guidelines={guidelines} zoomLevel={zoomLevel} />
