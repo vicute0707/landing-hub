@@ -1,13 +1,24 @@
+/**
+ * Element Component - Draggable/Droppable canvas elements
+ *
+ * Updated for 3-Layer Drag & Drop Architecture
+ * - Uses dragDropCore for coordinate transformation
+ * - Simplified drag/drop logic
+ * - Better responsive handling
+ */
+
 import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDrop, useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { toast } from 'react-toastify';
 import SectionToolkit from './toolkitqick/SectionToolkit';
-import { ItemTypes, getCanvasPosition, snapToGrid } from './helpers';
+import { ItemTypes } from './helpers';
 import eventController from '../../utils/EventUtils';
 import { getResponsiveValues } from '../../utils/responsiveSync';
 import ResizeHandles from './ResizeHandles';
+// Import from dragDropCore for consistent coordinate handling
+import { transformCoordinates, snapToGrid, snapToGuides, BREAKPOINTS } from '../../utils/dragDropCore';
 
 /**
  * Utility to check if URL is valid
@@ -29,17 +40,10 @@ const getLockedStyles = (isLocked) =>
 
 /**
  * Get canvas width based on view mode
+ * Uses BREAKPOINTS from dragDropCore for consistency
  */
 const getCanvasWidth = (viewMode) => {
-    switch (viewMode) {
-        case 'mobile':
-            return 375;
-        case 'tablet':
-            return 768;
-        case 'desktop':
-        default:
-            return 1200;
-    }
+    return BREAKPOINTS[viewMode] || BREAKPOINTS.desktop;
 };
 
 /**
@@ -394,9 +398,24 @@ const Element = React.memo(
                 if (!monitor.canDrop() || !containerRef.current) return { moved: false };
                 const clientOffset = monitor.getClientOffset();
                 if (!clientOffset) return { moved: false };
-                const pos = getCanvasPosition(clientOffset.x, clientOffset.y, containerRef.current, zoomLevel);
-                // FREE MODE: Disable snapping for smooth positioning
-                const snapped = snapToGrid(pos.x, pos.y, gridSize, snapPoints, showGrid);
+
+                // LAYER 2: Transform coordinates using dragDropCore
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const canvasPos = transformCoordinates(
+                    clientOffset.x,
+                    clientOffset.y,
+                    containerRect,
+                    zoomLevel
+                );
+
+                // LAYER 2: Apply snapping
+                let snapped;
+                if (showGrid && gridSize > 1) {
+                    snapped = snapToGrid(canvasPos.x, canvasPos.y, gridSize, true);
+                } else {
+                    const guideSnap = snapToGuides(canvasPos.x, canvasPos.y, snapPoints, 10);
+                    snapped = { x: guideSnap.x, y: guideSnap.y };
+                }
 
                 if (monitor.getItemType() === ItemTypes.ELEMENT) {
                     const newId = `${item.id}-${Date.now()}`;
@@ -447,9 +466,24 @@ const Element = React.memo(
                 if (!containerRef.current) return { moved: false };
                 const clientOffset = monitor.getClientOffset();
                 if (!clientOffset) return { moved: false };
-                const pos = getCanvasPosition(clientOffset.x, clientOffset.y, containerRef.current, zoomLevel);
-                // FREE MODE: Smooth positioning without grid constraints
-                const snapped = snapToGrid(pos.x, pos.y, gridSize, snapPoints, showGrid);
+
+                // LAYER 2: Transform coordinates using dragDropCore
+                const containerRect = containerRef.current.getBoundingClientRect();
+                const canvasPos = transformCoordinates(
+                    clientOffset.x,
+                    clientOffset.y,
+                    containerRect,
+                    zoomLevel
+                );
+
+                // LAYER 2: Apply snapping
+                let snapped;
+                if (showGrid && gridSize > 1) {
+                    snapped = snapToGrid(canvasPos.x, canvasPos.y, gridSize, true);
+                } else {
+                    const guideSnap = snapToGuides(canvasPos.x, canvasPos.y, snapPoints, 10);
+                    snapped = { x: guideSnap.x, y: guideSnap.y };
+                }
 
                 if (monitor.getItemType() === ItemTypes.ELEMENT) {
                     const newId = `${item.id}-${Date.now()}`;

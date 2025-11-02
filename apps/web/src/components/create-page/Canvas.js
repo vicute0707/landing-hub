@@ -1,3 +1,37 @@
+/**
+ * Canvas Component - Landing Page Builder
+ *
+ * ARCHITECTURE: 3-Layer Drag & Drop System (LadiPage-style)
+ *
+ * LAYER 1 (UI Layer):
+ * - Mouse event tracking (hover, drop)
+ * - Visual feedback (drag preview, guidelines)
+ * - Performance optimization (rafThrottle for 60fps)
+ *
+ * LAYER 2 (Logic Layer):
+ * - Coordinate transformation: client coordinates → canvas coordinates
+ * - Snap-to-grid algorithm: x = round(x / gridSize) * gridSize
+ * - Smart guide snapping: snap to element edges/centers
+ * - Collision detection (future enhancement)
+ *
+ * LAYER 3 (Data Layer):
+ * - JSON state management for all elements
+ * - Immutable updates to element positions
+ * - Auto-responsive scaling: desktop → tablet/mobile
+ * - State format: {id, type, position: {desktop, tablet, mobile}, size, ...}
+ *
+ * COORDINATE SYSTEM:
+ * - Client coordinates: Browser viewport (clientX, clientY from mouse event)
+ * - Canvas coordinates: Actual canvas position accounting for zoom/scroll
+ * - Transform: canvasX = (clientX - rect.left) / zoom
+ *
+ * RESPONSIVE SCALING:
+ * - Desktop: 1200px
+ * - Tablet: 768px (scale = 768/1200 = 0.64)
+ * - Mobile: 375px (scale = 375/1200 = 0.3125)
+ * - Formula: newX = oldX * scaleFactor
+ */
+
 import React, { useRef, useCallback, useState, useEffect, useMemo } from 'react';
 import { useDrop } from 'react-dnd';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -8,11 +42,22 @@ import Guidelines from './Guidelines';
 import SelectionOverlay from './SelectionOverlay';
 import '../../styles/CreateLanding.css';
 import { Element } from './Element';
-import { ItemTypes, getCanvasPosition, snapToGrid, getElementBounds, renderComponentContent } from './helpers';
+import { ItemTypes, renderComponentContent } from './helpers';
 import AddSectionButton from './AddSectionButton';
 import eventController from '../../utils/EventUtils';
 import { getResponsiveValues } from '../../utils/responsiveSync';
-import { autoConvertToMobile, autoConvertToTablet, calculateAlignmentGuides } from '../../utils/autoResponsive';
+// DRAG DROP CORE: New 3-layer architecture utilities
+import {
+    transformCoordinates,
+    snapToGrid,
+    snapToGuides,
+    generateSnapPoints,
+    autoScale,
+    clampToCanvas,
+    getElementBounds,
+    BREAKPOINTS,
+    rafThrottle,
+} from '../../utils/dragDropCore';
 
 const Canvas = React.memo(({
                                pageData,
@@ -51,13 +96,9 @@ const Canvas = React.memo(({
     const [guideLinePosition, setGuideLinePosition] = useState(guideLine?.y || 0);
     const [visiblePopups, setVisiblePopups] = useState([]);
     // Helper function to get canvas width based on viewMode
+    // Uses BREAKPOINTS from dragDropCore for consistency
     const getCanvasWidth = useCallback((mode) => {
-        switch (mode) {
-            case 'mobile': return 375;
-            case 'tablet': return 768;
-            case 'desktop':
-            default: return 1200;
-        }
+        return BREAKPOINTS[mode] || BREAKPOINTS.desktop;
     }, []);
 
     const [canvasBounds, setCanvasBounds] = useState({
@@ -96,39 +137,24 @@ const Canvas = React.memo(({
         return () => window.removeEventListener('resize', handleResize);
     }, [viewMode, zoomLevel, getCanvasWidth]);
 
+    // LAYER 2: Generate snap points using dragDropCore
     const getSnapPoints = useCallback(() => {
+        // Use dragDropCore's generateSnapPoints for all elements
+        const elementSnapPoints = generateSnapPoints(pageData.elements, viewMode);
+
+        // Add canvas boundary snap points
         const canvasWidth = getCanvasWidth(viewMode);
-        const points = [
-            { x: 0, y: 0 },
-            { x: canvasWidth, y: canvasBounds.height },
-            { x: canvasWidth / 2, y: canvasBounds.height / 2 },
+        const canvasPoints = [
+            { x: 0, y: null },
+            { x: canvasWidth, y: null },
+            { x: canvasWidth / 2, y: null },
+            { x: null, y: 0 },
+            { x: null, y: canvasBounds.height },
+            { x: null, y: canvasBounds.height / 2 },
         ];
-        pageData.elements.forEach((el) => {
-            const bounds = getElementBounds(el);
-            points.push(
-                { x: bounds.left, y: bounds.top },
-                { x: bounds.right, y: bounds.bottom },
-                { x: bounds.centerX, y: bounds.centerY },
-                { x: bounds.left, y: bounds.centerY },
-                { x: bounds.right, y: bounds.centerY },
-                { x: bounds.centerX, y: bounds.top },
-                { x: bounds.centerX, y: bounds.bottom }
-            );
-            el.children?.forEach((child) => {
-                const childBounds = getElementBounds(child);
-                points.push(
-                    { x: childBounds.left, y: childBounds.top },
-                    { x: childBounds.right, y: childBounds.bottom },
-                    { x: childBounds.centerX, y: childBounds.centerY },
-                    { x: childBounds.left, y: childBounds.centerY },
-                    { x: childBounds.right, y: childBounds.centerY },
-                    { x: childBounds.centerX, y: childBounds.top },
-                    { x: childBounds.centerX, y: childBounds.bottom }
-                );
-            });
-        });
-        return points;
-    }, [pageData.elements, canvasBounds, viewMode]);
+
+        return [...elementSnapPoints, ...canvasPoints];
+    }, [pageData.elements, canvasBounds, viewMode, getCanvasWidth]);
 
     const calculateGuidelines = useCallback((snapped) => {
         const newGuidelines = [];
@@ -217,18 +243,35 @@ const Canvas = React.memo(({
         };
     }, [pageData.elements, onSelectElement, selectedIds, handleSelectElement]);
 
-    // Throttle hover updates for better performance
+    // LAYER 1: UI Layer - Throttle hover updates for 60fps performance
     const throttledHover = useMemo(
         () =>
-            throttle((item, monitor, clientOffset) => {
+            rafThrottle((item, monitor, clientOffset) => {
                 if (!clientOffset || !canvasRef.current) {
                     setDragPreview(null);
                     return;
                 }
-                const pos = getCanvasPosition(clientOffset.x, clientOffset.y, canvasRef.current, zoomLevel);
-                const snapPoints = getSnapPoints();
-                // FREE MODE: Use showGrid to enable/disable snapping for smooth positioning
-                const snapped = snapToGrid(pos.x, pos.y, gridSize, snapPoints, showGrid);
+
+                // LAYER 2: Transform client coordinates to canvas coordinates
+                const containerRect = canvasRef.current.getBoundingClientRect();
+                const canvasPos = transformCoordinates(
+                    clientOffset.x,
+                    clientOffset.y,
+                    containerRect,
+                    zoomLevel
+                );
+
+                // LAYER 2: Apply snap-to-grid and snap-to-guides
+                let snapped;
+                if (showGrid && gridSize > 1) {
+                    // Grid snapping enabled
+                    snapped = snapToGrid(canvasPos.x, canvasPos.y, gridSize, true);
+                } else {
+                    // Smart guide snapping only
+                    const snapPoints = getSnapPoints();
+                    const guideSnap = snapToGuides(canvasPos.x, canvasPos.y, snapPoints, 10);
+                    snapped = { x: guideSnap.x, y: guideSnap.y };
+                }
 
                 if (monitor.getItemType() === ItemTypes.ELEMENT && item.json) {
                     const defaultWidth = item.json.type === 'section' ? getCanvasWidth(viewMode) : 600;
@@ -278,10 +321,25 @@ const Canvas = React.memo(({
                 setGuidelines([]);
                 return { moved: false };
             }
-            const pos = getCanvasPosition(clientOffset.x, clientOffset.y, canvasRef.current, zoomLevel);
-            const snapPoints = getSnapPoints();
-            // FREE MODE: Use showGrid to enable/disable snapping for smooth positioning
-            const snapped = snapToGrid(pos.x, pos.y, gridSize, snapPoints, showGrid);
+
+            // LAYER 2: Transform coordinates using dragDropCore
+            const containerRect = canvasRef.current.getBoundingClientRect();
+            const canvasPos = transformCoordinates(
+                clientOffset.x,
+                clientOffset.y,
+                containerRect,
+                zoomLevel
+            );
+
+            // LAYER 2: Apply snapping
+            let snapped;
+            if (showGrid && gridSize > 1) {
+                snapped = snapToGrid(canvasPos.x, canvasPos.y, gridSize, true);
+            } else {
+                const snapPoints = getSnapPoints();
+                const guideSnap = snapToGuides(canvasPos.x, canvasPos.y, snapPoints, 10);
+                snapped = { x: guideSnap.x, y: guideSnap.y };
+            }
             if (monitor.getItemType() === ItemTypes.CHILD_ELEMENT) {
                 // FREE DRAG MODE: Allow child to be promoted to top-level element
                 const sourceSection = pageData.elements.find((el) => el.id === item.parentId);
@@ -372,14 +430,14 @@ const Canvas = React.memo(({
                     meta: { updated_at: new Date().toISOString() },
                 };
 
-                // AUTO-RESPONSIVE: Apply smart responsive conversion for non-section elements
+                // LAYER 3: Apply auto-responsive scaling using dragDropCore
                 if (item.json.type !== 'section') {
-                    newElement = autoConvertToTablet(newElement, 768);
-                    newElement = autoConvertToMobile(newElement, 375);
+                    // Auto-scale to all viewports (desktop, tablet, mobile)
+                    newElement = autoScale(newElement);
                 } else {
                     // For sections, use default responsive sizes
-                    newElement.mobileSize = item.json.mobileSize || { width: 375, height: item.json.size?.height || 400 };
-                    newElement.tabletSize = item.json.tabletSize || { width: 768, height: item.json.size?.height || 400 };
+                    newElement.mobileSize = item.json.mobileSize || { width: BREAKPOINTS.mobile, height: item.json.size?.height || 400 };
+                    newElement.tabletSize = item.json.tabletSize || { width: BREAKPOINTS.tablet, height: item.json.size?.height || 400 };
                 }
 
                 onAddElement(newElement);
