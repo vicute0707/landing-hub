@@ -21,6 +21,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { parseHTMLToPageData, renderStaticHTML } from '../utils/pageUtils';
 import { syncElementBetweenModes } from '../utils/responsiveSync';
+import { applyMobileVerticalStacking, applySectionMobileStacking } from '../utils/dragDropCore';
 import {
     calculateNextSectionY,
     reorderSections,
@@ -262,20 +263,57 @@ const CreateLanding = () => {
         toast.success(childId ? 'Đã cập nhật khóa child!' : 'Đã cập nhật khóa element!');
     }, [history, historyIndex]);
 
-    // View mode change with responsive sync
+    // View mode change with responsive sync and mobile stacking
     const handleViewModeChange = useCallback((mode) => {
         setViewMode(mode);
         setPageData((prev) => {
             const canvasWidth = mode === 'desktop' ? 1200 : mode === 'tablet' ? 768 : 375;
 
             // Sync elements để đảm bảo responsive data được cập nhật
-            const syncedElements = prev.elements.map((element) => {
-                // Nếu element chưa có responsive data, sync ngay
-                if (!element.position?.mobile || !element.position?.tablet) {
-                    return syncElementBetweenModes(element, 'desktop');
-                }
-                return element;
+            let syncedElements = prev.elements.map((element) => {
+                // Always sync to ensure responsive data is up to date
+                return syncElementBetweenModes(element, 'desktop');
             });
+
+            // MOBILE: Apply vertical stacking for better mobile layout
+            if (mode === 'mobile') {
+                // Separate sections and other elements
+                const sections = syncedElements.filter(el => el.type === 'section');
+                const others = syncedElements.filter(el => el.type !== 'section');
+
+                // Apply mobile stacking to sections (stack children vertically)
+                const stackedSections = sections.map(section => {
+                    if (section.children && section.children.length > 0) {
+                        return applySectionMobileStacking(section, {
+                            startY: 20,
+                            spacing: 16,
+                            padding: 20,
+                            viewportWidth: 375
+                        });
+                    }
+                    return section;
+                });
+
+                // Apply vertical stacking to other top-level elements (popups don't need stacking)
+                const nonPopupOthers = others.filter(el => el.type !== 'popup' && el.type !== 'modal');
+                const popups = others.filter(el => el.type === 'popup' || el.type === 'modal');
+
+                const stackedOthers = nonPopupOthers.length > 0
+                    ? applyMobileVerticalStacking(nonPopupOthers, {
+                        startY: stackedSections.reduce((maxY, section) => {
+                            const sectionBottom = (section.position?.mobile?.y || 0) + (section.mobileSize?.height || section.size?.height || 400);
+                            return Math.max(maxY, sectionBottom);
+                        }, 0) + 20,
+                        spacing: 20,
+                        padding: 20,
+                        viewportWidth: 375,
+                        centerHorizontally: true
+                    })
+                    : nonPopupOthers;
+
+                // Combine: sections first, then stacked others, then popups (unchanged)
+                syncedElements = [...stackedSections, ...stackedOthers, ...popups];
+            }
 
             const newPageData = {
                 ...prev,
@@ -289,7 +327,7 @@ const CreateLanding = () => {
         });
 
         const modeLabel = mode === 'desktop' ? 'Desktop' : mode === 'tablet' ? 'Tablet' : 'Mobile';
-        toast.info(`Đã chuyển sang chế độ ${modeLabel}`);
+        toast.info(`Đã chuyển sang chế độ ${modeLabel}${mode === 'mobile' ? ' - Áp dụng vertical stacking' : ''}`);
     }, [history, historyIndex]);
 
     // Add section
