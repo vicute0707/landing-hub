@@ -156,9 +156,10 @@ const ChildElement = React.memo(
             [parentId, id, onUpdateChildSize, locked, componentData.locked, responsivePosition]
         );
 
+        // IMPROVED: Attach drag to wrapper for full click area
         useEffect(() => {
-            if (!locked && !componentData.locked) {
-                drag(dragRef);
+            if (!locked && !componentData.locked && dragRef.current) {
+                drag(dragRef.current);
             }
         }, [drag, locked, componentData.locked]);
 
@@ -184,9 +185,9 @@ const ChildElement = React.memo(
                 width: getElementWidth(),
                 height: getElementHeight(),
                 zIndex: isDragging ? 1000 : responsivePosition.z || 20,
-                cursor: locked || componentData.locked ? 'not-allowed' : isDragging ? 'grabbing' : 'pointer',
+                cursor: locked || componentData.locked ? 'not-allowed' : isDragging ? 'grabbing' : 'move',
                 opacity: isDragging ? 0.5 : 1,
-                pointerEvents: 'auto',
+                pointerEvents: 'auto', // FULL CLICK AREA for drag
                 ...lockedStyles,
             }),
             [responsivePosition, type, isDragging, locked, componentData.locked, lockedStyles, responsiveSize]
@@ -196,15 +197,17 @@ const ChildElement = React.memo(
             () => ({
                 width: '100%',
                 height: '100%',
-                pointerEvents: 'auto',
+                // IMPORTANT: Allow interaction with content but don't block drag
+                pointerEvents: isSelected ? 'auto' : 'none', // Auto only when selected for editing
                 userSelect: type === 'heading' || type === 'paragraph' ? 'text' : 'none',
                 ...responsiveStyles,
             }),
-            [type, responsiveStyles]
+            [type, responsiveStyles, isSelected]
         );
 
         return (
             <div
+                ref={dragRef}
                 className={`lpb-child-element ${isSelected ? 'lpb-child-element-selected' : ''} ${
                     isDragging ? 'lpb-child-element-dragging' : ''
                 } ${locked || componentData.locked ? 'lpb-element-locked' : ''}`}
@@ -212,12 +215,11 @@ const ChildElement = React.memo(
                 onClick={handleClick}
             >
                 <div
-                    ref={dragRef}
                     style={{
                         width: '100%',
                         height: '100%',
                         position: 'relative',
-                        pointerEvents: 'auto',
+                        pointerEvents: isSelected ? 'auto' : 'none', // Match contentStyles
                     }}
                 >
                     {renderComponentContent(
@@ -676,14 +678,22 @@ const Element = React.memo(
                 }
                 if (!e.target.closest('button')) {
                     e.stopPropagation();
+
+                    // IMPROVED: If already selected without multi-select keys, don't re-select
+                    // This allows drag to start smoothly without re-triggering selection
+                    if (isSelected && !e.ctrlKey && !e.metaKey) {
+                        console.log(`Element ${id} already selected, allowing drag`);
+                        return;
+                    }
+
                     if (typeof onSelectElement === 'function') {
-                        onSelectElement([id], e.ctrlKey);
+                        onSelectElement([id], e.ctrlKey || e.metaKey);
                     }
                     onSelectChild(id, null);
                     console.log(`Element ${id} selected`);
                 }
             },
-            [id, locked, onSelectElement, onSelectChild]
+            [id, locked, isSelected, onSelectElement, onSelectChild]
         );
 
         const handleClick = useCallback(

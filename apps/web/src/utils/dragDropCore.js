@@ -429,6 +429,127 @@ export const autoScale = (element, options = {}) => {
     };
 };
 
+/**
+ * Vertical Stacking Algorithm for Mobile View
+ * Sắp xếp tất cả elements theo định hướng dọc để review dễ dàng
+ *
+ * @param {Array} elements - Array of elements to stack
+ * @param {Object} options - Stacking options
+ * @param {number} options.startY - Starting Y position (default: 20)
+ * @param {number} options.spacing - Spacing between elements (default: 20)
+ * @param {number} options.padding - Horizontal padding (default: 20)
+ * @param {number} options.viewportWidth - Mobile viewport width (default: 375)
+ * @param {boolean} options.centerHorizontally - Center elements (default: true)
+ * @returns {Array} Elements with updated mobile positions
+ */
+export const applyMobileVerticalStacking = (elements, options = {}) => {
+    if (!elements || elements.length === 0) return elements;
+
+    const {
+        startY = 20,
+        spacing = 20,
+        padding = 20,
+        viewportWidth = BREAKPOINTS.mobile,
+        centerHorizontally = true,
+    } = options;
+
+    // Sort elements by desktop Y position (top to bottom)
+    const sorted = [...elements].sort((a, b) => {
+        const aY = a.position?.desktop?.y || 0;
+        const bY = b.position?.desktop?.y || 0;
+        return aY - bY;
+    });
+
+    let currentY = startY;
+    const maxWidth = viewportWidth - padding * 2;
+
+    return sorted.map((element) => {
+        // Get mobile size (use existing or calculate)
+        const mobileSize = element.mobileSize || {
+            width: Math.min(maxWidth, element.size?.width || 200),
+            height: element.size?.height || 100,
+        };
+
+        // Ensure width doesn't exceed viewport
+        const finalWidth = Math.min(mobileSize.width, maxWidth);
+
+        // Calculate X position
+        let x;
+        if (centerHorizontally) {
+            x = Math.round((viewportWidth - finalWidth) / 2);
+        } else {
+            x = padding;
+        }
+
+        // Create updated element
+        const updatedElement = {
+            ...element,
+            position: {
+                ...element.position,
+                mobile: {
+                    x,
+                    y: currentY,
+                    z: element.position?.desktop?.z || 1,
+                },
+            },
+            mobileSize: {
+                width: finalWidth,
+                height: mobileSize.height,
+            },
+        };
+
+        // Move Y down for next element
+        currentY += mobileSize.height + spacing;
+
+        return updatedElement;
+    });
+};
+
+/**
+ * Apply vertical stacking to section children for mobile
+ *
+ * @param {Object} section - Section element with children
+ * @param {Object} options - Stacking options
+ * @returns {Object} Section with children stacked vertically on mobile
+ */
+export const applySectionMobileStacking = (section, options = {}) => {
+    if (!section || !section.children || section.children.length === 0) {
+        return section;
+    }
+
+    const {
+        startY = 20,
+        spacing = 16,
+        padding = 20,
+        viewportWidth = BREAKPOINTS.mobile,
+    } = options;
+
+    // Apply vertical stacking to children
+    const stackedChildren = applyMobileVerticalStacking(section.children, {
+        startY,
+        spacing,
+        padding,
+        viewportWidth,
+        centerHorizontally: true,
+    });
+
+    // Calculate total height for section
+    const totalHeight = stackedChildren.reduce((height, child) => {
+        const childY = child.position?.mobile?.y || 0;
+        const childHeight = child.mobileSize?.height || 0;
+        return Math.max(height, childY + childHeight);
+    }, 0) + spacing;
+
+    return {
+        ...section,
+        children: stackedChildren,
+        mobileSize: {
+            width: viewportWidth,
+            height: totalHeight,
+        },
+    };
+};
+
 // ============================================
 // LAYER 3: DATA LAYER - JSON State Helpers
 // ============================================
@@ -657,6 +778,8 @@ export default {
     // Responsive scaling
     scaleToViewport,
     autoScale,
+    applyMobileVerticalStacking,
+    applySectionMobileStacking,
 
     // JSON state helpers
     createElementData,

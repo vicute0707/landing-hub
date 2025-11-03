@@ -53,6 +53,8 @@ import {
     snapToGuides,
     generateSnapPoints,
     autoScale,
+    applyMobileVerticalStacking,
+    applySectionMobileStacking,
     clampToCanvas,
     getElementBounds,
     BREAKPOINTS,
@@ -437,9 +439,14 @@ const Canvas = React.memo(({
                     tabletSize: item.json.tabletSize,
                     styles: JSON.parse(JSON.stringify(item.json.styles || {})),
                     children: JSON.parse(JSON.stringify(item.json.children || [])),
-                    visible: true,
-                    locked: false,
-                    meta: { updated_at: new Date().toISOString() },
+                    visible: item.json.visible !== undefined ? item.json.visible : true,
+                    locked: item.json.locked || false,
+                    // IMPROVED: Preserve all metadata properly
+                    meta: {
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        ...JSON.parse(JSON.stringify(item.json.meta || {})),
+                    },
                 };
 
                 // LAYER 3: Apply auto-responsive scaling using dragDropCore
