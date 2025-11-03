@@ -119,11 +119,12 @@ const ChildElement = React.memo(
                     onSelectChild(parentId, id);
                     console.log(`onSelectChild called with parentId: ${parentId}, id: ${id}`);
                 }
-                if (componentData.events?.onClick) {
-                    eventController.handleEvent(componentData.events.onClick, id, true);
-                }
+                // REMOVED: Event handling in canvas - only in preview
+                // if (componentData.events?.onClick) {
+                //     eventController.handleEvent(componentData.events.onClick, id, true);
+                // }
             },
-            [parentId, id, type, onSelectChild, componentData.events]
+            [parentId, id, type, onSelectChild]
         );
 
         const handleDelete = useCallback(
@@ -197,9 +198,9 @@ const ChildElement = React.memo(
             () => ({
                 width: '100%',
                 height: '100%',
-                // IMPORTANT: Allow interaction with content but don't block drag
-                pointerEvents: isSelected ? 'auto' : 'none', // Auto only when selected for editing
-                userSelect: type === 'heading' || type === 'paragraph' ? 'text' : 'none',
+                // IMPROVED: Always allow pointer events for drag/select, but control interaction
+                pointerEvents: 'auto',
+                userSelect: isSelected && (type === 'heading' || type === 'paragraph') ? 'text' : 'none',
                 ...responsiveStyles,
             }),
             [type, responsiveStyles, isSelected]
@@ -219,7 +220,7 @@ const ChildElement = React.memo(
                         width: '100%',
                         height: '100%',
                         position: 'relative',
-                        pointerEvents: isSelected ? 'auto' : 'none', // Match contentStyles
+                        pointerEvents: 'auto', // Always allow pointer events for drag/select
                     }}
                 >
                     {renderComponentContent(
@@ -699,11 +700,12 @@ const Element = React.memo(
         const handleClick = useCallback(
             (e) => {
                 e.stopPropagation();
-                if (componentData.events?.onClick) {
-                    eventController.handleEvent(componentData.events.onClick, id, true);
-                }
+                // REMOVED: Event handling in canvas - only in preview
+                // if (componentData.events?.onClick) {
+                //     eventController.handleEvent(componentData.events.onClick, id, true);
+                // }
             },
-            [id, componentData.events]
+            [id]
         );
 
         const handleContextMenu = useCallback(
