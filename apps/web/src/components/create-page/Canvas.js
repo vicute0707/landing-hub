@@ -341,7 +341,19 @@ const Canvas = React.memo(({
                 snapped = { x: guideSnap.x, y: guideSnap.y };
             }
             if (monitor.getItemType() === ItemTypes.CHILD_ELEMENT) {
-                // FREE DRAG MODE: Allow child to be promoted to top-level element
+                // IMPROVED: Check if dropping on a section/popup
+                // If yes, let the section handle it (don't intercept)
+                // Only convert to top-level if dropping on empty canvas
+
+                const didDrop = monitor.didDrop();
+                if (didDrop) {
+                    // Section or popup already handled the drop
+                    setDragPreview(null);
+                    setGuidelines([]);
+                    return { moved: false };
+                }
+
+                // Dropping on EMPTY canvas → convert to top-level element
                 const sourceSection = pageData.elements.find((el) => el.id === item.parentId);
                 if (!sourceSection) {
                     toast.error('Không tìm thấy section nguồn!');
@@ -374,7 +386,7 @@ const Canvas = React.memo(({
 
                 setDragPreview(null);
                 setGuidelines([]);
-                toast.success('Element được di chuyển tự do!');
+                toast.success('Element được di chuyển ra ngoài section!');
                 return { moved: true, newPosition: snapped };
             } else if (monitor.getItemType() === ItemTypes.ELEMENT) {
                 if (item.json.type !== 'section' && item.json.type !== 'popup' && item.json.type !== 'modal') {

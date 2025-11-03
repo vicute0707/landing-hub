@@ -90,6 +90,14 @@ const ChildElement = React.memo(
                     toast.warning('Child element đã bị khóa!');
                     return null;
                 }
+
+                // IMPROVED: Auto-deselect parent section when dragging child
+                // This prevents confusing visual state (section selected while dragging child)
+                if (typeof onSelectChild === 'function') {
+                    // Select only this child, deselect parent section
+                    onSelectChild(parentId, id);
+                }
+
                 // FREE DRAG: Include full element data for conversion to top-level
                 return {
                     childId: id,
@@ -102,7 +110,7 @@ const ChildElement = React.memo(
                 };
             },
             collect: (monitor) => ({ isDragging: monitor.isDragging() }),
-        }, [id, parentId, responsivePosition, responsiveSize, locked, componentData.locked, element]);
+        }, [id, parentId, responsivePosition, responsiveSize, locked, componentData.locked, element, onSelectChild]);
 
         const handleClick = useCallback(
             (e) => {
@@ -453,12 +461,15 @@ const Element = React.memo(
                     setDragPreview(null);
                     return { moved: true, newPosition: snapped };
                 } else if (monitor.getItemType() === ItemTypes.CHILD_ELEMENT) {
+                    // IMPROVED: Flexible child movement
                     if (item.parentId === id) {
+                        // Moving within same section - smooth update
                         onUpdateChildPosition(id, item.childId, snapped);
-                        toast.success('Đã di chuyển thành phần con trong section!');
+                        // No toast for within-section moves (less noise)
                     } else {
+                        // Moving to different section - show feedback
                         onMoveChild(item.parentId, item.childId, id, snapped);
-                        toast.success('Đã di chuyển thành phần con sang section khác!');
+                        toast.success('Đã di chuyển sang section khác!');
                     }
                     setDragPreview(null);
                     return { moved: true, newPosition: snapped };
@@ -521,12 +532,15 @@ const Element = React.memo(
                     setDragPreview(null);
                     return { moved: true, newPosition: snapped };
                 } else if (monitor.getItemType() === ItemTypes.CHILD_ELEMENT) {
+                    // IMPROVED: Flexible child movement in popups
                     if (item.parentId === id) {
+                        // Moving within same popup - smooth update
                         onUpdateChildPosition(id, item.childId, snapped);
-                        toast.success('Đã di chuyển thành phần con trong popup!');
+                        // No toast for within-popup moves (less noise)
                     } else {
+                        // Moving to different popup - show feedback
                         onMoveChild(item.parentId, item.childId, id, snapped);
-                        toast.success('Đã di chuyển thành phần con sang popup khác!');
+                        toast.success('Đã di chuyển sang popup khác!');
                     }
                     setDragPreview(null);
                     return { moved: true, newPosition: snapped };
