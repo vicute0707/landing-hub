@@ -778,6 +778,12 @@
     pointer-events: none !important;
 }
 
+/* IMPORTANT: Allow wrapper itself to be draggable even when locked */
+.lpb-element-locked.lpb-child-element {
+    pointer-events: auto !important;
+    cursor: not-allowed !important;
+}
+
 /* Allow lock indicator to be clickable */
 .lpb-element-locked > div[style*="background: rgba(0,0,0,0.7)"] {
     pointer-events: auto !important;
@@ -1160,27 +1166,33 @@
 
 /* Child Elements - Independent from Parent Styles */
 .lpb-child-element {
-    /* Reset parent inheritance */
-    all: initial;
-    
+    /* IMPORTANT: Do NOT use 'all: initial' - it breaks everything! */
+    /* Instead, explicitly reset only what's needed */
+
     /* Restore necessary properties */
     position: absolute !important;
     display: block !important;
     box-sizing: border-box !important;
-    
+
     /* Prevent parent padding/margin interference */
     margin: 0 !important;
-    
+
     /* Independent positioning context */
     transform-origin: top left !important;
-    
+
     /* Prevent text inheritance issues */
     font-family: inherit;
     color: inherit;
     line-height: normal;
-    
+
     /* Ensure proper layering */
     z-index: auto;
+
+    /* CRITICAL: Allow pointer events for drag */
+    pointer-events: auto !important;
+
+    /* Allow cursor changes */
+    cursor: move;
 }
 
 /* Child Element Content - Restore Normal Behavior */
