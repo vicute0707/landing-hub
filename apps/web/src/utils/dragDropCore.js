@@ -464,14 +464,47 @@ export const applyMobileVerticalStacking = (elements, options = {}) => {
     const maxWidth = viewportWidth - padding * 2;
 
     return sorted.map((element) => {
-        // Get mobile size (use existing or calculate)
-        const mobileSize = element.mobileSize || {
-            width: Math.min(maxWidth, element.size?.width || 200),
-            height: element.size?.height || 100,
-        };
+        // IMPROVED: Calculate proper mobile size with scaling
+        const desktopSize = element.size || { width: 200, height: 100 };
+        const desktopWidth = desktopSize.width;
+        const desktopHeight = desktopSize.height;
+
+        // Scale down to fit mobile viewport
+        let mobileWidth = desktopWidth;
+        let mobileHeight = desktopHeight;
+
+        // If element is wider than maxWidth, scale it down proportionally
+        if (desktopWidth > maxWidth) {
+            const scaleFactor = maxWidth / desktopWidth;
+            mobileWidth = maxWidth;
+            mobileHeight = Math.round(desktopHeight * scaleFactor);
+        } else {
+            // Element fits, but might want to make it wider on mobile
+            // For small elements (< 50% of viewport), keep original size
+            // For medium elements (50-90%), scale to fit nicely
+            const widthPercent = (desktopWidth / BREAKPOINTS.desktop) * 100;
+
+            if (widthPercent > 50) {
+                // Scale to mobile viewport
+                const scaleFactor = maxWidth / desktopWidth;
+                mobileWidth = Math.min(maxWidth, Math.round(desktopWidth * scaleFactor));
+                mobileHeight = Math.round(desktopHeight * scaleFactor);
+            }
+        }
+
+        // Minimum sizes based on element type
+        const minHeight = element.type === 'button' ? 40 :
+                         element.type === 'heading' ? 30 :
+                         element.type === 'paragraph' ? 20 :
+                         element.type === 'form' ? 200 :
+                         element.type === 'iframe' ? 300 :
+                         element.type === 'gallery' ? 200 :
+                         50;
+
+        mobileHeight = Math.max(mobileHeight, minHeight);
 
         // Ensure width doesn't exceed viewport
-        const finalWidth = Math.min(mobileSize.width, maxWidth);
+        const finalWidth = Math.min(mobileWidth, maxWidth);
 
         // Calculate X position
         let x;
@@ -494,12 +527,12 @@ export const applyMobileVerticalStacking = (elements, options = {}) => {
             },
             mobileSize: {
                 width: finalWidth,
-                height: mobileSize.height,
+                height: mobileHeight,
             },
         };
 
         // Move Y down for next element
-        currentY += mobileSize.height + spacing;
+        currentY += mobileHeight + spacing;
 
         return updatedElement;
     });
