@@ -1,4 +1,4 @@
-
+/* Create Page Popup - Using Design System */
 .popup-overlay {
     position: fixed;
     top: 0;
@@ -9,46 +9,46 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: var(--z-modal);
 }
 
 .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+    background: var(--color-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
     width: 400px;
     max-width: 90%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-xl);
 }
 
 .popup-content h2 {
     margin-top: 0;
-    font-size: 1.5rem;
-    color: #333;
+    font-size: var(--font-size-2xl);
+    color: var(--color-gray-900);
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: var(--spacing-md);
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #333;
+    margin-bottom: var(--spacing-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-gray-900);
 }
 
 .form-group label span {
-    color: red;
+    color: var(--color-error);
 }
 
 .form-group input,
 .form-group textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-base);
 }
 
 .form-group textarea {
@@ -59,29 +59,29 @@
 .form-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
+    gap: var(--spacing-sm);
 }
 
 .form-buttons button {
-    padding: 10px 20px;
+    padding: var(--spacing-sm) var(--spacing-lg);
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
 }
 
 .form-buttons button[type="button"] {
-    background: #ccc;
-    color: #333;
+    background: var(--color-gray-300);
+    color: var(--color-gray-900);
 }
 
 .form-buttons button[type="submit"] {
     background: #007bff;
-    color: white;
+    color: var(--color-white);
 }
 
 .form-buttons button:disabled {
-    background: #aaa;
+    background: var(--color-gray-400);
     cursor: not-allowed;
 }
 
@@ -89,22 +89,22 @@
 .mode-selection {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-sm);
 }
 
 .mode-option {
     display: flex;
     align-items: center;
-    padding: 15px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+    padding: var(--spacing-md);
+    border: 2px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
 }
 
 .mode-option:hover {
     border-color: #007bff;
-    background-color: #f8f9fa;
+    background-color: var(--color-gray-50);
 }
 
 .mode-option.active {
@@ -113,8 +113,8 @@
 }
 
 .mode-icon {
-    font-size: 2rem;
-    margin-right: 15px;
+    font-size: var(--font-size-3xl);
+    margin-right: var(--spacing-md);
 }
 
 .mode-info {
@@ -122,40 +122,40 @@
 }
 
 .mode-info h4 {
-    margin: 0 0 5px 0;
-    font-size: 1rem;
-    color: #333;
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-base);
+    color: var(--color-gray-900);
 }
 
 .mode-info p {
     margin: 0;
-    font-size: 0.875rem;
-    color: #666;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
 }
 
 .mode-radio {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
 }
 
 /* File Upload */
 .file-upload-area {
-    margin-top: 10px;
+    margin-top: var(--spacing-sm);
 }
 
 .file-select-btn {
     width: 100%;
-    padding: 12px;
-    background: #f8f9fa;
+    padding: var(--spacing-md);
+    background: var(--color-gray-50);
     border: 2px dashed #007bff;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: #007bff;
-    transition: all 0.3s ease;
+    transition: var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--spacing-sm);
 }
 
 .file-select-btn:hover {
@@ -164,30 +164,30 @@
 }
 
 .file-select-btn i {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
 }
 
 .file-info {
-    margin-top: 10px;
-    padding: 10px;
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-sm);
     background: #d4edda;
     border: 1px solid #c3e6cb;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.875rem;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-sm);
     color: #155724;
 }
 
 .file-check {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
 }
 
 .form-hint {
     display: block;
-    margin-top: 8px;
-    font-size: 0.875rem;
-    color: #666;
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-600);
     font-style: italic;
 }

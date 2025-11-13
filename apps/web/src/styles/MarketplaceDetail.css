@@ -532,5 +532,88 @@
 }
 .review-date { font-size: 0.85em; color: #666; }
 .review-comment { margin-top: 6px; color: #333; }
-.stars { color: #ffc107; }
-.stars svg { margin-right: 2px; }
+
+/* Review Box - Form đánh giá */
+.review-box {
+    background: var(--color-bg-container);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    box-shadow: var(--shadow-soft);
+}
+
+.review-box h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-header);
+    margin-bottom: var(--space-md);
+}
+
+.review-box textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    margin: var(--space-md) 0;
+    resize: vertical;
+    transition: var(--transition);
+}
+
+.review-box textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(161, 138, 109, 0.1);
+}
+
+.review-box button {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.review-box button:hover:not(:disabled) {
+    background: var(--color-secondary-accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-interactive);
+}
+
+.review-box button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Stars Rating */
+.stars {
+    display: flex;
+    gap: 4px;
+    margin: var(--space-md) 0;
+}
+
+.stars svg {
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #d1d5db; /* Default gray for empty stars */
+    stroke: #9ca3af;
+    stroke-width: 1.5;
+}
+
+.stars svg:hover {
+    transform: scale(1.15);
+    color: #fbbf24; /* Hover yellow */
+}
+
+.stars svg.filled {
+    color: #fbbf24; /* Bright gold for filled stars */
+    fill: #fbbf24;
+    stroke: #f59e0b;
+}

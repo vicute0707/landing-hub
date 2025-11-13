@@ -1,4 +1,4 @@
-/* Modal styles */
+/* Modal styles - Using Design System */
 .modal1-overlay--preview {
     position: fixed;
     inset: 0;
@@ -6,19 +6,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
-    padding: 0; /* Removed padding to allow full-screen usage */
+    z-index: var(--z-modal);
+    padding: 0;
 }
 
 .modal1-content--preview {
-    background: white;
-    border-radius: 16px;
-    width: 78vw; /* Reduced from 90vw (~12% smaller) */
-    height: 78vh; /* Reduced from 90vh (~12% smaller) */
-    max-width: 1400px; /* Adjusted from 1600px for smaller footprint */
-    max-height: 880px; /* Adjusted from 1000px for smaller footprint */
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    width: 78vw;
+    height: 78vh;
+    max-width: 1400px;
+    max-height: 880px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-2xl);
     display: flex;
     flex-direction: column;
 }
@@ -36,18 +36,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-gray-200);
     background: linear-gradient(to bottom, #f9fafb, #ffffff);
 }
 
 .modal1-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #111827;
+    gap: var(--spacing-sm);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-900);
 }
 
 .btn--close {
@@ -56,23 +56,23 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s ease;
-    color: #6b7280;
+    transition: var(--transition-fast);
+    color: var(--color-gray-500);
     font-size: 20px;
 }
 
 .btn--close:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--color-gray-100);
+    color: var(--color-gray-900);
 }
 
 .modal1-body {
     flex: 1;
-    padding: 10px;
+    padding: var(--spacing-sm);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -82,21 +82,21 @@
 /* Tab styles */
 .preview-tabs {
     display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
     justify-content: center;
 }
 
 .preview-tab {
     border: none;
-    background: #f3f4f6;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #374151;
+    background: var(--color-gray-100);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-700);
     cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 8px 12px;
+    transition: var(--transition-fast);
+    padding: var(--spacing-sm) var(--spacing-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -108,7 +108,7 @@
 }
 
 .preview-tab:hover {
-    background: #e5e7eb;
+    background: var(--color-gray-200);
 }
 
 .preview-tab.active:hover {
@@ -146,9 +146,9 @@
 .desktop-preview {
     width: 100%;
     height: 100%;
-    background: #f3f4f6;
-    border-radius: 16px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    background: var(--color-gray-100);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -157,8 +157,8 @@
 .desktop-header {
     display: flex;
     align-items: center;
-    padding: 12px;
-    background: #e5e7eb;
+    padding: var(--spacing-md);
+    background: var(--color-gray-200);
 }
 
 .control-btn {
@@ -185,9 +185,9 @@
     width: 100%;
     height: 100%;
     border: none;
-    background: white;
+    background: var(--color-white);
     overflow: auto;
-    scrollbar-width: none; /* Firefox */
+    scrollbar-width: none;
 }
 
 .desktop-preview .modal1-iframe::-webkit-scrollbar {
@@ -205,11 +205,11 @@
 .mobile-preview {
     width: 100%;
     height: 100%;
-    padding: 12px; /* Slightly reduced padding */
+    padding: var(--spacing-md);
     background: #f9fafb;
-    border-radius: 36px; /* Adjusted for smaller frame */
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-    border: 2px solid #e5e7eb;
+    border-radius: 36px;
+    box-shadow: var(--shadow-xl);
+    border: 2px solid var(--color-gray-200);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -220,18 +220,18 @@
 .mobile-frame {
     width: 100%;
     height: 100%;
-    border-radius: 28px; /* Adjusted for smaller frame */
+    border-radius: 28px;
     overflow: hidden;
-    background: white;
+    background: var(--color-white);
 }
 
 .mobile-preview .modal1-iframe {
     width: 100%;
     height: 100%;
     border: none;
-    background: white;
-    overflow: hidden; /* Hide scrollbars */
-    scrollbar-width: none; /* Firefox */
+    background: var(--color-white);
+    overflow: hidden;
+    scrollbar-width: none;
 }
 
 .mobile-preview .modal1-iframe::-webkit-scrollbar {
@@ -240,12 +240,12 @@
 
 .mobile-home-button {
     position: absolute;
-    bottom: 8px;
+    bottom: var(--spacing-sm);
     left: 50%;
     transform: translateX(-50%);
-    width: 100px; /* Slightly smaller */
+    width: 100px;
     height: 4px;
-    background: #d1d5db;
+    background: var(--color-gray-300);
     border-radius: 2px;
 }
 
@@ -256,15 +256,15 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .modal1-content--preview {
-        width: 92vw; /* Slightly larger for smaller screens */
+        width: 92vw;
         height: 92vh;
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
     }
 
     .modal1-content--preview.full-screen {
@@ -288,16 +288,16 @@
     }
 
     .modal1-title {
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     .preview-tab {
-        padding: 6px 10px;
-        font-size: 0.875rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-sm);
     }
 
     .mobile-preview {
-        padding: 10px;
+        padding: var(--spacing-sm);
         border-radius: 32px;
     }
 
@@ -331,7 +331,7 @@
     }
 
     .preview-tab {
-        padding: 6px 8px;
-        font-size: 0.75rem;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: var(--font-size-xs);
     }
 }

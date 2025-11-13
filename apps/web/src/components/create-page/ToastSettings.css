@@ -1,4 +1,4 @@
-/* Toast Settings Panel */
+/* Toast Settings Panel - Using Design System */
 .toast-settings-overlay {
     position: fixed;
     top: 0;
@@ -9,8 +9,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
-    animation: fadeIn 0.2s;
+    z-index: var(--z-modal);
+    animation: fadeIn var(--transition-fast);
 }
 
 @keyframes fadeIn {
@@ -19,12 +19,12 @@
 }
 
 .toast-settings-panel {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
     width: 90%;
     max-width: 500px;
-    animation: slideUp 0.3s;
+    animation: slideUp var(--transition-base);
 }
 
 @keyframes slideUp {
@@ -42,22 +42,22 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
 .toast-settings-header h3 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-gray-900);
 }
 
 .toast-settings-close {
     background: none;
     border: none;
     font-size: 32px;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     cursor: pointer;
     line-height: 1;
     padding: 0;
@@ -66,31 +66,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
 }
 
 .toast-settings-close:hover {
-    background: #f3f4f6;
-    color: #1f2937;
+    background: var(--color-gray-100);
+    color: var(--color-gray-900);
 }
 
 .toast-settings-body {
-    padding: 24px;
+    padding: var(--spacing-xl);
 }
 
 .toast-settings-desc {
-    margin: 0 0 20px 0;
-    color: #6b7280;
-    font-size: 14px;
+    margin: 0 0 var(--spacing-lg) 0;
+    color: var(--color-gray-500);
+    font-size: var(--font-size-sm);
 }
 
 .toast-setting-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid #f3f4f6;
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--color-gray-100);
 }
 
 .toast-setting-item:last-child {
@@ -103,16 +103,16 @@
 
 .toast-setting-info label {
     display: block;
-    font-weight: 500;
-    color: #1f2937;
-    margin-bottom: 4px;
-    font-size: 15px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-gray-900);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-base);
 }
 
 .toast-setting-info small {
     display: block;
-    color: #9ca3af;
-    font-size: 13px;
+    color: var(--color-gray-400);
+    font-size: var(--font-size-xs);
 }
 
 /* Toggle Switch */
@@ -136,9 +136,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #d1d5db;
+    background-color: var(--color-gray-300);
     border-radius: 24px;
-    transition: 0.3s;
+    transition: var(--transition-base);
 }
 
 .toast-toggle-slider:before {
@@ -148,9 +148,9 @@
     width: 18px;
     left: 3px;
     bottom: 3px;
-    background-color: white;
+    background-color: var(--color-white);
     border-radius: 50%;
-    transition: 0.3s;
+    transition: var(--transition-base);
 }
 
 .toast-toggle input:checked + .toast-toggle-slider {
@@ -171,24 +171,24 @@
 }
 
 .toast-settings-footer {
-    padding: 16px 24px;
-    border-top: 1px solid #e5e7eb;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-top: 1px solid var(--color-gray-200);
     display: flex;
     justify-content: flex-end;
 }
 
 .toast-settings-btn-close {
-    padding: 10px 20px;
-    background: #f3f4f6;
-    color: #1f2937;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--color-gray-100);
+    color: var(--color-gray-900);
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-fast);
 }
 
 .toast-settings-btn-close:hover {
-    background: #e5e7eb;
+    background: var(--color-gray-200);
 }
