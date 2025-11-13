@@ -256,8 +256,12 @@ const Marketplace = () => {
         try {
             const token = localStorage.getItem('token');
 
-            // Fetch HTML from backend (marketplace page's file_path in S3)
-            const response = await axios.get(`${API_BASE_URL}/api/pages/${marketplacePage.original_page_id}/preview-html`, {
+            // Use page_id from marketplace page (reference to original page)
+            const pageId = marketplacePage.page_id || marketplacePage.pageId || marketplacePage._id;
+            console.log('Preview for page:', pageId, marketplacePage);
+
+            // Fetch HTML from backend
+            const response = await axios.get(`${API_BASE_URL}/api/pages/${pageId}/preview-html`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

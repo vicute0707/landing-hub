@@ -11,6 +11,7 @@ router.put('/:id', authenticate, pagesController.updatePage);
 router.post('/:id/publish', authenticate, pagesController.publishPage);
 router.delete('/:id', authenticate, pagesController.deletePage);
 router.get('/:id/content', authenticate, pagesController.getPageContent);
+router.get('/:id/preview-html', authenticate, pagesController.getPreviewHTML);
 router.get('/debug/s3', pagesController.debugS3);
 router.get('/:id/regenerate-screenshot', authenticate, pagesController.regenerateScreenshot); // Đã có
 router.get('/regenerate-screenshots', authenticate, pagesController.regenerateScreenshots); // Thêm mới

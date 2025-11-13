@@ -1350,3 +1350,40 @@ exports.regenerateScreenshots = async (req, res) => {
         res.status(500).json({ error: 'Lỗi khi tạo lại screenshots: ' + err.message });
     }
 };
+
+/**
+ * Get preview HTML for a page (for marketplace preview modal)
+ */
+exports.getPreviewHTML = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user?.userId || req.user?.id || req.user?._id;
+
+        if (!userId) {
+            return res.status(401).json({ success: false, message: 'Unauthorized' });
+        }
+
+        // Get page data
+        const page = await Page.findById(id);
+        if (!page) {
+            return res.status(404).json({ success: false, message: 'Page not found' });
+        }
+
+        // Use deployment controller's buildHTML function
+        const { buildHTML } = require('./deploymentController');
+        const result = await buildHTML(page);
+
+        res.json({
+            success: true,
+            html: result.html,
+            pageData: page
+        });
+    } catch (err) {
+        console.error('Error getting preview HTML:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi tải preview',
+            error: err.message
+        });
+    }
+};
