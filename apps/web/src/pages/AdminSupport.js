@@ -69,7 +69,9 @@ const MessagesContainer = styled(Box)(({ theme }) => ({
   }
 }));
 
-const MessageBubble = styled(Box)(({ theme, isOwn, isBot }) => ({
+const MessageBubble = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isOwn' && prop !== 'isBot'
+})(({ theme, isOwn, isBot }) => ({
   maxWidth: '70%',
   padding: '10px 14px',
   borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',

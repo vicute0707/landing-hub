@@ -19,7 +19,12 @@ import {
   Zoom,
   Snackbar,
   Alert,
-  LinearProgress
+  LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Rating
 } from '@mui/material';
 import {
   Chat as ChatIcon,
@@ -34,7 +39,9 @@ import {
 import { styled } from '@mui/material/styles';
 
 // Styled components
-const ChatContainer = styled(Box)(({ theme, isOpen }) => ({
+const ChatContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isOpen'
+})(({ theme, isOpen }) => ({
   position: 'fixed',
   bottom: 20,
   right: 20,
@@ -88,7 +95,9 @@ const MessagesContainer = styled(Box)(({ theme }) => ({
   }
 }));
 
-const MessageBubble = styled(Box)(({ theme, isOwn, isBot }) => ({
+const MessageBubble = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'isOwn' && prop !== 'isBot'
+})(({ theme, isOwn, isBot }) => ({
   maxWidth: '75%',
   padding: '10px 14px',
   borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
@@ -166,6 +175,10 @@ const SupportChatbox = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const [failedMessages, setFailedMessages] = useState(new Set());
+  const [imagePreview, setImagePreview] = useState(null);
+  const [ratingDialog, setRatingDialog] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [ratingFeedback, setRatingFeedback] = useState('');
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -279,6 +292,10 @@ const SupportChatbox = () => {
     newSocket.on('chat:room_closed', (data) => {
       setMessages(prev => [...prev, data.systemMessage]);
       setRoom(prev => ({ ...prev, status: 'resolved' }));
+      // Show rating dialog after a short delay
+      setTimeout(() => {
+        setRatingDialog(true);
+      }, 1000);
     });
 
     newSocket.on('chat:error', (data) => {
@@ -444,6 +461,15 @@ const SupportChatbox = () => {
       return;
     }
 
+    // Show image preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
     try {
       setIsUploading(true);
       setUploadProgress(0);
@@ -469,15 +495,17 @@ const SupportChatbox = () => {
       // Send message with attachment
       socket.emit('chat:send_message', {
         roomId: room._id,
-        message: `📎 ${file.name}`,
+        message: file.type.startsWith('image/') ? `🖼️ ${file.name}` : `📎 ${file.name}`,
         message_type: response.data.file.type,
         attachments: [response.data.file]
       });
 
       showToast('Upload thành công! ✅', 'success');
+      setImagePreview(null);
     } catch (error) {
       console.error('File upload error:', error);
       showToast('Không thể upload file. Vui lòng thử lại.', 'error');
+      setImagePreview(null);
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -559,6 +587,34 @@ const SupportChatbox = () => {
       showToast('Không thể kết nối với Admin. Vui lòng thử lại sau.', 'error');
     } finally {
       setRequestingAdmin(false);
+    }
+  };
+
+  // Handle rating submission
+  const handleSubmitRating = async () => {
+    if (!room || rating === 0) {
+      showToast('Vui lòng chọn số sao đánh giá', 'warning');
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${API_URL}/api/chat/rooms/${room._id}/rate`,
+        { score: rating, feedback: ratingFeedback },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+
+      showToast('Cảm ơn đánh giá của bạn! ⭐', 'success');
+      setRatingDialog(false);
+      setRating(0);
+      setRatingFeedback('');
+    } catch (error) {
+      console.error('Rating error:', error);
+      showToast('Không thể gửi đánh giá. Vui lòng thử lại.', 'error');
     }
   };
 
@@ -765,16 +821,55 @@ const SupportChatbox = () => {
               </Box>
             )}
 
-            {/* Upload Progress */}
-            {isUploading && (
+            {/* Image Preview & Upload Progress */}
+            {(imagePreview || isUploading) && (
               <Box px={2} pb={1}>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <LinearProgress variant="determinate" value={uploadProgress} sx={{ flex: 1 }} />
-                  <Typography variant="caption">{uploadProgress}%</Typography>
-                </Box>
-                <Typography variant="caption" color="textSecondary">
-                  Đang upload file...
-                </Typography>
+                {imagePreview && (
+                  <Box mb={1} position="relative">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{
+                        maxWidth: '200px',
+                        maxHeight: '200px',
+                        borderRadius: '8px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                    {!isUploading && (
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          setImagePreview(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                        sx={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          bgcolor: 'rgba(0,0,0,0.6)',
+                          color: '#fff',
+                          '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' }
+                        }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+                )}
+                {isUploading && (
+                  <>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <LinearProgress variant="determinate" value={uploadProgress} sx={{ flex: 1 }} />
+                      <Typography variant="caption">{uploadProgress}%</Typography>
+                    </Box>
+                    <Typography variant="caption" color="textSecondary">
+                      Đang upload {imagePreview ? 'hình ảnh' : 'file'}...
+                    </Typography>
+                  </>
+                )}
               </Box>
             )}
 
@@ -859,6 +954,65 @@ const SupportChatbox = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* Rating Dialog */}
+      <Dialog open={ratingDialog} onClose={() => setRatingDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Typography variant="h6" fontWeight={600}>
+            Đánh giá trải nghiệm hỗ trợ
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box textAlign="center" py={2}>
+            <Typography variant="body1" mb={2} color="textSecondary">
+              Bạn có hài lòng với dịch vụ hỗ trợ không?
+            </Typography>
+            <Rating
+              name="support-rating"
+              value={rating}
+              onChange={(event, newValue) => setRating(newValue)}
+              size="large"
+              sx={{ fontSize: '3rem' }}
+            />
+            <Typography variant="caption" display="block" mt={1} color="textSecondary">
+              {rating === 0 && 'Chọn số sao'}
+              {rating === 1 && 'Rất không hài lòng'}
+              {rating === 2 && 'Không hài lòng'}
+              {rating === 3 && 'Bình thường'}
+              {rating === 4 && 'Hài lòng'}
+              {rating === 5 && 'Rất hài lòng'}
+            </Typography>
+          </Box>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            placeholder="Chia sẻ ý kiến của bạn (không bắt buộc)"
+            value={ratingFeedback}
+            onChange={(e) => setRatingFeedback(e.target.value)}
+            variant="outlined"
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRatingDialog(false)} color="inherit">
+            Bỏ qua
+          </Button>
+          <Button
+            onClick={handleSubmitRating}
+            variant="contained"
+            disabled={rating === 0}
+            sx={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)'
+              }
+            }}
+          >
+            Gửi đánh giá
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

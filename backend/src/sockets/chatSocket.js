@@ -213,7 +213,8 @@ module.exports = (io) => {
       };
 
       if (user && user.role === 'admin') {
-        // Emit immediately, then query
+        // Wait a bit to ensure old connection is fully disconnected
+        await new Promise(resolve => setTimeout(resolve, 100));
         const adminStatus = await getAdminOnlineStatus();
         io.emit('chat:admin_status', { admins: adminStatus });
         console.log(`✅ Admin ${user.name} is now ONLINE - Broadcasting to all clients`);
