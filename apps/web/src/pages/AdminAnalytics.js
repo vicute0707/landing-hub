@@ -202,43 +202,6 @@ const AdminAnalytics = () => {
         </Grid>
       )}
 
-      {/* Chat Volume Trend */}
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" fontWeight="bold" mb={3}>
-          💬 Chat Volume Trend
-        </Typography>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chatTrends}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="_id" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="totalChats" 
-              stroke="#667eea" 
-              strokeWidth={2}
-              name="Total Chats"
-            />
-            <Line 
-              type="monotone" 
-              dataKey="openChats" 
-              stroke="#f093fb" 
-              strokeWidth={2}
-              name="Open Chats"
-            />
-            <Line 
-              type="monotone" 
-              dataKey="resolvedChats" 
-              stroke="#43e97b" 
-              strokeWidth={2}
-              name="Resolved Chats"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </Paper>
-
       {/* Marketplace Trends */}
       <Grid container spacing={3}>
         {/* Category Performance */}

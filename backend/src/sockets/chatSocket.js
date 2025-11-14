@@ -23,11 +23,19 @@ const notifyUser = (io, userId, event, data) => {
 // Get admin online status
 const getAdminOnlineStatus = async () => {
   const admins = await User.find({ role: 'admin' });
-  return admins.map(admin => ({
-    id: admin._id,
-    name: admin.name,
-    isOnline: onlineUsers.has(admin._id.toString())
-  }));
+  console.log('🔍 Checking admin status. Online users:', Array.from(onlineUsers.keys()));
+
+  return admins.map(admin => {
+    const adminIdStr = admin._id.toString();
+    const isOnline = onlineUsers.has(adminIdStr);
+    console.log(`👤 Admin ${admin.name} (${adminIdStr}): ${isOnline ? 'ONLINE' : 'OFFLINE'}`);
+
+    return {
+      id: admin._id,
+      name: admin.name,
+      isOnline
+    };
+  });
 };
 
 /**
@@ -162,10 +170,12 @@ const handleAdminEscalation = async (io, room, user, userMessage, aiResult) => {
 module.exports = (io) => {
   io.on('connection', (socket) => {
     const userId = socket.userId;
-    console.log(`💬 Chat: User ${userId} connected via socket ${socket.id}`);
+    console.log(`💬 Chat: User ${userId} (type: ${typeof userId}) connected via socket ${socket.id}`);
 
-    // Track online status
-    onlineUsers.set(userId, socket.id);
+    // Track online status - ensure userId is string
+    const userIdStr = userId.toString();
+    onlineUsers.set(userIdStr, socket.id);
+    console.log(`📝 Added to onlineUsers: ${userIdStr}`);
 
     // Join user's personal room (already done in server.js, but ensure)
     socket.join(`user_${userId}`);
@@ -176,7 +186,7 @@ module.exports = (io) => {
       if (user && user.role === 'admin') {
         const adminStatus = await getAdminOnlineStatus();
         io.emit('chat:admin_status', { admins: adminStatus });
-        console.log(`✅ Admin ${user.name} is now online`);
+        console.log(`✅ Admin ${user.name} is now ONLINE - Broadcasting to all clients`);
       }
     })();
 
@@ -320,18 +330,24 @@ module.exports = (io) => {
 
         // Generate AI response if applicable
         if (enableAI && senderType === 'user' && !room.admin_id) {
+          console.log(`🤖 AI will respond to: "${message}"`);
+
           // Delay AI response slightly to feel more natural
           setTimeout(async () => {
             try {
+              console.log('🔄 Calling AI service...');
               const aiResult = await detectIntentAndRespond(message, room.context || {}, userId);
+              console.log('✅ AI response received:', aiResult);
 
               // 🧠 SMART ESCALATION: Check if AI needs admin help
               const needsAdmin = shouldEscalateToAdmin(aiResult, message);
 
               if (needsAdmin) {
+                console.log('⬆️ Escalating to admin');
                 // AI không tự tin → Notify admin
                 await handleAdminEscalation(io, room, user, message, aiResult);
               } else {
+                console.log('💬 Sending AI response to user');
                 // AI tự tin → Send AI response
                 const botMessage = new ChatMessage({
                   room_id: roomId,
@@ -349,6 +365,7 @@ module.exports = (io) => {
                 await botMessage.save();
                 await botMessage.populate('sender_id', 'name role');
 
+                console.log(`📤 Broadcasting AI message to room ${roomId}:`, botMessage.message);
                 // Broadcast AI response
                 notifyRoom(io, roomId, 'chat:new_message', {
                   message: botMessage
@@ -370,11 +387,14 @@ module.exports = (io) => {
                 }
               }
             } catch (aiError) {
-              console.error('AI response error:', aiError);
+              console.error('❌ AI response error:', aiError);
+              console.error('Error stack:', aiError.stack);
               // If AI fails, escalate to admin
               await handleAdminEscalation(io, room, user, message, { needsAdmin: true, reason: 'AI Error' });
             }
           }, 1000); // 1 second delay
+        } else {
+          console.log(`⏭️ Skipping AI (enableAI: ${enableAI}, senderType: ${senderType}, has admin: ${!!room.admin_id})`);
         }
 
         socket.emit('chat:message_sent', {
@@ -573,7 +593,9 @@ module.exports = (io) => {
     // ===== DISCONNECT =====
     socket.on('disconnect', () => {
       console.log(`💬 Chat: User ${userId} disconnected`);
-      onlineUsers.delete(userId);
+      const userIdStr = userId.toString();
+      onlineUsers.delete(userIdStr);
+      console.log(`📝 Removed from onlineUsers: ${userIdStr}`);
 
       // 🔔 Broadcast admin offline status change
       (async () => {
@@ -581,14 +603,14 @@ module.exports = (io) => {
         if (user && user.role === 'admin') {
           const adminStatus = await getAdminOnlineStatus();
           io.emit('chat:admin_status', { admins: adminStatus });
-          console.log(`⚠️ Admin ${user.name} is now offline`);
+          console.log(`⚠️ Admin ${user.name} is now OFFLINE - Broadcasting to all clients`);
         }
       })();
 
       // Clear typing indicators
       typingUsers.forEach((users, roomId) => {
-        if (users.has(userId)) {
-          users.delete(userId);
+        if (users.has(userIdStr)) {
+          users.delete(userIdStr);
           notifyRoom(io, roomId, 'chat:user_typing', {
             roomId,
             userId,
