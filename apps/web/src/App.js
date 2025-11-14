@@ -35,6 +35,7 @@ import AdminUser from "./pages/AdminUsers";
 import UnifiedPayments from './pages/UnifiedPayments';
 import DeploymentSettings from './components/DeploymentSettings';
 import AdminSupport from './pages/AdminSupport';
+import AdminAnalytics from './pages/AdminAnalytics';
 import SupportChatbox from './components/SupportChatbox';
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
                             <Route path="/admin/marketplace" element={<AdminMarketplace />} />
                             <Route path="/admin/payouts" element={<AdminPayoutManagement />} />
                             <Route path="/admin/support" element={<AdminSupport />} />
+                            <Route path="/admin/analytics" element={<AdminAnalytics />} />
                             <Route path="/reports" element={<Reports />} />
                             <Route path="/users" element={<AdminUser />} />
                             {/* Catch-all route */}

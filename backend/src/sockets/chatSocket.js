@@ -2,6 +2,7 @@ const ChatRoom = require('../models/ChatRoom');
 const ChatMessage = require('../models/ChatMessage');
 const User = require('../models/User');
 const { detectIntentAndRespond } = require('../services/aiResponseService');
+const emailService = require('../services/emailService');
 
 // Track online users
 const onlineUsers = new Map(); // userId -> socketId
@@ -27,6 +28,135 @@ const getAdminOnlineStatus = async () => {
     name: admin.name,
     isOnline: onlineUsers.has(admin._id.toString())
   }));
+};
+
+/**
+ * 🧠 SMART AI: Decide if should escalate to admin
+ * Returns true if:
+ * - AI confidence is low
+ * - User explicitly asks for human
+ * - Complex/urgent keywords detected
+ * - Payment/refund issues
+ */
+const shouldEscalateToAdmin = (aiResult, userMessage) => {
+  const message = userMessage.toLowerCase();
+
+  // 1. Urgent keywords → Need admin immediately
+  const urgentKeywords = [
+    'lỗi', 'error', 'không hoạt động', 'bug', 'hack',
+    'mất tiền', 'hoàn tiền', 'refund', 'complaint', 'khiếu nại',
+    'urgent', 'gấp', 'khẩn cấp'
+  ];
+  if (urgentKeywords.some(keyword => message.includes(keyword))) {
+    console.log('🚨 Urgent keywords detected → Escalate to admin');
+    return true;
+  }
+
+  // 2. User explicitly asks for human
+  const humanRequestKeywords = [
+    'admin', 'người thật', 'human', 'nhân viên', 'hỗ trợ trực tiếp',
+    'gặp admin', 'nói chuyện với người'
+  ];
+  if (humanRequestKeywords.some(keyword => message.includes(keyword))) {
+    console.log('👤 User requests human → Escalate to admin');
+    return true;
+  }
+
+  // 3. AI low confidence
+  if (aiResult.confidence && aiResult.confidence < 0.6) {
+    console.log(`🤔 AI confidence low (${aiResult.confidence}) → Escalate to admin`);
+    return true;
+  }
+
+  // 4. Payment/refund issues
+  if (aiResult.intent === 'payment' && (message.includes('lỗi') || message.includes('hoàn'))) {
+    console.log('💳 Payment issue → Escalate to admin');
+    return true;
+  }
+
+  return false; // AI can handle
+};
+
+/**
+ * 📧 Handle escalation to admin
+ * - Set room priority
+ * - Send email to admin
+ * - Send bot message informing user
+ * - Notify online admins via socket
+ */
+const handleAdminEscalation = async (io, room, user, userMessage, aiResult) => {
+  try {
+    console.log(`🔔 Escalating chat ${room._id} to admin`);
+
+    // Set room priority based on urgency
+    const message = userMessage.toLowerCase();
+    if (message.includes('gấp') || message.includes('urgent') || message.includes('khẩn cấp')) {
+      room.priority = 'urgent';
+    } else if (message.includes('lỗi') || message.includes('error')) {
+      room.priority = 'high';
+    } else {
+      room.priority = 'normal';
+    }
+
+    // Add 'general' tag if not exist
+    if (!room.tags.includes('general')) {
+      room.tags.push('general');
+    }
+
+    await room.save();
+
+    // 1. Send bot message to user
+    const botMessage = new ChatMessage({
+      room_id: room._id,
+      sender_id: user._id,
+      sender_type: 'bot',
+      message: `Đã chuyển yêu cầu của bạn tới admin. Admin sẽ hỗ trợ bạn trong giây lát! 👨‍💼\n\n${aiResult.reason === 'AI Error' ? 'Hệ thống đang gặp vấn đề nhỏ, admin sẽ xử lý ngay.' : 'Câu hỏi này cần sự hỗ trợ từ chuyên gia.'}`,
+      message_type: 'system'
+    });
+
+    await botMessage.save();
+    await botMessage.populate('sender_id', 'name role');
+
+    // Broadcast bot message
+    notifyRoom(io, room._id.toString(), 'chat:new_message', {
+      message: botMessage
+    });
+
+    // 2. Send email to admin (if configured)
+    try {
+      await emailService.notifyAdminNewChat(room, user);
+    } catch (emailError) {
+      console.log('⚠️  Email notification failed (not configured?):', emailError.message);
+    }
+
+    // 3. Notify all online admins via socket
+    const admins = await User.find({ role: 'admin' });
+    admins.forEach(admin => {
+      const adminId = admin._id.toString();
+      if (onlineUsers.has(adminId)) {
+        notifyUser(io, adminId, 'chat:admin_needed', {
+          room: {
+            _id: room._id,
+            user_id: user._id,
+            subject: room.subject,
+            priority: room.priority,
+            tags: room.tags,
+            last_message_at: room.last_message_at
+          },
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email
+          },
+          message: userMessage
+        });
+      }
+    });
+
+    console.log(`✅ Admin escalation complete for room ${room._id}`);
+  } catch (error) {
+    console.error('❌ Escalation error:', error);
+  }
 };
 
 module.exports = (io) => {
@@ -177,43 +307,54 @@ module.exports = (io) => {
             try {
               const aiResult = await detectIntentAndRespond(message, room.context || {}, userId);
 
-              const botMessage = new ChatMessage({
-                room_id: roomId,
-                sender_id: userId,
-                sender_type: 'bot',
-                message: aiResult.response,
-                message_type: 'text',
-                ai_metadata: {
-                  is_ai_generated: true,
-                  confidence: aiResult.confidence,
-                  intent: aiResult.intent
-                }
-              });
+              // 🧠 SMART ESCALATION: Check if AI needs admin help
+              const needsAdmin = shouldEscalateToAdmin(aiResult, message);
 
-              await botMessage.save();
-              await botMessage.populate('sender_id', 'name role');
-
-              // Broadcast AI response
-              notifyRoom(io, roomId, 'chat:new_message', {
-                message: botMessage
-              });
-
-              // Update room tags
-              if (aiResult.intent && !room.tags.includes(aiResult.intent)) {
-                room.tags.push(aiResult.intent);
-                await room.save();
-
-                // Notify admins about tagged room
-                const admins = await User.find({ role: 'admin' });
-                admins.forEach(admin => {
-                  notifyUser(io, admin._id.toString(), 'chat:room_tagged', {
-                    roomId,
-                    tags: room.tags
-                  });
+              if (needsAdmin) {
+                // AI không tự tin → Notify admin
+                await handleAdminEscalation(io, room, user, message, aiResult);
+              } else {
+                // AI tự tin → Send AI response
+                const botMessage = new ChatMessage({
+                  room_id: roomId,
+                  sender_id: userId,
+                  sender_type: 'bot',
+                  message: aiResult.response,
+                  message_type: 'text',
+                  ai_metadata: {
+                    is_ai_generated: true,
+                    confidence: aiResult.confidence,
+                    intent: aiResult.intent
+                  }
                 });
+
+                await botMessage.save();
+                await botMessage.populate('sender_id', 'name role');
+
+                // Broadcast AI response
+                notifyRoom(io, roomId, 'chat:new_message', {
+                  message: botMessage
+                });
+
+                // Update room tags
+                if (aiResult.intent && !room.tags.includes(aiResult.intent)) {
+                  room.tags.push(aiResult.intent);
+                  await room.save();
+
+                  // Notify admins about tagged room
+                  const admins = await User.find({ role: 'admin' });
+                  admins.forEach(admin => {
+                    notifyUser(io, admin._id.toString(), 'chat:room_tagged', {
+                      roomId,
+                      tags: room.tags
+                    });
+                  });
+                }
               }
             } catch (aiError) {
               console.error('AI response error:', aiError);
+              // If AI fails, escalate to admin
+              await handleAdminEscalation(io, room, user, message, { needsAdmin: true, reason: 'AI Error' });
             }
           }, 1000); // 1 second delay
         }
@@ -338,6 +479,17 @@ module.exports = (io) => {
             name: user.name
           }
         });
+
+        // Send email notification to user (if configured)
+        try {
+          await emailService.notifyUserAdminResponse(
+            room,
+            room.user_id,
+            `Admin ${user.name} đã tham gia hỗ trợ bạn!`
+          );
+        } catch (emailError) {
+          console.log('⚠️  Email notification failed:', emailError.message);
+        }
 
         socket.emit('chat:assign_success', { room });
       } catch (error) {
