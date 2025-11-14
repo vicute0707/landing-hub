@@ -25,6 +25,7 @@ const AdminAnalytics = () => {
   const [chatTrends, setChatTrends] = useState([]);
   const [marketplaceTrends, setMarketplaceTrends] = useState(null);
   const [summary, setSummary] = useState(null);
+  const [aiInsights, setAiInsights] = useState(null);
 
   useEffect(() => {
     fetchAnalytics();
@@ -38,15 +39,17 @@ const AdminAnalytics = () => {
         headers: { Authorization: `Bearer ${token}` }
       };
 
-      const [trendsRes, marketplaceRes, summaryRes] = await Promise.all([
+      const [trendsRes, marketplaceRes, summaryRes, insightsRes] = await Promise.all([
         axios.get(`${process.env.REACT_APP_API_URL}/api/chat-analytics/trends?days=${timeRange}`, config),
         axios.get(`${process.env.REACT_APP_API_URL}/api/chat-analytics/marketplace-trends?days=${timeRange}`, config),
-        axios.get(`${process.env.REACT_APP_API_URL}/api/chat-analytics/summary`, config)
+        axios.get(`${process.env.REACT_APP_API_URL}/api/chat-analytics/summary`, config),
+        axios.get(`${process.env.REACT_APP_API_URL}/api/chat-analytics/ai-insights?days=${timeRange}`, config)
       ]);
 
       setChatTrends(trendsRes.data.data);
       setMarketplaceTrends(marketplaceRes.data.data);
       setSummary(summaryRes.data.data);
+      setAiInsights(insightsRes.data.data);
     } catch (error) {
       console.error('Error fetching analytics:', error);
     } finally {
@@ -160,6 +163,44 @@ const AdminAnalytics = () => {
           />
         </Grid>
       </Grid>
+
+      {/* 🤖 AI Recommendations */}
+      {summary?.aiRecommendations && (
+        <Paper sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)' }}>
+          <Typography variant="h6" fontWeight="bold" mb={2}>
+            🤖 AI Smart Recommendations
+          </Typography>
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+            {summary.aiRecommendations}
+          </Typography>
+        </Paper>
+      )}
+
+      {/* 🧠 AI Insights */}
+      {aiInsights && (
+        <Grid container spacing={3} mb={4}>
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                💬 Chat Trends Analysis
+              </Typography>
+              <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                {aiInsights.chatInsights}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <Paper sx={{ p: 3, height: '100%' }}>
+              <Typography variant="h6" fontWeight="bold" mb={2}>
+                🛒 Marketplace Insights
+              </Typography>
+              <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                {aiInsights.marketplaceInsights}
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
 
       {/* Chat Volume Trend */}
       <Paper sx={{ p: 3, mb: 4 }}>

@@ -178,7 +178,9 @@ const SupportChatbox = () => {
       newSocket.emit('chat:get_admin_status');
     });
 
+    // Listen to global admin status broadcasts
     newSocket.on('chat:admin_status', (data) => {
+      console.log('📡 Admin status update:', data.admins);
       const hasOnlineAdmin = data.admins.some(admin => admin.isOnline);
       setAdminOnline(hasOnlineAdmin);
     });
@@ -195,6 +197,17 @@ const SupportChatbox = () => {
       // Update unread count if chat is closed
       if (!isOpen) {
         setUnreadCount(prev => prev + 1);
+      }
+    });
+
+    newSocket.on('chat:joined_room', (data) => {
+      console.log('✅ Joined room:', data.room);
+      setRoom(data.room);
+
+      // Update admin info if available
+      if (data.room.admin_info) {
+        console.log('👨‍💼 Admin assigned:', data.room.admin_info);
+        setAdminOnline(data.room.admin_info.isOnline);
       }
     });
 

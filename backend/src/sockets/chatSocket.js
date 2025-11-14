@@ -170,6 +170,16 @@ module.exports = (io) => {
     // Join user's personal room (already done in server.js, but ensure)
     socket.join(`user_${userId}`);
 
+    // 🔔 Broadcast admin online status change
+    (async () => {
+      const user = await User.findById(userId);
+      if (user && user.role === 'admin') {
+        const adminStatus = await getAdminOnlineStatus();
+        io.emit('chat:admin_status', { admins: adminStatus });
+        console.log(`✅ Admin ${user.name} is now online`);
+      }
+    })();
+
     // ===== CHAT EVENTS =====
 
     // Join a specific chat room
@@ -199,6 +209,7 @@ module.exports = (io) => {
 
         // Join Socket.IO room
         socket.join(`chat_room_${roomId}`);
+        console.log(`✅ User ${userId} (${user.name}) joined chat room ${roomId}`);
 
         // Mark messages as read
         if (isOwner) {
@@ -219,12 +230,19 @@ module.exports = (io) => {
           }
         });
 
+        // Send full room data with admin info
         socket.emit('chat:joined_room', {
           roomId,
-          room
+          room: {
+            ...room.toObject(),
+            admin_info: room.admin_id ? {
+              id: room.admin_id._id,
+              name: room.admin_id.name,
+              email: room.admin_id.email,
+              isOnline: onlineUsers.has(room.admin_id._id.toString())
+            } : null
+          }
         });
-
-        console.log(`User ${userId} joined chat room ${roomId}`);
       } catch (error) {
         console.error('Join room error:', error);
         socket.emit('chat:error', { message: 'Lỗi khi tham gia phòng chat' });
@@ -556,6 +574,16 @@ module.exports = (io) => {
     socket.on('disconnect', () => {
       console.log(`💬 Chat: User ${userId} disconnected`);
       onlineUsers.delete(userId);
+
+      // 🔔 Broadcast admin offline status change
+      (async () => {
+        const user = await User.findById(userId);
+        if (user && user.role === 'admin') {
+          const adminStatus = await getAdminOnlineStatus();
+          io.emit('chat:admin_status', { admins: adminStatus });
+          console.log(`⚠️ Admin ${user.name} is now offline`);
+        }
+      })();
 
       // Clear typing indicators
       typingUsers.forEach((users, roomId) => {
