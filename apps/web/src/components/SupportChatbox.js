@@ -157,6 +157,8 @@ const SupportChatbox = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminOnline, setAdminOnline] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState({}); // Track feedback per message
+  const [requestingAdmin, setRequestingAdmin] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -414,6 +416,64 @@ const SupportChatbox = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Handle AI feedback
+  const handleAIFeedback = async (messageId, isHelpful) => {
+    try {
+      await axios.post(
+        `${API_URL}/api/chat/feedback`,
+        { messageId, isHelpful, roomId: room._id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+
+      setFeedbackGiven(prev => ({ ...prev, [messageId]: isHelpful }));
+
+      // If not helpful, suggest admin
+      if (!isHelpful) {
+        setTimeout(() => {
+          const shouldConnectAdmin = window.confirm(
+            'Xin lỗi câu trả lời chưa hữu ích. Bạn có muốn kết nối với Admin không?'
+          );
+          if (shouldConnectAdmin) {
+            handleRequestAdmin();
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Feedback error:', error);
+    }
+  };
+
+  // Request admin connection
+  const handleRequestAdmin = async () => {
+    if (!room || !socket || requestingAdmin) return;
+
+    setRequestingAdmin(true);
+
+    try {
+      await axios.post(
+        `${API_URL}/api/chat/request-admin`,
+        { roomId: room._id, reason: 'user_requested' },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+
+      // Socket will handle the escalation on backend
+      alert('Đã gửi yêu cầu đến Admin. Admin sẽ hỗ trợ bạn trong giây lát!');
+    } catch (error) {
+      console.error('Request admin error:', error);
+      alert('Không thể kết nối với Admin. Vui lòng thử lại sau.');
+    } finally {
+      setRequestingAdmin(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -531,6 +591,47 @@ const SupportChatbox = () => {
                           <Typography variant="caption" color="textSecondary" sx={{ ml: msg.sender_type !== 'user' ? 5 : 0, mt: 0.5 }}>
                             {new Date(msg.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                           </Typography>
+
+                          {/* AI Feedback Buttons */}
+                          {msg.sender_type === 'bot' && !room.admin_id && !feedbackGiven[msg._id] && (
+                            <Box display="flex" gap={0.5} ml={msg.sender_type !== 'user' ? 5 : 0} mt={0.5}>
+                              <Tooltip title="Câu trả lời hữu ích">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleAIFeedback(msg._id, true)}
+                                  sx={{
+                                    fontSize: '0.75rem',
+                                    padding: '2px 6px',
+                                    bgcolor: '#e8f5e9',
+                                    '&:hover': { bgcolor: '#c8e6c9' }
+                                  }}
+                                >
+                                  👍
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Cần hỗ trợ thêm">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleAIFeedback(msg._id, false)}
+                                  sx={{
+                                    fontSize: '0.75rem',
+                                    padding: '2px 6px',
+                                    bgcolor: '#ffebee',
+                                    '&:hover': { bgcolor: '#ffcdd2' }
+                                  }}
+                                >
+                                  👎
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          )}
+
+                          {/* Feedback given confirmation */}
+                          {msg.sender_type === 'bot' && feedbackGiven[msg._id] !== undefined && (
+                            <Typography variant="caption" color="textSecondary" sx={{ ml: 5, mt: 0.5, fontStyle: 'italic' }}>
+                              {feedbackGiven[msg._id] ? '✓ Cảm ơn phản hồi!' : '✓ Đã ghi nhận'}
+                            </Typography>
+                          )}
                         </Box>
                       )}
                     </Box>
@@ -548,6 +649,32 @@ const SupportChatbox = () => {
                 </>
               )}
             </MessagesContainer>
+
+            {/* Connect to Admin Button */}
+            {room && room.status !== 'resolved' && !room.admin_id && (
+              <Box px={2} pb={1}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  startIcon={<PersonIcon />}
+                  onClick={handleRequestAdmin}
+                  disabled={requestingAdmin}
+                  sx={{
+                    borderColor: '#667eea',
+                    color: '#667eea',
+                    fontSize: '0.8rem',
+                    py: 0.5,
+                    '&:hover': {
+                      borderColor: '#764ba2',
+                      bgcolor: '#f5f3ff'
+                    }
+                  }}
+                >
+                  {requestingAdmin ? 'Đang kết nối...' : '💬 Kết nối với Admin'}
+                </Button>
+              </Box>
+            )}
 
             {/* Input */}
             {room && room.status !== 'resolved' && (
