@@ -3,55 +3,79 @@ const router = express.Router();
 const chatController = require('../controllers/chatController');
 const { authMiddleware, isAdmin } = require('../middleware/authMiddleware');
 const multer = require('multer');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
 const path = require('path');
+const fs = require('fs');
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION || 'ap-southeast-1'
-});
+// Try to configure AWS S3 if credentials available
+let useS3 = false;
+let upload;
 
-// Configure multer for S3 upload
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_S3_BUCKET || 'landing-hub-deployments',
-    acl: 'public-read',
-    metadata: function (req, file, cb) {
-      cb(null, { fieldName: file.fieldname });
+try {
+  if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    const multerS3 = require('multer-s3');
+    const AWS = require('aws-sdk');
+
+    const s3 = new AWS.S3({
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      region: process.env.AWS_REGION || 'ap-southeast-1'
+    });
+
+    upload = multer({
+      storage: multerS3({
+        s3: s3,
+        bucket: process.env.AWS_S3_BUCKET || 'landing-hub-deployments',
+        acl: 'public-read',
+        metadata: function (req, file, cb) {
+          cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req, file, cb) {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+          const ext = path.extname(file.originalname);
+          cb(null, `chat-uploads/${req.user.id}/${uniqueSuffix}${ext}`);
+        }
+      }),
+      limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB limit
+      }
+    });
+
+    useS3 = true;
+    console.log('✅ Using S3 for chat file uploads');
+  } else {
+    throw new Error('AWS credentials not configured');
+  }
+} catch (error) {
+  console.log('⚠️  S3 not configured, using local storage for chat uploads:', error.message);
+
+  // Fallback to local storage
+  const uploadDir = path.join(__dirname, '../../uploads/chat');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const userDir = path.join(uploadDir, req.user.id.toString());
+      if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir, { recursive: true });
+      }
+      cb(null, userDir);
     },
-    key: function (req, file, cb) {
+    filename: function (req, file, cb) {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
       const ext = path.extname(file.originalname);
-      cb(null, `chat-uploads/${req.user.id}/${uniqueSuffix}${ext}`);
+      cb(null, uniqueSuffix + ext);
     }
-  }),
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    // Allow images and common document types
-    const allowedMimes = [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'image/webp',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
-    ];
+  });
 
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Định dạng file không được hỗ trợ'));
+  upload = multer({
+    storage: storage,
+    limits: {
+      fileSize: 10 * 1024 * 1024 // 10MB limit
     }
-  }
-});
+  });
+}
 
 // ===== USER ROUTES =====
 
@@ -80,20 +104,32 @@ router.post('/rooms/:roomId/upload', authMiddleware, upload.single('file'), asyn
       });
     }
 
+    let fileUrl;
+    if (useS3) {
+      // S3 upload
+      fileUrl = req.file.location;
+    } else {
+      // Local storage - construct URL
+      const relativePath = req.file.path.split('uploads')[1];
+      fileUrl = `${process.env.API_URL || 'http://localhost:5000'}/uploads${relativePath}`;
+    }
+
     const fileData = {
       type: req.file.mimetype.startsWith('image/') ? 'image' : 'file',
-      url: req.file.location,
+      url: fileUrl,
       filename: req.file.originalname,
       size: req.file.size,
       mime_type: req.file.mimetype
     };
+
+    console.log('✅ File uploaded:', fileData);
 
     res.json({
       success: true,
       file: fileData
     });
   } catch (error) {
-    console.error('Upload file error:', error);
+    console.error('❌ Upload file error:', error);
     res.status(500).json({
       success: false,
       message: 'Không thể upload file',

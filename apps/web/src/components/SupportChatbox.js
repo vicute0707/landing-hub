@@ -306,9 +306,11 @@ const SupportChatbox = () => {
     setSocket(newSocket);
 
     return () => {
-      newSocket.disconnect();
+      if (newSocket) {
+        newSocket.disconnect();
+      }
     };
-  }, [user, API_URL, isOpen]);
+  }, [user, API_URL]); // Remove isOpen from dependencies to prevent disconnects
 
   // Helper function to load messages for a room
   const loadMessagesForRoom = async (roomId) => {
@@ -349,8 +351,21 @@ const SupportChatbox = () => {
       const roomData = response.data.room;
       setRoom(roomData);
 
-      // Join socket room
-      socket.emit('chat:join_room', { roomId: roomData._id });
+      // Join socket room if connected
+      if (socket && socket.connected) {
+        socket.emit('chat:join_room', { roomId: roomData._id });
+      } else {
+        console.warn('Socket not connected, waiting...');
+        // Wait for connection and retry
+        const retryJoin = () => {
+          if (socket && socket.connected) {
+            socket.emit('chat:join_room', { roomId: roomData._id });
+          } else {
+            setTimeout(retryJoin, 500);
+          }
+        };
+        setTimeout(retryJoin, 500);
+      }
 
       // Load messages
       const messagesResponse = await axios.get(`${API_URL}/api/chat/rooms/${roomData._id}/messages`, {
@@ -400,6 +415,12 @@ const SupportChatbox = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !room || !socket) return;
 
+    // Check socket connection
+    if (!socket.connected) {
+      showToast('Đang kết nối lại... Vui lòng đợi', 'warning');
+      return;
+    }
+
     const messageText = inputMessage.trim();
     setInputMessage('');
 
@@ -427,6 +448,13 @@ const SupportChatbox = () => {
       message: messageText,
       message_type: 'text',
       enableAI: !room.admin_id // Enable AI only if no admin assigned
+    }, (error) => {
+      if (error) {
+        console.error('Send message error:', error);
+        showToast('Không thể gửi tin nhắn. Vui lòng thử lại.', 'error');
+        // Remove optimistic message
+        setMessages(prev => prev.filter(msg => msg._id !== optimisticMessage._id));
+      }
     });
   };
 
