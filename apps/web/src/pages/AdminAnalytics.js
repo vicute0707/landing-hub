@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UserContext } from '../context/UserContext';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import '../styles/Dashboard.css';
 import {
   Container, Grid, Paper, Typography, Box, Card, CardContent,
   Select, MenuItem, FormControl, InputLabel, CircularProgress
@@ -15,6 +19,7 @@ import axios from 'axios';
 const COLORS = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
 
 const AdminAnalytics = () => {
+  const { user } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(30);
   const [chatTrends, setChatTrends] = useState([]);
@@ -80,14 +85,27 @@ const AdminAnalytics = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
-        <CircularProgress />
-      </Box>
+      <div className="dashboard-container">
+        <Header role={user?.role} />
+        <div className="dashboard-main">
+          <Sidebar role={user?.role} />
+          <div className="dashboard-content">
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+              <CircularProgress />
+            </Box>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+    <div className="dashboard-container">
+      <Header role={user?.role} />
+      <div className="dashboard-main">
+        <Sidebar role={user?.role} />
+        <div className="dashboard-content">
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
       {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h4" fontWeight="bold">
@@ -269,7 +287,10 @@ const AdminAnalytics = () => {
           </Paper>
         </Grid>
       </Grid>
-    </Container>
+          </Container>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { UserContext } from '../context/UserContext';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import '../styles/Dashboard.css';
 import io from 'socket.io-client';
 import axios from 'axios';
 import {
@@ -115,7 +118,12 @@ const AdminSupport = () => {
     // Listen for new messages
     newSocket.on('chat:new_message', (data) => {
       if (selectedRoom && data.message.room_id === selectedRoom._id) {
-        setMessages(prev => [...prev, data.message]);
+        setMessages(prev => {
+          // Remove optimistic message if exists
+          const filtered = prev.filter(msg => !msg.__optimistic || msg.message !== data.message.message);
+          // Add real message from server
+          return [...filtered, data.message];
+        });
         scrollToBottom();
       }
 
@@ -233,6 +241,21 @@ const AdminSupport = () => {
     // Stop typing indicator
     socket.emit('chat:typing', { roomId: selectedRoom._id, isTyping: false });
 
+    // 🚀 OPTIMISTIC UPDATE: Add message to UI immediately
+    const optimisticMessage = {
+      _id: `temp-${Date.now()}`,
+      room_id: selectedRoom._id,
+      sender_id: user,
+      sender_type: 'admin',
+      message: messageText,
+      message_type: 'text',
+      createdAt: new Date().toISOString(),
+      __optimistic: true
+    };
+
+    setMessages(prev => [...prev, optimisticMessage]);
+    scrollToBottom();
+
     // Send message
     socket.emit('chat:send_message', {
       roomId: selectedRoom._id,
@@ -304,11 +327,19 @@ const AdminSupport = () => {
 
   if (!user || user.role !== 'admin') {
     return (
-      <Container>
-        <Box py={4} textAlign="center">
-          <Typography variant="h5">Bạn không có quyền truy cập trang này</Typography>
-        </Box>
-      </Container>
+      <div className="dashboard-container">
+        <Header role={user?.role} />
+        <div className="dashboard-main">
+          <Sidebar role={user?.role} />
+          <div className="dashboard-content">
+            <Container>
+              <Box py={4} textAlign="center">
+                <Typography variant="h5">Bạn không có quyền truy cập trang này</Typography>
+              </Box>
+            </Container>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -332,10 +363,15 @@ const AdminSupport = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Typography variant="h4" gutterBottom fontWeight={600}>
-        🎧 Hỗ trợ khách hàng
-      </Typography>
+    <div className="dashboard-container">
+      <Header role={user.role} />
+      <div className="dashboard-main">
+        <Sidebar role={user.role} />
+        <div className="dashboard-content">
+          <Container maxWidth="xl" sx={{ py: 3 }}>
+            <Typography variant="h4" gutterBottom fontWeight={600}>
+              🎧 Hỗ trợ khách hàng
+            </Typography>
 
       {/* Stats */}
       {stats && (
@@ -645,7 +681,10 @@ const AdminSupport = () => {
           </StyledPaper>
         </Grid>
       </Grid>
-    </Container>
+          </Container>
+        </div>
+      </div>
+    </div>
   );
 };
 

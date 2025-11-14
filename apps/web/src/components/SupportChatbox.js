@@ -184,7 +184,12 @@ const SupportChatbox = () => {
     });
 
     newSocket.on('chat:new_message', (data) => {
-      setMessages(prev => [...prev, data.message]);
+      setMessages(prev => {
+        // Remove optimistic message if exists
+        const filtered = prev.filter(msg => !msg.__optimistic || msg.message !== data.message.message);
+        // Add real message from server
+        return [...filtered, data.message];
+      });
       scrollToBottom();
 
       // Update unread count if chat is closed
@@ -302,6 +307,21 @@ const SupportChatbox = () => {
 
     // Stop typing indicator
     socket.emit('chat:typing', { roomId: room._id, isTyping: false });
+
+    // 🚀 OPTIMISTIC UPDATE: Add message to UI immediately
+    const optimisticMessage = {
+      _id: `temp-${Date.now()}`,
+      room_id: room._id,
+      sender_id: user,
+      sender_type: 'user',
+      message: messageText,
+      message_type: 'text',
+      createdAt: new Date().toISOString(),
+      __optimistic: true
+    };
+
+    setMessages(prev => [...prev, optimisticMessage]);
+    scrollToBottom();
 
     // Send message via socket
     socket.emit('chat:send_message', {
