@@ -474,7 +474,8 @@ const SupportChatbox = () => {
     }
   };
 
-  if (!user) return null;
+  // Don't show chatbox for admin users - they use admin dashboard instead
+  if (!user || user.role === 'admin') return null;
 
   return (
     <>
@@ -593,7 +594,7 @@ const SupportChatbox = () => {
                           </Typography>
 
                           {/* AI Feedback Buttons */}
-                          {msg.sender_type === 'bot' && !room.admin_id && !feedbackGiven[msg._id] && (
+                          {msg.sender_type === 'bot' && (!room.admin_id || !room.admin_id._id) && !feedbackGiven[msg._id] && (
                             <Box display="flex" gap={0.5} ml={msg.sender_type !== 'user' ? 5 : 0} mt={0.5}>
                               <Tooltip title="Câu trả lời hữu ích">
                                 <IconButton
@@ -651,7 +652,7 @@ const SupportChatbox = () => {
             </MessagesContainer>
 
             {/* Connect to Admin Button */}
-            {room && room.status !== 'resolved' && !room.admin_id && (
+            {room && room.status !== 'resolved' && (!room.admin_id || !room.admin_id._id) && (
               <Box px={2} pb={1}>
                 <Button
                   fullWidth
