@@ -16,7 +16,10 @@ import {
   Divider,
   Paper,
   Fade,
-  Zoom
+  Zoom,
+  Snackbar,
+  Alert,
+  LinearProgress
 } from '@mui/material';
 import {
   Chat as ChatIcon,
@@ -159,11 +162,24 @@ const SupportChatbox = () => {
   const [adminOnline, setAdminOnline] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState({}); // Track feedback per message
   const [requestingAdmin, setRequestingAdmin] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const [failedMessages, setFailedMessages] = useState(new Set());
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+  // Helper function to show toast notifications
+  const showToast = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // Initialize socket connection
   useEffect(() => {
@@ -180,6 +196,39 @@ const SupportChatbox = () => {
       newSocket.emit('chat:get_admin_status');
     });
 
+    // Handle reconnection - rejoin room automatically
+    newSocket.on('reconnect', (attemptNumber) => {
+      console.log('🔄 Socket reconnected after', attemptNumber, 'attempts');
+      showToast('Đã kết nối lại! 🎉', 'success');
+      // Re-join room if exists
+      if (room) {
+        console.log('🔄 Re-joining room:', room._id);
+        newSocket.emit('chat:join_room', { roomId: room._id });
+        // Reload messages to get any missed messages
+        loadMessagesForRoom(room._id);
+      }
+      // Re-check admin status
+      newSocket.emit('chat:get_admin_status');
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Socket connection error:', error.message);
+      showToast('Lỗi kết nối. Đang thử lại...', 'warning');
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('⚠️ Socket disconnected:', reason);
+      if (reason === 'io server disconnect') {
+        // Server forcefully disconnected, reconnect manually
+        showToast('Mất kết nối. Đang kết nối lại...', 'info');
+        newSocket.connect();
+      } else if (reason === 'io client disconnect') {
+        // Manual disconnect, no action needed
+      } else {
+        showToast('Mất kết nối. Đang tự động kết nối lại...', 'warning');
+      }
+    });
+
     // Listen to global admin status broadcasts
     newSocket.on('chat:admin_status', (data) => {
       console.log('📡 Admin status update:', data.admins);
@@ -189,8 +238,10 @@ const SupportChatbox = () => {
 
     newSocket.on('chat:new_message', (data) => {
       setMessages(prev => {
-        // Remove optimistic message if exists
-        const filtered = prev.filter(msg => !msg.__optimistic || msg.message !== data.message.message);
+        // Remove optimistic messages with temp IDs
+        const filtered = prev.filter(msg =>
+          !(msg.__optimistic && msg._id && msg._id.toString().startsWith('temp-'))
+        );
         // Add real message from server
         return [...filtered, data.message];
       });
@@ -232,7 +283,7 @@ const SupportChatbox = () => {
 
     newSocket.on('chat:error', (data) => {
       console.error('Chat error:', data.message);
-      alert(data.message);
+      showToast(data.message, 'error');
     });
 
     setSocket(newSocket);
@@ -241,6 +292,21 @@ const SupportChatbox = () => {
       newSocket.disconnect();
     };
   }, [user, API_URL, isOpen]);
+
+  // Helper function to load messages for a room
+  const loadMessagesForRoom = async (roomId) => {
+    try {
+      const messagesResponse = await axios.get(`${API_URL}/api/chat/rooms/${roomId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setMessages(messagesResponse.data.messages);
+      scrollToBottom();
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    }
+  };
 
   // Get or create chat room when opening
   const initializeChatRoom = async () => {
@@ -372,7 +438,16 @@ const SupportChatbox = () => {
     const file = e.target.files[0];
     if (!file || !room) return;
 
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('File quá lớn! Tối đa 10MB', 'error');
+      return;
+    }
+
     try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
       const formData = new FormData();
       formData.append('file', file);
 
@@ -383,6 +458,10 @@ const SupportChatbox = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
             'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
           }
         }
       );
@@ -394,9 +473,18 @@ const SupportChatbox = () => {
         message_type: response.data.file.type,
         attachments: [response.data.file]
       });
+
+      showToast('Upload thành công! ✅', 'success');
     } catch (error) {
       console.error('File upload error:', error);
-      alert('Không thể upload file');
+      showToast('Không thể upload file. Vui lòng thử lại.', 'error');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -465,10 +553,10 @@ const SupportChatbox = () => {
       );
 
       // Socket will handle the escalation on backend
-      alert('Đã gửi yêu cầu đến Admin. Admin sẽ hỗ trợ bạn trong giây lát!');
+      showToast('Đã gửi yêu cầu đến Admin. Admin sẽ hỗ trợ bạn trong giây lát! 👨‍💼', 'success');
     } catch (error) {
       console.error('Request admin error:', error);
-      alert('Không thể kết nối với Admin. Vui lòng thử lại sau.');
+      showToast('Không thể kết nối với Admin. Vui lòng thử lại sau.', 'error');
     } finally {
       setRequestingAdmin(false);
     }
@@ -677,6 +765,19 @@ const SupportChatbox = () => {
               </Box>
             )}
 
+            {/* Upload Progress */}
+            {isUploading && (
+              <Box px={2} pb={1}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <LinearProgress variant="determinate" value={uploadProgress} sx={{ flex: 1 }} />
+                  <Typography variant="caption">{uploadProgress}%</Typography>
+                </Box>
+                <Typography variant="caption" color="textSecondary">
+                  Đang upload file...
+                </Typography>
+              </Box>
+            )}
+
             {/* Input */}
             {room && room.status !== 'resolved' && (
               <InputContainer>
@@ -687,7 +788,11 @@ const SupportChatbox = () => {
                   onChange={handleFileUpload}
                   accept="image/*,.pdf,.doc,.docx,.txt"
                 />
-                <IconButton onClick={() => fileInputRef.current.click()} size="small">
+                <IconButton
+                  onClick={() => fileInputRef.current.click()}
+                  size="small"
+                  disabled={isUploading}
+                >
                   <AttachFileIcon />
                 </IconButton>
                 <TextField
@@ -742,6 +847,18 @@ const SupportChatbox = () => {
           </>
         )}
       </ChatContainer>
+
+      {/* Toast Notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={closeSnackbar} severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

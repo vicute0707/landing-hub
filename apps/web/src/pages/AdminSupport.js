@@ -30,7 +30,9 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -97,10 +99,20 @@ const AdminSupport = () => {
   const [stats, setStats] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+  // Helper function to show toast notifications
+  const showToast = (message, severity = 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const closeSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // Initialize socket
   useEffect(() => {
@@ -115,12 +127,45 @@ const AdminSupport = () => {
       console.log('✅ Admin socket connected');
     });
 
+    // Handle reconnection - rejoin room automatically
+    newSocket.on('reconnect', (attemptNumber) => {
+      console.log('🔄 Admin socket reconnected after', attemptNumber, 'attempts');
+      showToast('Đã kết nối lại! 🎉', 'success');
+      // Re-join room if exists
+      if (selectedRoom) {
+        console.log('🔄 Admin re-joining room:', selectedRoom._id);
+        newSocket.emit('chat:join_room', { roomId: selectedRoom._id });
+        // Reload messages
+        loadMessagesForRoom(selectedRoom._id);
+      }
+      // Reload room list
+      loadRooms();
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('❌ Admin socket connection error:', error.message);
+      showToast('Lỗi kết nối. Đang thử lại...', 'warning');
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      console.log('⚠️ Admin socket disconnected:', reason);
+      if (reason === 'io server disconnect') {
+        // Server forcefully disconnected, reconnect manually
+        showToast('Mất kết nối. Đang kết nối lại...', 'info');
+        newSocket.connect();
+      } else if (reason !== 'io client disconnect') {
+        showToast('Mất kết nối. Đang tự động kết nối lại...', 'warning');
+      }
+    });
+
     // Listen for new messages
     newSocket.on('chat:new_message', (data) => {
       if (selectedRoom && data.message.room_id === selectedRoom._id) {
         setMessages(prev => {
-          // Remove optimistic message if exists
-          const filtered = prev.filter(msg => !msg.__optimistic || msg.message !== data.message.message);
+          // Remove optimistic messages with temp IDs
+          const filtered = prev.filter(msg =>
+            !(msg.__optimistic && msg._id && msg._id.toString().startsWith('temp-'))
+          );
           // Add real message from server
           return [...filtered, data.message];
         });
@@ -148,6 +193,21 @@ const AdminSupport = () => {
       newSocket.disconnect();
     };
   }, [user, API_URL, selectedRoom]);
+
+  // Helper function to load messages for a room
+  const loadMessagesForRoom = async (roomId) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/chat/rooms/${roomId}/messages`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setMessages(response.data.messages);
+      scrollToBottom();
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+    }
+  };
 
   // Load rooms
   const loadRooms = async () => {
@@ -684,6 +744,18 @@ const AdminSupport = () => {
           </Container>
         </div>
       </div>
+
+      {/* Toast Notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={closeSnackbar} severity={snackbar.severity} variant="filled">
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

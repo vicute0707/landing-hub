@@ -4,9 +4,27 @@ const User = require('../models/User');
 const { detectIntentAndRespond } = require('../services/aiResponseService');
 const emailService = require('../services/emailService');
 
-// Track online users
-const onlineUsers = new Map(); // userId -> socketId
+// Track online users with timestamps for cleanup
+const onlineUsers = new Map(); // userId -> { socketId, lastSeen }
 const typingUsers = new Map(); // roomId -> Set of userIds
+
+// Periodic cleanup of stale entries (every 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  const STALE_THRESHOLD = 10 * 60 * 1000; // 10 minutes
+
+  let cleanedCount = 0;
+  for (const [userId, data] of onlineUsers.entries()) {
+    if (now - data.lastSeen > STALE_THRESHOLD) {
+      onlineUsers.delete(userId);
+      cleanedCount++;
+    }
+  }
+
+  if (cleanedCount > 0) {
+    console.log(`🧹 Cleaned up ${cleanedCount} stale entries from onlineUsers`);
+  }
+}, 5 * 60 * 1000); // Run every 5 minutes
 
 // Note: detectIntentAndRespond is now imported from aiResponseService
 
@@ -27,7 +45,8 @@ const getAdminOnlineStatus = async () => {
 
   return admins.map(admin => {
     const adminIdStr = admin._id.toString();
-    const isOnline = onlineUsers.has(adminIdStr);
+    const userData = onlineUsers.get(adminIdStr);
+    const isOnline = !!userData;
     console.log(`👤 Admin ${admin.name} (${adminIdStr}): ${isOnline ? 'ONLINE' : 'OFFLINE'}`);
 
     return {
@@ -141,7 +160,7 @@ const handleAdminEscalation = async (io, room, user, userMessage, aiResult) => {
     const admins = await User.find({ role: 'admin' });
     admins.forEach(admin => {
       const adminId = admin._id.toString();
-      if (onlineUsers.has(adminId)) {
+      if (onlineUsers.get(adminId)) {
         notifyUser(io, adminId, 'chat:admin_needed', {
           room: {
             _id: room._id,
@@ -172,18 +191,29 @@ module.exports = (io) => {
     const userId = socket.userId;
     console.log(`💬 Chat: User ${userId} (type: ${typeof userId}) connected via socket ${socket.id}`);
 
-    // Track online status - ensure userId is string
+    // Track online status - ensure userId is string with timestamp
     const userIdStr = userId.toString();
-    onlineUsers.set(userIdStr, socket.id);
+    onlineUsers.set(userIdStr, {
+      socketId: socket.id,
+      lastSeen: Date.now()
+    });
     console.log(`📝 Added to onlineUsers: ${userIdStr}`);
 
     // Join user's personal room (already done in server.js, but ensure)
     socket.join(`user_${userId}`);
 
-    // 🔔 Broadcast admin online status change
+    // 🔔 Broadcast admin online status change (with caching)
     (async () => {
       const user = await User.findById(userId);
+      // Cache user info in socket
+      socket.userData = {
+        id: user._id,
+        name: user.name,
+        role: user.role
+      };
+
       if (user && user.role === 'admin') {
+        // Emit immediately, then query
         const adminStatus = await getAdminOnlineStatus();
         io.emit('chat:admin_status', { admins: adminStatus });
         console.log(`✅ Admin ${user.name} is now ONLINE - Broadcasting to all clients`);
@@ -249,7 +279,7 @@ module.exports = (io) => {
               id: room.admin_id._id,
               name: room.admin_id.name,
               email: room.admin_id.email,
-              isOnline: onlineUsers.has(room.admin_id._id.toString())
+              isOnline: !!onlineUsers.get(room.admin_id._id.toString())
             } : null
           }
         });
@@ -284,6 +314,13 @@ module.exports = (io) => {
     // Send message
     socket.on('chat:send_message', async (data) => {
       try {
+        // Update lastSeen for heartbeat
+        const userIdStr = userId.toString();
+        const userData = onlineUsers.get(userIdStr);
+        if (userData) {
+          userData.lastSeen = Date.now();
+        }
+
         const { roomId, message, message_type = 'text', attachments = [], enableAI = true } = data;
 
         const room = await ChatRoom.findById(roomId);
@@ -335,9 +372,25 @@ module.exports = (io) => {
           // Delay AI response slightly to feel more natural
           setTimeout(async () => {
             try {
+              // 🎯 Emit bot typing indicator immediately
+              notifyRoom(io, roomId, 'chat:user_typing', {
+                roomId,
+                userId: 'bot',
+                userName: 'AI Assistant',
+                isTyping: true
+              });
+
               console.log('🔄 Calling AI service...');
               const aiResult = await detectIntentAndRespond(message, room.context || {}, userId);
               console.log('✅ AI response received:', aiResult);
+
+              // Stop bot typing indicator
+              notifyRoom(io, roomId, 'chat:user_typing', {
+                roomId,
+                userId: 'bot',
+                userName: 'AI Assistant',
+                isTyping: false
+              });
 
               // 🧠 SMART ESCALATION: Check if AI needs admin help
               const needsAdmin = shouldEscalateToAdmin(aiResult, message);
@@ -389,10 +442,19 @@ module.exports = (io) => {
             } catch (aiError) {
               console.error('❌ AI response error:', aiError);
               console.error('Error stack:', aiError.stack);
+
+              // Stop bot typing on error
+              notifyRoom(io, roomId, 'chat:user_typing', {
+                roomId,
+                userId: 'bot',
+                userName: 'AI Assistant',
+                isTyping: false
+              });
+
               // If AI fails, escalate to admin
               await handleAdminEscalation(io, room, user, message, { needsAdmin: true, reason: 'AI Error' });
             }
-          }, 1000); // 1 second delay
+          }, 300); // 0.3 second delay - faster response!
         } else {
           console.log(`⏭️ Skipping AI (enableAI: ${enableAI}, senderType: ${senderType}, has admin: ${!!room.admin_id})`);
         }
@@ -597,15 +659,14 @@ module.exports = (io) => {
       onlineUsers.delete(userIdStr);
       console.log(`📝 Removed from onlineUsers: ${userIdStr}`);
 
-      // 🔔 Broadcast admin offline status change
-      (async () => {
-        const user = await User.findById(userId);
-        if (user && user.role === 'admin') {
+      // 🔔 Broadcast admin offline status change (using cached data)
+      if (socket.userData && socket.userData.role === 'admin') {
+        (async () => {
           const adminStatus = await getAdminOnlineStatus();
           io.emit('chat:admin_status', { admins: adminStatus });
-          console.log(`⚠️ Admin ${user.name} is now OFFLINE - Broadcasting to all clients`);
-        }
-      })();
+          console.log(`⚠️ Admin ${socket.userData.name} is now OFFLINE - Broadcasting to all clients`);
+        })();
+      }
 
       // Clear typing indicators
       typingUsers.forEach((users, roomId) => {
