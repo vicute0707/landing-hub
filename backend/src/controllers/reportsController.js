@@ -361,7 +361,7 @@ const getAdminSystemReport = async (req, res) => {
                 return {
                     rank: index + 1,
                     sellerId: item._id,
-                    sellerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Người dùng ẩn danh'),
+                    sellerName: user?.name || user?.email || `ID: ${item._id}`,
                     sellerEmail: user?.email || null,
                     sellerAvatar: user?.avatar || null,
                     totalSales: item.totalSales,
@@ -395,7 +395,7 @@ const getAdminSystemReport = async (req, res) => {
                 return {
                     rank: index + 1,
                     buyerId: item._id,
-                    buyerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Khách ẩn danh'),
+                    buyerName: user?.name || user?.email || `ID: ${item._id}`,
                     buyerEmail: user?.email || null,
                     buyerAvatar: user?.avatar || null,
                     totalPurchases: item.totalPurchases,
