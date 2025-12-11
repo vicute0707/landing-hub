@@ -70,6 +70,7 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/orders', require('./routes/orderRoutes'));
-
+// Health-check route
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
 module.exports = app;
