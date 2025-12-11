@@ -9,6 +9,7 @@ import axios from 'axios';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { renderStaticHTML } from '../utils/pageUtils'; // đường dẫn giống CreateLanding
 import '../styles/Templates.css';
 import DogLoader from '../components/Loader';
 
@@ -28,7 +29,7 @@ const Templates = () => {
     const [previewHtml, setPreviewHtml] = useState('');
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-
+    const [showPreview, setShowPreview] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -145,15 +146,25 @@ const Templates = () => {
     const handlePreview = async (template) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_BASE_URL}/api/templates/${template.id}/preview`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setPreviewTemplate(template);
-            setPreviewHtml(response.data.html);
-            setShowPreviewModal(true);
+            const res = await axios.get(
+                `${API_BASE_URL}/api/templates/${template.id}/preview`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const { pageData } = res.data;
+            console.log('🔍 PREVIEW response', res.data); // ← phải sau await
+
+            if (!pageData || !pageData.elements) throw new Error('Không có dữ liệu trang');
+
+            const html = renderStaticHTML(pageData);
+            console.log('🔍 HTML length', html.length); // ← sau render
+
+            setPreviewTemplate({ name: template.name });
+            setPreviewHtml(html);
+            setShowPreview(true);
         } catch (err) {
-            console.error('Lỗi xem trước template:', err);
-            alert('Không thể xem trước template: ' + (err.response?.data?.error || err.message));
+            console.error(err);
+            alert('Không thể xem trước: ' + (err.response?.data?.error || err.message));
         }
     };
 
@@ -367,13 +378,13 @@ const Templates = () => {
                             );
                         })}
                     </InfiniteScroll>
-
-                    {showPreviewModal && previewTemplate && (
+                    {showPreview && (
                         <PreviewModal
                             selectedTemplate={previewTemplate}
-                            setShowPreviewModal={setShowPreviewModal}
+                            setShowPreviewModal={setShowPreview}
                             previewHtml={previewHtml}
                             setPreviewHtml={setPreviewHtml}
+                            fullScreen={false}
                         />
                     )}
                 </div>

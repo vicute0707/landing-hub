@@ -76,7 +76,6 @@ const useAuth = (navigate) => {
 const usePageContent = (pageId, navigate, setPageData, setHistory, setHistoryIndex, setIsLoading) => {
     useEffect(() => {
         if (!pageId || !pageId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-            toast.error('ID trang không hợp lệ. Vui lòng kiểm tra lại.');
             navigate('/pages');
             return;
         }

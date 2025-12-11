@@ -7,7 +7,7 @@ const UserProfile = () => {
     const [userData, setUserData] = useState({});
     const [form, setForm] = useState({ name: '' });
     const [loading, setLoading] = useState(true);
-    const [updating, setUpdating] = useState(false); // tách riêng state update form
+    const [updating, setUpdating] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const UserProfile = () => {
                 setUserData(res.data);
                 setForm({ name: res.data.name || '' });
             } catch (err) {
-                console.error('Error fetching user data:', err);
+                console.error(err);
                 setError('Không thể tải dữ liệu người dùng.');
             } finally {
                 setLoading(false);
@@ -26,9 +26,7 @@ const UserProfile = () => {
         fetchData();
     }, []);
 
-    const handleChange = (e) => {
-        setForm({ name: e.target.value });
-    };
+    const handleChange = (e) => setForm({ name: e.target.value });
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -36,10 +34,8 @@ const UserProfile = () => {
         setUpdating(true);
         try {
             const res = await api.put('/api/user/update', { name: form.name });
-            const newToken = res.data.token;
-            localStorage.setItem('token', newToken);
+            localStorage.setItem('token', res.data.token);
             setUserData({ ...userData, name: form.name });
-            console.log('Thông tin người dùng được cập nhật thành công');
         } catch (err) {
             setError(err.response?.data?.msg || 'Cập nhật thất bại');
         } finally {
@@ -47,56 +43,85 @@ const UserProfile = () => {
         }
     };
 
-    if (error && loading) return <div style={{ color: 'red' }}>{error}</div>;
-    // if (loading) return <Loading />; // chỉ khi load dữ liệu lần đầu
+    /* ---------- RENDER ---------- */
+    if (loading)
+        return (
+            <div className="upro-container">
+                <div className="upro-card">
+                    <div className="upro-skeleton" />
+                </div>
+            </div>
+        );
 
     return (
-        <div className="user-profile">
-            <h2>Thông tin người dùng</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="upro-container">
+            <div className="upro-card">
+                <h2 className="upro-title">Thông tin người dùng</h2>
+                {error && <p className="upro-error">{error}</p>}
 
-            <form onSubmit={handleUpdate} className="user-form">
-                <div className="form-group">
-                    <label>Tên</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        disabled={updating}
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Email</label>
-                    <input type="text" value={userData.email || 'Chưa có thông tin'} disabled />
-                </div>
-                <div className="form-group">
-                    <label>Vai trò</label>
-                    <input type="text" value={userData.role || 'Chưa có thông tin'} disabled />
-                </div>
-                <div className="form-group">
-                    <label>Đăng ký</label>
-                    <input type="text" value={userData.subscription || 'Chưa có thông tin'} disabled />
-                </div>
-                <div className="form-group">
-                    <label>Ngày tạo</label>
-                    <input
-                        type="text"
-                        value={userData.createdAt ? new Date(userData.createdAt).toLocaleDateString() : 'Chưa có thông tin'}
-                        disabled
-                    />
-                </div>
+                <form onSubmit={handleUpdate} className="upro-form">
+                    <label className="upro-label">
+                        Tên
+                        <input
+                            className="upro-input"
+                            value={form.name}
+                            onChange={handleChange}
+                            disabled={updating}
+                        />
+                    </label>
 
-                {/* Loader chỉ hiển thị trong form khi cập nhật */}
-                {updating ? (
-                    <div className="form-loader">
-                        <Loading />
-                        <span>Đang cập nhật...</span>
+                    <label className="upro-label">
+                        Email
+                        <input
+                            className="upro-input"
+                            value={userData.email || 'Chưa có thông tin'}
+                            disabled
+                        />
+                    </label>
+
+                    <label className="upro-label">
+                        Vai trò
+                        <input
+                            className="upro-input"
+                            value={userData.role || 'Chưa có thông tin'}
+                            disabled
+                        />
+                    </label>
+
+                    <label className="upro-label">
+                        Gói
+                        <input
+                            className="upro-input"
+                            value={userData.subscription || 'Chưa có thông tin'}
+                            disabled
+                        />
+                    </label>
+
+                    <label className="upro-label">
+                        Ngày tạo
+                        <input
+                            className="upro-input"
+                            value={
+                                userData.createdAt
+                                    ? new Date(userData.createdAt).toLocaleDateString('vi-VN')
+                                    : 'Chưa có thông tin'
+                            }
+                            disabled
+                        />
+                    </label>
+
+                    <div className="upro-footer">
+                        {updating ? (
+                            <div className="upro-loaderWrap">
+                                <Loading />
+                                <span>Đang cập nhật...</span>
+                            </div>
+                        ) : (
+                            <button className="upro-btn">Cập nhật</button>
+                        )}
                     </div>
-                ) : (
-                    <button type="submit">Cập nhật</button>
-                )}
-            </form>
+                </form>
+            </div>
         </div>
     );
 };

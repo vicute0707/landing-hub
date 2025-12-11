@@ -42,11 +42,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-
-
-// Increase body size limit to handle large HTML exports with many components
-// Default 100kb is too small for landing pages with forms, shapes, and multiple elements
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

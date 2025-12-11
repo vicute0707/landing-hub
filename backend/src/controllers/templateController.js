@@ -3,7 +3,7 @@ const Page = require('../models/Page');
 const { v4: uuidv4 } = require('uuid');
 const AWS = require('aws-sdk');
 const mongoose = require('mongoose');
-// const puppeteer = require('puppeteer'); // Lazy load when needed
+const puppeteer = require('puppeteer');
 const cheerio = require('cheerio'); // Thêm cheerio để parse HTML
 // Cấu hình AWS
 AWS.config.update({ region: process.env.AWS_REGION || 'ap-southeast-1' });
@@ -21,32 +21,18 @@ const getBrowser = async () => {
     if (!browserPool.browser) {
         console.log('Launching Puppeteer browser for templates');
         try {
-            const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
-
-            if (isLambda) {
-                const chromium = require('chrome-aws-lambda');
-                browserPool.browser = await chromium.puppeteer.launch({
-                    args: chromium.args,
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: await chromium.executablePath,
-                    headless: chromium.headless,
-                    ignoreHTTPSErrors: true
-                });
-            } else {
-                const puppeteer = require('puppeteer');
-                browserPool.browser = await puppeteer.launch({
-                    headless: 'new',
-                    args: [
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-web-security',
-                        '--disable-features=VizDisplayCompositor',
-                        '--disable-extensions',
-                        '--disable-plugins',
-                    ],
-                    timeout: 30000,
-                });
-            }
+            browserPool.browser = await puppeteer.launch({
+                headless: 'new',
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-web-security',
+                    '--disable-features=VizDisplayCompositor',
+                    '--disable-extensions',
+                    '--disable-plugins',
+                ],
+                timeout: 30000,
+            });
 
             browserPool.browser.on('disconnected', () => {
                 console.log('Browser disconnected, clearing pool');
@@ -386,76 +372,43 @@ exports.getTemplates = async (req, res) => {
 };
 
 // ========== XEM TRƯỚC TEMPLATE (CÔNG KHAI) ==========
+// file: templateController.js
 exports.previewTemplate = async (req, res) => {
     const { id } = req.params;
-
-    if (!id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-        return res.status(400).json({ error: 'templateId không hợp lệ' });
-    }
+    if (!id.match(/^[0-9a-f-]{36}$/i)) return res.status(400).json({ error: 'ID không hợp lệ' });
 
     try {
         const template = await Template.findOne({ _id: id, status: 'ACTIVE' });
+        if (!template) return res.status(404).json({ error: 'Không tìm thấy template' });
 
-        if (!template) {
-            return res.status(404).json({ error: 'Không tìm thấy template' });
-        }
+        // 1️⃣ Ưu tiên pageData đã lưu trong DB
+        let pageData = template.page_data;
 
+        // 2️⃣ (Optional) nếu muốn lấy HTML để tạo screenshot sau này – không block preview
         let htmlContent = null;
-        let pageData = template.page_data; // ⭐ Ưu tiên lấy từ DB
-
-        // Nếu không có pageData trong DB, lấy từ S3
-        if (!pageData && template.file_path) {
+        if (template.file_path) {
             const s3Key = getS3KeyFromFilePath(template.file_path);
-            console.log('Fetching template HTML from S3:', s3Key);
-            htmlContent = await getFromS3(s3Key);
-
-            if (htmlContent) {
-                pageData = extractPageDataFromHTML(htmlContent, template.name, template.description);
-            }
-        } else if (template.file_path) {
-            // Lấy HTML để preview
-            const s3Key = getS3KeyFromFilePath(template.file_path);
-            htmlContent = await getFromS3(s3Key);
+            htmlContent = await getFromS3(s3Key); // thất bại cũng không sao
         }
 
-        // Fallback structure
-        if (!pageData && !htmlContent) {
-            pageData = {
-                canvas: { width: 1200, height: 'auto', background: '#ffffff' },
-                elements: [],
-                meta: { title: template.name, description: template.description || '' }
-            };
+        if (!pageData) {
+            return res.status(500).json({ error: 'Template chưa có dữ liệu trang' });
         }
 
-        console.log('Template preview:', {
-            hasPageData: !!pageData,
-            hasHTML: !!htmlContent,
-            elementsCount: pageData?.elements?.length || 0
-        });
-
-        return res.json({
+        res.json({
             success: true,
             template: {
                 id: template._id,
                 name: template.name,
-                description: template.description,
                 category: template.category,
-                price: template.price,
                 screenshot_url: template.screenshot_url,
-                usage_count: template.usage_count,
-                is_premium: template.is_premium,
-                tags: template.tags
             },
-            pageData: pageData,
+            pageData,        // ← quan trọng: dùng cái này để render
             html: htmlContent || '',
-            css: ''
         });
-
     } catch (err) {
-        console.error('Lỗi xem trước template:', err);
-        res.status(500).json({
-            error: 'Lỗi khi xem trước template: ' + err.message
-        });
+        console.error(err);
+        res.status(500).json({ error: 'Lỗi preview: ' + err.message });
     }
 };
 

@@ -184,22 +184,12 @@ const CreatePagePopup = ({ isOpen, onClose, onCreateSuccess }) => {
                             >
                                 <div className="mode-icon">📝</div>
                                 <div className="mode-info">
-                                    <h4>Tạo từ đầu</h4>
+                                    <h4>Tạo landing page</h4>
                                     <p>Bắt đầu với trang trống</p>
                                 </div>
                                 <div className="mode-radio">{createMode === 'scratch' ? '⚫' : '⚪'}</div>
                             </div>
-                            <div
-                                className={`mode-option ${createMode === 'import' ? 'active' : ''}`}
-                                onClick={() => handleModeChange('import')}
-                            >
-                                <div className="mode-icon">📥</div>
-                                <div className="mode-info">
-                                    <h4>Import từ file</h4>
-                                    <p>Import file .iuhpage</p>
-                                </div>
-                                <div className="mode-radio">{createMode === 'import' ? '⚫' : '⚪'}</div>
-                            </div>
+
                         </div>
                     </div>
 

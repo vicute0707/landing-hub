@@ -56,7 +56,6 @@ exports.login = async (req, res) => {
 
 exports.googleCallback = async (req, res) => {
     const { email, name } = req.body;
-    console.log('Received email and name:', { email, name });
     try {
         if (!email || !name) return res.status(400).json({ msg: 'Missing user info' });
 

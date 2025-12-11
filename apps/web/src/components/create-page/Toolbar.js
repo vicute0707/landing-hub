@@ -109,9 +109,7 @@ const Toolbar = ({
                             <i className="fas fa-cloud-upload-alt"></i> Deploy
                         </button>
                     )}
-                    <button onClick={onGenerateCode} className="lpb-toolbar-action-primary">
-                        <i className="fas fa-code"></i> Triển khai
-                    </button>
+
                 </div>
             </div>
         </div>

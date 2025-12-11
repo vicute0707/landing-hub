@@ -109,82 +109,112 @@ const Header = () => {
     if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
     return (
-        <div className="header-container">
-            <nav className="navbar">
-                <div className="navbar-container">
-                    <img src={logo} alt="Logo" className="logo-image" />
+        <header className="header">
+            <div className="header__wrapper">
+                {/* Logo */}
+                <img
+                    src={logo}
+                    alt="Logo"
+                    className="header__logo"
+                    onClick={() => navigate('/')}
+                />
 
-                    <div className="header-right">
-                        {/* 🔔 Thông báo */}
-                        <div className="notif-wrapper">
-                            <div className="bell-icon" onClick={() => setShowNotif(!showNotif)}>
-                                <FiBell size={20} />
-                                {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
-                            </div>
+                {/* Right area */}
+                <div className="header__right">
+                    {/* Notification */}
+                    <div className="notif">
+                        <button
+                            className="notif__btn"
+                            onClick={() => setShowNotif(s => !s)}
+                            aria-label="Thông báo"
+                        >
+                            <FiBell size={20} />
+                            {unreadCount > 0 && <span className="notif__badge">{unreadCount}</span>}
+                        </button>
 
-                            {showNotif && (
-                                <div className="notif-dropdown">
-                                    <div className="notif-header">
-                                        <strong>Thông báo</strong>
-                                        <FiX className="close-notif" onClick={() => setShowNotif(false)} />
-                                    </div>
-                                    <div className="notif-list">
-                                        {notifications.length === 0 ? (
-                                            <div className="notif-empty">Không có thông báo mới</div>
-                                        ) : (
-                                            notifications.map(notif => (
-                                                <div
-                                                    key={notif._id}
-                                                    className={`notif-item ${notif.isRead ? 'read' : 'unread'}`}
-                                                    onClick={() => markAsRead(notif._id)}
-                                                >
-                                                    <div className="notif-title">{notif.title}</div>
-                                                    <div className="notif-message">{notif.message}</div>
-                                                    <div className="notif-time">
-                                                        {new Date(notif.createdAt).toLocaleString('vi-VN')}
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
+                        {showNotif && (
+                            <div className="notif__panel">
+                                <div className="notif__header">
+                                    <span>Thông báo</span>
+                                    <FiX onClick={() => setShowNotif(false)} />
                                 </div>
-                            )}
-                        </div>
+                                <div className="notif__body">
+                                    {notifications.length === 0 ? (
+                                        <div className="notif__empty">Không có thông báo mới</div>
+                                    ) : (
+                                        notifications.map(n => (
+                                            <div
+                                                key={n._id}
+                                                className={`notif__item ${n.isRead ? 'read' : 'unread'}`}
+                                                onClick={() => markAsRead(n._id)}
+                                            >
+                                                <div className="notif__title">{n.title}</div>
+                                                <div className="notif__msg">{n.message}</div>
+                                                <div className="notif__time">
+                                                    {new Date(n.createdAt).toLocaleString('vi-VN')}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
-                        {/* 👤 Avatar + Profile */}
-                        <div className="user-info">
-                            {localStorage.getItem('token') ? (
-                                <>
-                                    <span>Chào, {displayName}</span>
-                                    <div
-                                        className="user-avatar cursor-pointer"
-                                        onClick={() => setShowProfile(!showProfile)}
-                                    >
-                                        {userData.avatar ? (
-                                            <img src={userData.avatar} alt="User Avatar" className="w-full h-full rounded-full object-cover" />
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-5 h-5 text-gray-600">
+                    {/* User */}
+                    <div className="user">
+                        {!localStorage.getItem('token') ? (
+                            <button
+                                className="user__loginBtn"
+                                onClick={() => navigate('/auth')}
+                            >
+                                Đăng nhập
+                            </button>
+                        ) : (
+                            <>
+                                <span className="user__name">Chào, {displayName}</span>
+
+                                <div
+                                    className="user__avatarWrap"
+                                    onClick={() => setShowProfile(s => !s)}
+                                >
+                                    {userData.avatar ? (
+                                        <img
+                                            src={userData.avatar}
+                                            alt="avatar"
+                                            className="user__avatar"
+                                        />
+                                    ) : (
+                                        <div className="user__avatarFallback">
+                                            <svg viewBox="0 0 24 24">
                                                 <circle cx="12" cy="8" r="4" />
                                                 <path d="M4 20c0-3.5 4-5.5 8-5.5s8 2 8 5.5" />
                                             </svg>
-                                        )}
-                                    </div>
-                                    <button onClick={handleLogout}>Đăng xuất</button>
-                                    {showProfile && (
-                                        <div className="profile-popup">
-                                            <UserProfile />
-                                            <button onClick={() => setShowProfile(false)}>Đóng</button>
                                         </div>
                                     )}
-                                </>
-                            ) : (
-                                <button onClick={() => navigate('/auth')}>Đăng nhập</button>
-                            )}
-                        </div>
+                                </div>
+
+                                <button className="user__logout" onClick={handleLogout}>
+                                    Đăng xuất
+                                </button>
+
+                                {showProfile && (
+                                    <div className="user__popover">
+                                        <UserProfile />
+                                        <button
+                                            className="user__close"
+                                            onClick={() => setShowProfile(false)}
+                                        >
+                                            Đóng
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
-            </nav>
-        </div>
+            </div>
+        </header>
     );
 };
 
