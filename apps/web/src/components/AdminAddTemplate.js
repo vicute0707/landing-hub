@@ -632,9 +632,6 @@ const Templates = () => {
                                             )}
                                         </div>
                                         <div className="card-overlay">
-                                            <button onClick={() => handlePreview(template)} className="btn btn--secondary" title="Xem trước">
-                                                <Eye size={16} />
-                                            </button>
                                             <button onClick={() => handleEdit(template)} className="btn btn--primary" title="Chỉnh sửa">
                                                 <Edit size={16} />
                                             </button>
