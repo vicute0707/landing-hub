@@ -22,40 +22,48 @@ const MarketplacePreviewModal = ({ page, onClose }) => {
         const token = localStorage.getItem("token");
 
         try {
-            // Lấy pageData từ API
-            const response = await axios.get(
-                `${API_BASE_URL}/api/marketplace/preview-data/${page._id}`,
-                {
-                    headers: token ? { Authorization: `Bearer ${token}` } : {}
-                }
-            );
+            // --- 1. Gọi API đúng route backend ---
+            // Backend expects: /api/marketplace/:id/preview-data
+            const url = `${API_BASE_URL}/api/marketplace/${page._id}/preview-data`;
 
-            if (response.data.success) {
+            const response = await axios.get(url, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {}
+            });
+
+            if (response.data?.success) {
                 const { htmlContent, pageData: data } = response.data.data;
-                setPreviewHtml(htmlContent);
-                setPageData(data);
+
+                setPreviewHtml(htmlContent || "");
+                setPageData(data || {});
+                setLoading(false);
+                return;
             }
-        } catch (error) {
-            console.error("Error loading preview:", error);
-            // Fallback: load HTML only
-            try {
-                const htmlResponse = await fetch(
-                    `${API_BASE_URL}/api/marketplace/preview/${page._id}`,
-                    {
-                        headers: token ? { Authorization: `Bearer ${token}` } : {}
-                    }
-                );
-                if (htmlResponse.ok) {
-                    const html = await htmlResponse.text();
-                    setPreviewHtml(html);
-                }
-            } catch (err) {
-                console.error("Fallback preview failed:", err);
-            }
-        } finally {
-            setLoading(false);
+        } catch (err) {
+            console.error("Preview-data failed → fallback to plain HTML:", err);
         }
+
+        // --- 2. FALLBACK: nếu preview-data lỗi, load HTML thuần ---
+        try {
+            // Backend expects: /api/marketplace/:id/preview
+            const fallbackUrl = `${API_BASE_URL}/api/marketplace/${page._id}/preview`;
+
+            const htmlResponse = await fetch(fallbackUrl, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {}
+            });
+
+            if (htmlResponse.ok) {
+                const html = await htmlResponse.text();
+                setPreviewHtml(html);
+            } else {
+                console.warn("Fallback preview failed:", htmlResponse.status);
+            }
+        } catch (err) {
+            console.error("Fallback HTML preview error:", err);
+        }
+
+        setLoading(false);
     };
+
 
     const handleClose = (e) => {
         e?.stopPropagation();

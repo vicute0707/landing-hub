@@ -3,16 +3,7 @@ const router = express.Router();
 const auth = require('../middleware/authMiddleware');
 const marketplaceController = require('../controllers/marketplaceController');
 
-/**
- * IMPORTANT: Route ordering matters!
- * 1. Static routes first (e.g., /my/pages, /featured/list)
- * 2. Specific dynamic routes (e.g., /:id/preview, /:id/reviews)
- * 3. General dynamic routes last (e.g., /:id)
- */
 
-/**
- * Protected routes - yêu cầu authentication
- */
 
 // Lấy marketplace pages của user
 router.get('/my/pages', auth, marketplaceController.getMyMarketplacePages);
@@ -36,25 +27,14 @@ router.get('/bestsellers/list', marketplaceController.getBestsellers);
 // Lấy new arrivals (phải đặt trước /:id)
 router.get('/new-arrivals/list', marketplaceController.getNewArrivals);
 
-// Lấy danh sách marketplace pages
-router.get('/', marketplaceController.getMarketplacePages);
 
-/**
- * Dynamic routes with specific patterns (MUST be before /:id)
- */
 
-// Preview marketplace page (HTML) - MUST be before /:id
 router.get('/:id/preview-data', marketplaceController.getPreviewData);
 router.get('/:id/preview', marketplaceController.previewMarketplacePage);
-
-// Download marketplace page as HTML ZIP - MUST be before /:id
 router.get('/:id/download/html', auth, marketplaceController.downloadAsHTML);
-
-// Download marketplace page as .iuhpage - MUST be before /:id
 router.get('/:id/download/iuhpage', auth, marketplaceController.downloadAsIUHPage);
-
-// Get detail with order info - MUST be before /:id
 router.get('/:id/detail', auth, marketplaceController.getPageDetailWithOrder);
+router.get('/:id/reviews', marketplaceController.getReviews);
 
 // Get detail with order (duplicate route?) - MUST be before /:id
 router.get("/:id/detail-order", auth, marketplaceController.getPageDetailWithOrder);
@@ -87,5 +67,7 @@ router.put('/:id', auth, marketplaceController.updateMarketplacePage);
 
 // Xóa marketplace page
 router.delete('/:id', auth, marketplaceController.deleteMarketplacePage);
+router.get('/', marketplaceController.getMarketplacePages);
+
 
 module.exports = router;
