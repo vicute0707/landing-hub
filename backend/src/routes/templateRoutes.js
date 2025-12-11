@@ -13,7 +13,9 @@ router.post('/admin/batch-regenerate-screenshots', authMiddleware, isAdmin, temp
 router.get('/admin/all', authMiddleware, isAdmin, templateController.getAllTemplatesAdmin);
 // ========== PUBLIC ROUTES (ĐẶT TRƯỚC :id) ==========
 router.get('/featured', templateController.getFeaturedTemplates);
-router.get('/search', templateController.searchTemplates);
+router.get('/search', templateController.searchTemplates);router.get('/:id/preview', templateController.previewTemplate);
+
+
 
 // ========== ROUTES VỚI :category PARAM ==========
 router.get('/category/:category', templateController.getTemplatesByCategory);

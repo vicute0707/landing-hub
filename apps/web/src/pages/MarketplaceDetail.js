@@ -108,7 +108,6 @@ const MarketplaceDetail = () => {
         return () => socket.disconnect();
     }, [order]);
     const paymentMethods = [
-        { value: "SANDBOX", label: "Sandbox (Test)", description: "Môi trường test thanh toán an toàn." },
         { value: "MOMO", label: "Ví điện tử MOMO", description: "Thanh toán nhanh chóng qua ví MOMO." },
         { value: "VNPAY", label: "Cổng thanh toán VNPay", description: "Hỗ trợ nhiều ngân hàng và thẻ quốc tế." },
     ]

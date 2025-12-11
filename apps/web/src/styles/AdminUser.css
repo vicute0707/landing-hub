@@ -16,12 +16,8 @@
     --border-radius: 12px;
 }
 
-body {
-    margin-top: 70px;
-    font-family: var(--font-family);
-    background-color: var(--bg-main);
-    color: var(--text-primary);
-}
+
+
 
 /* --- Layout chính --- */
 .admin-user-container {

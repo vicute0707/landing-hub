@@ -8,11 +8,6 @@ import {
     Select, MenuItem, FormControl, InputLabel, CircularProgress, Divider, Chip
 } from '@mui/material';
 import {
-    TrendingUp, ChatBubble, Message, Group, ShoppingCart, AttachMoney,
-    Assessment, Payment, AccountBalance, Description, Psychology,
-    Lightbulb, Analytics, Inventory, Category, Star, LocalAtm, CreditCard
-} from '@mui/icons-material';
-import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area
 } from 'recharts';
@@ -30,17 +25,14 @@ const AdminAnalytics = () => {
     const [aiInsights, setAiInsights] = useState(null);
     const [systemReport, setSystemReport] = useState(null);
 
-    // Helper function to clean and parse AI text (remove emoji)
+    // Làm sạch text AI (bỏ emoji)
     const cleanAIText = (text) => {
         if (!text) return [];
-        // Remove emoji and split into lines
         const cleanedText = text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
-        // Split by newlines and filter empty lines
-        const lines = cleanedText.split('\n').filter(line => line.trim());
-        return lines;
+        return cleanedText.split('\n').filter(line => line.trim());
     };
 
-    // Parse recommendations into structured format
+    // Parse gợi ý AI
     const parseRecommendations = (text) => {
         if (!text) return [];
         const lines = cleanAIText(text);
@@ -49,7 +41,6 @@ const AdminAnalytics = () => {
 
         lines.forEach(line => {
             const trimmed = line.trim();
-            // Check if it's a numbered item (e.g., "1. Title" or "1) Title")
             const match = trimmed.match(/^(\d+)[.):]\s*(.+)/);
             if (match) {
                 if (currentRec) recommendations.push(currentRec);
@@ -59,7 +50,6 @@ const AdminAnalytics = () => {
             } else if (currentRec && trimmed) {
                 currentRec.details.push(trimmed);
             } else if (trimmed && !currentRec) {
-                // Standalone text
                 recommendations.push({ title: trimmed, details: [] });
             }
         });
@@ -75,10 +65,7 @@ const AdminAnalytics = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const config = {
-                headers: { Authorization: `Bearer ${token}` }
-            };
-
+            const config = { headers: { Authorization: `Bearer ${token}` } };
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
             const [trendsRes, marketplaceRes, summaryRes, insightsRes, systemRes] = await Promise.all([
@@ -95,49 +82,21 @@ const AdminAnalytics = () => {
             setAiInsights(insightsRes.data.data);
             setSystemReport(systemRes.data.data);
         } catch (error) {
-            console.error('Error fetching analytics:', error);
+            console.error('Lỗi khi lấy dữ liệu phân tích:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const StatCard = ({ title, value, subtitle, icon, color, trend }) => (
-        <Card sx={{
-            background: `linear-gradient(135deg, ${color}20 0%, ${color}10 100%)`,
-            borderLeft: `4px solid ${color}`,
-            height: '100%'
-        }}>
+    const StatCard = ({ title, value, subtitle, trend }) => (
+        <Card sx={{ background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)', borderLeft: '4px solid #667eea', height: '100%' }}>
             <CardContent>
-                <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Box display="flex" justifyContent="space-between">
                     <Box>
-                        <Typography color="textSecondary" gutterBottom variant="body2">
-                            {title}
-                        </Typography>
-                        <Typography variant="h4" fontWeight="bold">
-                            {value}
-                        </Typography>
-                        {subtitle && (
-                            <Typography variant="caption" color="text.secondary">
-                                {subtitle}
-                            </Typography>
-                        )}
-                        {trend && (
-                            <Chip
-                                label={trend}
-                                size="small"
-                                color={trend.includes('+') ? 'success' : 'error'}
-                                sx={{ mt: 1 }}
-                            />
-                        )}
-                    </Box>
-                    <Box sx={{
-                        backgroundColor: `${color}20`,
-                        borderRadius: 2,
-                        p: 1.5,
-                        display: 'flex',
-                        alignItems: 'center'
-                    }}>
-                        {icon}
+                        <Typography color="textSecondary" gutterBottom variant="body2">{title}</Typography>
+                        <Typography variant="h4" fontWeight="bold">{value}</Typography>
+                        {subtitle && <Typography variant="caption" color="text.secondary">{subtitle}</Typography>}
+                        {trend && <Chip label={trend} size="small" color={trend.includes('+') ? 'success' : 'error'} sx={{ mt: 1 }} />}
                     </Box>
                 </Box>
             </CardContent>
@@ -160,14 +119,13 @@ const AdminAnalytics = () => {
         );
     }
 
-    // Prepare order status data for chart
+    // Chuẩn bị dữ liệu biểu đồ
     const orderStatusData = systemReport?.transactions?.byStatus?.map(item => ({
         status: item.status,
         count: item.count,
         amount: item.totalAmountRaw
     })) || [];
 
-    // Prepare payment method data
     const paymentMethodData = systemReport?.transactions?.byPaymentMethod?.map(item => ({
         method: item.method,
         count: item.count,
@@ -183,213 +141,103 @@ const AdminAnalytics = () => {
                     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
                         {/* Header */}
                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                            <Box display="flex" alignItems="center" gap={1}>
-                                <Analytics sx={{ fontSize: 40, color: '#667eea' }} />
-                                <Typography variant="h4" fontWeight="bold">
-                                    Admin Analytics Dashboard
-                                </Typography>
+                            <Box>
+                                <Typography variant="h4" fontWeight="bold">Tổng quan Admin</Typography>
                             </Box>
                             <FormControl variant="outlined" size="small" sx={{ minWidth: 150 }}>
-                                <InputLabel>Time Range</InputLabel>
-                                <Select
-                                    value={timeRange}
-                                    onChange={(e) => setTimeRange(e.target.value)}
-                                    label="Time Range"
-                                >
-                                    <MenuItem value={7}>Last 7 days</MenuItem>
-                                    <MenuItem value={30}>Last 30 days</MenuItem>
-                                    <MenuItem value={90}>Last 90 days</MenuItem>
+                                <InputLabel>Khoảng thời gian</InputLabel>
+                                <Select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} label="Khoảng thời gian">
+                                    <MenuItem value={7}>7 ngày qua</MenuItem>
+                                    <MenuItem value={30}>30 ngày qua</MenuItem>
+                                    <MenuItem value={90}>90 ngày qua</MenuItem>
                                 </Select>
                             </FormControl>
                         </Box>
 
-                        {/* Summary Cards Row 1 - Business Metrics */}
-                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                            <AttachMoney /> Business Metrics
-                        </Typography>
+                        {/* Dòng 1: Chỉ số kinh doanh */}
+                        <Typography variant="h6" sx={{ mb: 2 }}>Chỉ số kinh doanh</Typography>
                         <Grid container spacing={3} mb={4}>
                             <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Total Revenue"
-                                    value={systemReport?.overview?.totalRevenue || '₫0'}
-                                    subtitle={`Fees: ${systemReport?.overview?.platformFees || '₫0'}`}
-                                    icon={<AttachMoney sx={{ color: '#10b981', fontSize: 40 }} />}
-                                    color="#10b981"
-                                />
+                                <StatCard title="Tổng doanh thu" value={systemReport?.overview?.totalRevenue || '₫0'} subtitle={`Phí: ${systemReport?.overview?.platformFees || '₫0'}`} trend="+12%" />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Marketplace Pages"
-                                    value={systemReport?.marketplace?.totalPages || 0}
-                                    subtitle={`Avg: ${systemReport?.marketplace?.priceStats?.avg || '₫0'}`}
-                                    icon={<ShoppingCart sx={{ color: '#667eea', fontSize: 40 }} />}
-                                    color="#667eea"
-                                />
+                                <StatCard title="Số trang bán" value={systemReport?.marketplace?.totalPages || 0} subtitle={`TB: ${systemReport?.marketplace?.priceStats?.avg || '₫0'}`} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Total Leads"
-                                    value={systemReport?.leads?.total || 0}
-                                    subtitle={`Today: ${systemReport?.leads?.today || 0}`}
-                                    icon={<Description sx={{ color: '#f59e0b', fontSize: 40 }} />}
-                                    color="#f59e0b"
-                                />
+                                <StatCard title="Tổng lead" value={systemReport?.leads?.total || 0} subtitle={`Hôm nay: ${systemReport?.leads?.today || 0}`} />
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Active Users"
-                                    value={summary?.totalUsers || 0}
-                                    subtitle={`${summary?.totalChats || 0} total chats`}
-                                    icon={<Group sx={{ color: '#4facfe', fontSize: 40 }} />}
-                                    color="#4facfe"
-                                />
+                                <StatCard title="Người dùng hoạt động" value={summary?.totalUsers || 0} subtitle={`${summary?.totalChats || 0} cuộc chat`} />
                             </Grid>
                         </Grid>
 
-                        {/* Summary Cards Row 2 - Chat & Support */}
-                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                            <ChatBubble /> Support & Engagement
-                        </Typography>
+                        {/* Dòng 2: Hỗ trợ & tương tác */}
+                        <Typography variant="h6" sx={{ mb: 2 }}>Hỗ trợ & tương tác</Typography>
                         <Grid container spacing={3} mb={4}>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Today's Chats"
-                                    value={summary?.todayChats || 0}
-                                    subtitle={`${summary?.resolvedToday || 0} resolved today`}
-                                    icon={<ChatBubble sx={{ color: '#667eea', fontSize: 40 }} />}
-                                    color="#667eea"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Open Chats"
-                                    value={summary?.openChats || 0}
-                                    subtitle="Needs attention"
-                                    icon={<Message sx={{ color: '#f093fb', fontSize: 40 }} />}
-                                    color="#f093fb"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Messages Today"
-                                    value={summary?.todayMessages || 0}
-                                    subtitle={`AI: ${summary?.messageStats?.aiToday || 0} (${summary?.messageStats?.aiPercentage || 0}%)`}
-                                    icon={<TrendingUp sx={{ color: '#43e97b', fontSize: 40 }} />}
-                                    color="#43e97b"
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
-                                <StatCard
-                                    title="Total Messages"
-                                    value={summary?.messageStats?.total || 0}
-                                    subtitle={`AI: ${summary?.messageStats?.aiGenerated || 0}`}
-                                    icon={<Assessment sx={{ color: '#8b5cf6', fontSize: 40 }} />}
-                                    color="#8b5cf6"
-                                />
-                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}><StatCard title="Chat hôm nay" value={summary?.todayChats || 0} subtitle={`Đã xử lý: ${summary?.resolvedToday || 0}`} /></Grid>
+                            <Grid item xs={12} sm={6} md={3}><StatCard title="Chat đang mở" value={summary?.openChats || 0} subtitle="Cần xử lý" /></Grid>
+                            <Grid item xs={12} sm={6} md={3}><StatCard title="Tin nhắn hôm nay" value={summary?.todayMessages || 0} subtitle={`AI: ${summary?.messageStats?.aiToday || 0} (${summary?.messageStats?.aiPercentage || 0}%)`} /></Grid>
+                            <Grid item xs={12} sm={6} md={3}><StatCard title="Tổng tin nhắn" value={summary?.messageStats?.total || 0} subtitle={`AI: ${summary?.messageStats?.aiGenerated || 0}`} /></Grid>
                         </Grid>
 
                         <Divider sx={{ my: 4 }} />
 
-                        {/* AI Recommendations */}
+                        {/* Gợi ý AI */}
                         {summary?.aiRecommendations && parseRecommendations(summary.aiRecommendations).length > 0 && (
                             <Paper sx={{ p: 3, mb: 4, background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)', border: '1px solid #667eea40' }}>
-                                <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                    <Psychology sx={{ color: '#667eea', fontSize: 28 }} />
-                                    <Typography variant="h6" fontWeight="bold">
-                                        AI Smart Recommendations
-                                    </Typography>
-                                </Box>
+                                <Typography variant="h6" fontWeight="bold" mb={2}>Gợi ý thông minh từ AI</Typography>
                                 <Box>
                                     {parseRecommendations(summary.aiRecommendations).map((rec, index) => (
                                         <Box key={index} mb={2}>
-                                            <Box display="flex" alignItems="flex-start" gap={1}>
-                                                <Lightbulb sx={{ color: '#f59e0b', fontSize: 20, mt: 0.3 }} />
-                                                <Box>
-                                                    <Typography variant="body1" fontWeight="600" gutterBottom>
-                                                        {rec.title}
-                                                    </Typography>
-                                                    {rec.details.length > 0 && (
-                                                        <Box ml={2}>
-                                                            {rec.details.map((detail, idx) => (
-                                                                <Typography key={idx} variant="body2" color="text.secondary" paragraph>
-                                                                    {detail}
-                                                                </Typography>
-                                                            ))}
-                                                        </Box>
-                                                    )}
+                                            <Typography variant="body1" fontWeight="600">{rec.title}</Typography>
+                                            {rec.details.length > 0 && (
+                                                <Box ml={2} mt={1}>
+                                                    {rec.details.map((detail, idx) => (
+                                                        <Typography key={idx} variant="body2" color="text.secondary">{detail}</Typography>
+                                                    ))}
                                                 </Box>
-                                            </Box>
-                                            {index < parseRecommendations(summary.aiRecommendations).length - 1 && (
-                                                <Divider sx={{ my: 2 }} />
                                             )}
+                                            {index < parseRecommendations(summary.aiRecommendations).length - 1 && <Divider sx={{ my: 2 }} />}
                                         </Box>
                                     ))}
                                 </Box>
                             </Paper>
                         )}
 
-                        {/* AI Insights */}
+                        {/* Phân tích AI */}
                         {aiInsights && (
                             <Grid container spacing={3} mb={4}>
                                 <Grid item xs={12} md={6}>
-                                    <Paper sx={{ p: 3, height: '100%', border: '1px solid #f093fb40' }}>
-                                        <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                            <ChatBubble sx={{ color: '#f093fb', fontSize: 28 }} />
-                                            <Typography variant="h6" fontWeight="bold">
-                                                Chat Trends Analysis
-                                            </Typography>
-                                        </Box>
-                                        <Box>
-                                            {aiInsights.chatInsights && cleanAIText(aiInsights.chatInsights).length > 0 ? (
-                                                cleanAIText(aiInsights.chatInsights).map((line, index) => (
-                                                    <Typography key={index} variant="body2" paragraph color="text.secondary">
-                                                        {line}
-                                                    </Typography>
-                                                ))
-                                            ) : (
-                                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                                    Chưa có đủ dữ liệu cuộc hội thoại để phân tích. Khi có người dùng bắt đầu chat, AI sẽ tự động phân tích xu hướng và đưa ra insights.
-                                                </Typography>
-                                            )}
-                                        </Box>
+                                    <Paper sx={{ p: 3, height: '100%' }}>
+                                        <Typography variant="h6" fontWeight="bold" mb={2}>Phân tích xu hướng chat</Typography>
+                                        {aiInsights.chatInsights && cleanAIText(aiInsights.chatInsights).length > 0 ? (
+                                            cleanAIText(aiInsights.chatInsights).map((line, index) => (
+                                                <Typography key={index} variant="body2" paragraph color="text.secondary">{line}</Typography>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>Chưa đủ dữ liệu chat để phân tích.</Typography>
+                                        )}
                                     </Paper>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
-                                    <Paper sx={{ p: 3, height: '100%', border: '1px solid #43e97b40' }}>
-                                        <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                            <ShoppingCart sx={{ color: '#43e97b', fontSize: 28 }} />
-                                            <Typography variant="h6" fontWeight="bold">
-                                                Marketplace Insights
-                                            </Typography>
-                                        </Box>
-                                        <Box>
-                                            {aiInsights.marketplaceInsights && cleanAIText(aiInsights.marketplaceInsights).length > 0 ? (
-                                                cleanAIText(aiInsights.marketplaceInsights).map((line, index) => (
-                                                    <Typography key={index} variant="body2" paragraph color="text.secondary">
-                                                        {line}
-                                                    </Typography>
-                                                ))
-                                            ) : (
-                                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                                    Chưa có đủ dữ liệu marketplace để phân tích. Khi có template được đăng bán và có người mua, AI sẽ phân tích hiệu suất và đưa ra insights.
-                                                </Typography>
-                                            )}
-                                        </Box>
+                                    <Paper sx={{ p: 3, height: '100%' }}>
+                                        <Typography variant="h6" fontWeight="bold" mb={2}>Thông tin thị trường</Typography>
+                                        {aiInsights.marketplaceInsights && cleanAIText(aiInsights.marketplaceInsights).length > 0 ? (
+                                            cleanAIText(aiInsights.marketplaceInsights).map((line, index) => (
+                                                <Typography key={index} variant="body2" paragraph color="text.secondary">{line}</Typography>
+                                            ))
+                                        ) : (
+                                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>Chưa đủ dữ liệu mua-bán để phân tích.</Typography>
+                                        )}
                                     </Paper>
                                 </Grid>
                             </Grid>
                         )}
 
-                        {/* Revenue Trends Chart */}
+                        {/* Xu hướng doanh thu */}
                         {systemReport?.dailyRevenue && systemReport.dailyRevenue.length > 0 && (
                             <Paper sx={{ p: 3, mb: 4 }}>
-                                <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                    <LocalAtm sx={{ color: '#10b981', fontSize: 28 }} />
-                                    <Typography variant="h6" fontWeight="bold">
-                                        Revenue Trends (Last 30 Days)
-                                    </Typography>
-                                </Box>
+                                <Typography variant="h6" fontWeight="bold" mb={2}>Xu hướng doanh thu (30 ngày)</Typography>
                                 <ResponsiveContainer width="100%" height={300}>
                                     <AreaChart data={systemReport.dailyRevenue}>
                                         <defs>
@@ -407,23 +255,18 @@ const AdminAnalytics = () => {
                                         <YAxis />
                                         <Tooltip />
                                         <Legend />
-                                        <Area type="monotone" dataKey="revenueRaw" stroke="#10b981" fillOpacity={1} fill="url(#colorRevenue)" name="Revenue" />
-                                        <Area type="monotone" dataKey="platformFeesRaw" stroke="#667eea" fillOpacity={1} fill="url(#colorFees)" name="Platform Fees" />
+                                        <Area type="monotone" dataKey="revenueRaw" stroke="#10b981" fillOpacity={1} fill="url(#colorRevenue)" name="Doanh thu" />
+                                        <Area type="monotone" dataKey="platformFeesRaw" stroke="#667eea" fillOpacity={1} fill="url(#colorFees)" name="Phí nền tảng" />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </Paper>
                         )}
 
-                        {/* Order Status & Payment Methods */}
+                        {/* Trạng thái giao dịch & Phương thức thanh toán */}
                         <Grid container spacing={3} mb={4}>
                             <Grid item xs={12} md={6}>
                                 <Paper sx={{ p: 3 }}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                        <Inventory sx={{ color: '#667eea', fontSize: 28 }} />
-                                        <Typography variant="h6" fontWeight="bold">
-                                            Transaction Status Breakdown
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold" mb={2}>Phân loại trạng thái giao dịch</Typography>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <PieChart>
                                             <Pie
@@ -447,12 +290,7 @@ const AdminAnalytics = () => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Paper sx={{ p: 3 }}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                        <CreditCard sx={{ color: '#4facfe', fontSize: 28 }} />
-                                        <Typography variant="h6" fontWeight="bold">
-                                            Payment Methods Distribution
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold" mb={2}>Phương thức thanh toán</Typography>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={paymentMethodData}>
                                             <CartesianGrid strokeDasharray="3 3" />
@@ -460,24 +298,18 @@ const AdminAnalytics = () => {
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />
-                                            <Bar dataKey="count" fill="#667eea" name="Transactions" />
+                                            <Bar dataKey="count" fill="#667eea" name="Số giao dịch" />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </Paper>
                             </Grid>
                         </Grid>
 
-                        {/* Marketplace Trends */}
+                        {/* Danh mục & Top mẫu */}
                         <Grid container spacing={3}>
-                            {/* Category Performance */}
                             <Grid item xs={12} md={6}>
                                 <Paper sx={{ p: 3 }}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                        <Star sx={{ color: '#f59e0b', fontSize: 28 }} />
-                                        <Typography variant="h6" fontWeight="bold">
-                                            Top Categories by Sales
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold" mb={2}>Danh mục bán chạy nhất</Typography>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <BarChart data={marketplaceTrends?.categoryStats || []}>
                                             <CartesianGrid strokeDasharray="3 3" />
@@ -485,22 +317,15 @@ const AdminAnalytics = () => {
                                             <YAxis />
                                             <Tooltip />
                                             <Legend />
-                                            <Bar dataKey="totalSales" fill="#667eea" name="Sales" />
-                                            <Bar dataKey="totalViews" fill="#4facfe" name="Views" />
+                                            <Bar dataKey="totalSales" fill="#667eea" name="Doanh số" />
+                                            <Bar dataKey="totalViews" fill="#4facfe" name="Lượt xem" />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </Paper>
                             </Grid>
-
-                            {/* Category Distribution Pie */}
                             <Grid item xs={12} md={6}>
                                 <Paper sx={{ p: 3 }}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                        <Category sx={{ color: '#8b5cf6', fontSize: 28 }} />
-                                        <Typography variant="h6" fontWeight="bold">
-                                            Category Distribution
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold" mb={2}>Phân bố danh mục</Typography>
                                     <ResponsiveContainer width="100%" height={300}>
                                         <PieChart>
                                             <Pie
@@ -523,25 +348,20 @@ const AdminAnalytics = () => {
                                 </Paper>
                             </Grid>
 
-                            {/* Top Templates */}
+                            {/* Top mẫu */}
                             <Grid item xs={12}>
                                 <Paper sx={{ p: 3 }}>
-                                    <Box display="flex" alignItems="center" gap={1} mb={3}>
-                                        <TrendingUp sx={{ color: '#10b981', fontSize: 28 }} />
-                                        <Typography variant="h6" fontWeight="bold">
-                                            Top Performing Templates
-                                        </Typography>
-                                    </Box>
+                                    <Typography variant="h6" fontWeight="bold" mb={2}>Template hiệu quả nhất</Typography>
                                     <Box sx={{ overflowX: 'auto' }}>
                                         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                             <thead>
                                             <tr style={{ backgroundColor: '#f5f5f5' }}>
-                                                <th style={{ padding: '12px', textAlign: 'left' }}>Template</th>
-                                                <th style={{ padding: '12px', textAlign: 'left' }}>Category</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Price</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Sales</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Views</th>
-                                                <th style={{ padding: '12px', textAlign: 'right' }}>Rating</th>
+                                                <th style={{ padding: '12px', textAlign: 'left' }}>Tên mẫu</th>
+                                                <th style={{ padding: '12px', textAlign: 'left' }}>Danh mục</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Giá</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Đã bán</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Lượt xem</th>
+                                                <th style={{ padding: '12px', textAlign: 'right' }}>Đánh giá</th>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -555,7 +375,7 @@ const AdminAnalytics = () => {
                                                     <td style={{ padding: '12px', textAlign: 'right' }}>{template.sold_count}</td>
                                                     <td style={{ padding: '12px', textAlign: 'right' }}>{template.views}</td>
                                                     <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                        {template.rating?.toFixed(1) || 'N/A'}
+                                                        {template.rating?.toFixed(1) || 'Chưa có'}
                                                     </td>
                                                 </tr>
                                             ))}

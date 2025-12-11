@@ -65,36 +65,48 @@ import { styled } from '@mui/material/styles';
 const StyledPaper = styled(Paper)(({ theme }) => ({
     height: 'calc(100vh - 120px)',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    border: '1px solid rgba(226, 232, 240, 0.8)'
 }));
-
 const MessagesContainer = styled(Box)(({ theme }) => ({
     flex: 1,
     overflowY: 'auto',
     overflow: 'hidden',
-    padding: theme.spacing(2),
-    backgroundColor: '#f5f5f5',
+    padding: theme.spacing(3),
+    backgroundColor: '#f8fafc',
     '&::-webkit-scrollbar': {
-        width: '6px'
+        width: '8px'
+    },
+    '&::-webkit-scrollbar-track': {
+        backgroundColor: 'rgba(0,0,0,0.05)',
+        borderRadius: '4px'
     },
     '&::-webkit-scrollbar-thumb': {
         backgroundColor: 'rgba(0,0,0,0.2)',
-        borderRadius: '3px'
+        borderRadius: '4px',
+        '&:hover': {
+            backgroundColor: 'rgba(0,0,0,0.3)'
+        }
     }
 }));
 
 const MessageBubble = styled(Box, {
     shouldForwardProp: (prop) => prop !== 'isOwn' && prop !== 'isBot'
 })(({ theme, isOwn, isBot }) => ({
-    maxWidth: '70%',
-    padding: '10px 14px',
-    borderRadius: isOwn ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+    padding: '12px 18px',
+    borderRadius: isOwn ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
     backgroundColor: isBot ? '#e3f2fd' : isOwn ? '#667eea' : '#fff',
-    color: isBot ? '#1976d2' : isOwn ? '#fff' : '#000',
+    color: isBot ? '#1565c0' : isOwn ? '#fff' : '#1e293b',
     alignSelf: isOwn ? 'flex-end' : 'flex-start',
     wordWrap: 'break-word',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.08)',
-    marginBottom: theme.spacing(1)
+    boxShadow: isOwn ? '0 4px 12px rgba(102, 126, 234, 0.25)' : '0 4px 12px rgba(0, 0, 0, 0.08)',
+    marginBottom: theme.spacing(1.5),
+    fontSize: '15px',
+    lineHeight: '1.6',
+    transition: 'all 0.2s ease'
 }));
 
 const StatsCard = styled(Card)(({ theme }) => ({
@@ -809,7 +821,7 @@ const AdminSupport = () => {
                                                                     </MessageBubble>
                                                                 </Box>
                                                                 <Typography variant="caption" color="textSecondary" sx={{ ml: msg.sender_type === 'admin' ? 0 : 5, mt: 0.5 }}>
-                                                                    {msg.sender_type === 'bot' ? 'AI Assistant' : msg.sender_type === 'admin' ? 'Admin' : (msg.sender_id?.name || 'Người dùng')} • {new Date(msg.created_at || msg.createdAt).toLocaleTimeString('vi-VN')}
+                                                                    {msg.sender_type === 'bot' ? 'AI LandingHub' : msg.sender_type === 'admin' ? 'Admin' : (msg.sender_id?.name || 'Người dùng')} • {new Date(msg.created_at || msg.createdAt).toLocaleTimeString('vi-VN')}
                                                                 </Typography>
                                                             </Box>
                                                         )}
@@ -819,7 +831,7 @@ const AdminSupport = () => {
                                                 {isTyping && (
                                                     <Box display="flex" gap={1} alignItems="center">
                                                         <Typography variant="caption" color="textSecondary">
-                                                            Đang gõ...
+                                                           Đang trả lời tới bạn nhé =)) ...
                                                         </Typography>
                                                     </Box>
                                                 )}

@@ -308,22 +308,6 @@ const SellPage = () => {
                                         </p>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label>
-                                            <IconLuxury name="DollarSign" color="var(--color-text-secondary)" className="label-icon" />
-                                            Giá gốc (VNĐ)
-                                            <span className="optional">(Tùy chọn)</span>
-                                        </label>
-                                        <input
-                                            type="number"
-                                            value={formData.original_price}
-                                            onChange={(e) => setFormData({ ...formData, original_price: e.target.value })}
-                                            placeholder="0"
-                                            min="0"
-                                            step="1000"
-                                        />
-                                        <p className="help-text">Giá này sẽ hiển thị để tính % giảm giá</p>
-                                    </div>
                                 </div>
 
                                 {/* Tags */}

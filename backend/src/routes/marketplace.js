@@ -44,10 +44,8 @@ router.get('/', marketplaceController.getMarketplacePages);
  */
 
 // Preview marketplace page (HTML) - MUST be before /:id
-router.get('/:id/preview', marketplaceController.previewMarketplacePage);
-
-// Get preview data (HTML + pageData with popups) - MUST be before /:id
 router.get('/:id/preview-data', marketplaceController.getPreviewData);
+router.get('/:id/preview', marketplaceController.previewMarketplacePage);
 
 // Download marketplace page as HTML ZIP - MUST be before /:id
 router.get('/:id/download/html', auth, marketplaceController.downloadAsHTML);

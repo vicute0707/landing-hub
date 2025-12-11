@@ -608,19 +608,17 @@ const AdminMarketplace = () => {
                                                 <p className="page-seller">Người bán: <strong>{page.seller_id?.name || page.seller_id?.email || 'N/A'}</strong></p>
                                                 <p className="page-category">{page.category}</p>
                                                 <p className="page-description">{page.description?.substring(0, 150)}...</p>
-                                                <div className="page-meta">
-                                                    <span><Eye size={16} /> {page.views}</span>
-                                                    <span><Heart size={16} /> {page.likes}</span>
-                                                    <span><ShoppingCart size={16} /> {page.sold_count}</span>
-                                                    <span><Star size={16} fill="#f59e0b" color="#f59e0b" /> {page.rating.toFixed(1)}</span>
-                                                </div>
                                                 <p className="page-date">Ngày tạo: {formatDate(page.created_at)}</p>
                                                 {page.rejection_reason && (<div className="rejection-reason"><AlertTriangle size={16} /> {page.rejection_reason}</div>)}
                                             </div>
                                             <div className="page-actions">
                                                 <div className="page-price">{formatPrice(page.price)}</div>
                                                 <div className="action-buttons">
-                                                    <button className="btn-view" onClick={() => { setSelectedPage(page); setShowPreviewModal(true); }} disabled={actionLoading}><Eye size={16} /> Xem</button>
+                                                    <button className="btn-view" onClick={() => { setSelectedPage(page); setShowPreviewModal(true); // thêm dòng này
+                                                        page.previewUrl = `/api/marketplace/preview/${page._id}`;
+                                                        setSelectedPage(page);
+                                                        setShowPreviewModal(true);}
+                                                    } disabled={actionLoading}><Eye size={16} /> Xem</button>
                                                     {page.status === 'PENDING' && (
                                                         <>
                                                             <button className="btn-approve" onClick={() => handleApprove(page._id)} disabled={actionLoading}><Check size={16} /> Duyệt</button>

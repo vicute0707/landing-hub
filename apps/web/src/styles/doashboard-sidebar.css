@@ -428,6 +428,7 @@
     }
 
     .sidebar-nav {
+        margin-top: 2rem;
         flex-direction: row;
         overflow-x: auto;
         overflow-y: visible;

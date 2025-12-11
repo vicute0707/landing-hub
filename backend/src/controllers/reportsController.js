@@ -3,6 +3,7 @@ const Page = require('../models/Page');
 const MarketplacePage = require('../models/MarketplacePage');
 const FormSubmission = require('../models/FormSubmission');
 const mongoose = require('mongoose');
+
 /**
  * ========== BÁO CÁO TÀI CHÍNH CHO USER ==========
  * Tổng quan thu chi, doanh số, số dư
@@ -274,9 +275,18 @@ const getUserFinancialReport = async (req, res) => {
 
 /**
  * ========== BÁO CÁO ADMIN - TỔNG QUAN HỆ THỐNG ==========
+ * Báo cáo kinh tế chuẩn Việt Nam: doanh thu, phí, top người dùng (có tên), lead, marketplace.
  */
 const getAdminSystemReport = async (req, res) => {
     try {
+        // Định nghĩa formatVND trước để tránh lỗi initialization
+        const formatVND = (amount) => {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount || 0);
+        };
+
         const { startDate, endDate } = req.query;
 
         let dateFilter = {};
@@ -330,7 +340,7 @@ const getAdminSystemReport = async (req, res) => {
         ]);
 
         // ========== 3. TOP SELLERS ==========
-        const topSellers = await Transaction.aggregate([
+        const topSellersRaw = await Transaction.aggregate([
             { $match: { status: 'COMPLETED' } },
             {
                 $group: {
@@ -345,8 +355,28 @@ const getAdminSystemReport = async (req, res) => {
             { $limit: 20 }
         ]);
 
+        const topSellers = await Promise.all(
+            topSellersRaw.map(async (item, index) => {
+                const user = await mongoose.model('User').findById(item._id).select('name email avatar').lean();
+                return {
+                    rank: index + 1,
+                    sellerId: item._id,
+                    sellerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Người dùng ẩn danh'),
+                    sellerEmail: user?.email || null,
+                    sellerAvatar: user?.avatar || null,
+                    totalSales: item.totalSales,
+                    totalRevenue: formatVND(item.totalRevenue),
+                    totalRevenueRaw: item.totalRevenue,
+                    totalEarned: formatVND(item.totalEarned),
+                    totalEarnedRaw: item.totalEarned,
+                    platformFees: formatVND(item.platformFees),
+                    feePercentage: item.totalRevenue > 0 ? ((item.platformFees / item.totalRevenue) * 100).toFixed(2) + '%' : '0%'
+                };
+            })
+        );
+
         // ========== 4. TOP BUYERS ==========
-        const topBuyers = await Transaction.aggregate([
+        const topBuyersRaw = await Transaction.aggregate([
             { $match: { status: 'COMPLETED' } },
             {
                 $group: {
@@ -358,6 +388,22 @@ const getAdminSystemReport = async (req, res) => {
             { $sort: { totalSpent: -1 } },
             { $limit: 20 }
         ]);
+
+        const topBuyers = await Promise.all(
+            topBuyersRaw.map(async (item, index) => {
+                const user = await mongoose.model('User').findById(item._id).select('name email avatar').lean();
+                return {
+                    rank: index + 1,
+                    buyerId: item._id,
+                    buyerName: user?.name || (user?.email ? user.email.split('@')[0] : 'Khách ẩn danh'),
+                    buyerEmail: user?.email || null,
+                    buyerAvatar: user?.avatar || null,
+                    totalPurchases: item.totalPurchases,
+                    totalSpent: formatVND(item.totalSpent),
+                    totalSpentRaw: item.totalSpent
+                };
+            })
+        );
 
         // ========== 5. DOANH THU THEO NGÀY (30 ngày gần nhất) ==========
         const dailyRevenue = await Transaction.aggregate([
@@ -444,21 +490,14 @@ const getAdminSystemReport = async (req, res) => {
             }
         ]);
 
-        const formatVND = (amount) => {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(amount);
-        };
-
-        // Tính tổng platform fees
+        // Tính tổng platform fees và doanh thu
         const totalPlatformFees = transactionStats.reduce((sum, item) => sum + (item.platformFees || 0), 0);
         const totalRevenue = transactionStats.reduce((sum, item) => sum + (item.totalAmount || 0), 0);
 
         res.json({
             success: true,
             data: {
-                // Tổng quan
+                // Tổng quan (chuẩn kinh tế Việt Nam: doanh thu ròng, phí %)
                 overview: {
                     totalRevenue: formatVND(totalRevenue),
                     totalRevenueRaw: totalRevenue,
@@ -496,28 +535,13 @@ const getAdminSystemReport = async (req, res) => {
                     }
                 },
 
-                // Top performers
-                topSellers: topSellers.map((item, index) => ({
-                    rank: index + 1,
-                    sellerId: item._id,
-                    totalSales: item.totalSales,
-                    totalRevenue: formatVND(item.totalRevenue),
-                    totalRevenueRaw: item.totalRevenue,
-                    totalEarned: formatVND(item.totalEarned),
-                    platformFees: formatVND(item.platformFees)
-                })),
+                // Top performers (có tên người dùng)
+                topSellers,
+                topBuyers,
 
-                topBuyers: topBuyers.map((item, index) => ({
-                    rank: index + 1,
-                    buyerId: item._id,
-                    totalPurchases: item.totalPurchases,
-                    totalSpent: formatVND(item.totalSpent),
-                    totalSpentRaw: item.totalSpent
-                })),
-
-                // Biểu đồ theo ngày
+                // Biểu đồ theo ngày (định dạng ngày Việt Nam)
                 dailyRevenue: dailyRevenue.map(item => ({
-                    date: `${item._id.day}/${item._id.month}/${item._id.year}`,
+                    date: `${item._id.day.toString().padStart(2, '0')}/${item._id.month.toString().padStart(2, '0')}/${item._id.year}`,
                     revenue: formatVND(item.revenue),
                     revenueRaw: item.revenue,
                     platformFees: formatVND(item.platformFees),
@@ -525,7 +549,7 @@ const getAdminSystemReport = async (req, res) => {
                     count: item.count
                 })),
 
-                // 📊 Leads Statistics (Form Submissions)
+                // Leads Statistics
                 leads: {
                     total: leadsStats[0].total[0]?.count || 0,
                     today: leadsStats[0].today[0]?.count || 0,
@@ -535,13 +559,13 @@ const getAdminSystemReport = async (req, res) => {
                         rank: index + 1,
                         pageId: item._id,
                         leadsCount: item.count,
-                        latestSubmission: item.latestSubmission
+                        latestSubmission: item.latestSubmission ? new Date(item.latestSubmission).toLocaleString('vi-VN') : 'Chưa có'
                     }))
                 },
 
                 // Metadata
                 dateRange: startDate && endDate ? { startDate, endDate } : null,
-                generatedAt: new Date().toISOString()
+                generatedAt: new Date().toLocaleString('vi-VN')
             }
         });
 
@@ -626,8 +650,8 @@ const getPagePerformanceReport = async (req, res) => {
                 totalEarned: formatVND(sales.totalEarned),
                 totalEarnedRaw: sales.totalEarned,
                 conversionRate: page.views > 0 ? ((sales.totalSales / page.views) * 100).toFixed(2) + '%' : '0%',
-                lastSale: sales.lastSale,
-                createdAt: page.created_at
+                lastSale: sales.lastSale ? new Date(sales.lastSale).toLocaleString('vi-VN') : 'Chưa có',
+                createdAt: new Date(page.created_at).toLocaleString('vi-VN')
             };
         });
 
@@ -643,11 +667,11 @@ const getPagePerformanceReport = async (req, res) => {
                     views: page.views || 0,
                     revenue: formatVND(page.revenue || 0),
                     revenueRaw: page.revenue || 0,
-                    createdAt: page.created_at,
-                    updatedAt: page.updated_at
+                    createdAt: new Date(page.created_at).toLocaleString('vi-VN'),
+                    updatedAt: new Date(page.updated_at).toLocaleString('vi-VN')
                 })),
                 marketplacePages: enrichedMarketplacePages,
-                generatedAt: new Date().toISOString()
+                generatedAt: new Date().toLocaleString('vi-VN')
             }
         });
 
@@ -660,6 +684,7 @@ const getPagePerformanceReport = async (req, res) => {
         });
     }
 };
+
 module.exports = {
     getUserFinancialReport,
     getAdminSystemReport,

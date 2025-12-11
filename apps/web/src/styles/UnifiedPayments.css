@@ -1,5 +1,5 @@
 .unified-payments{display:flex;min-height:100vh;background:#f9fafb}
-.unified-payments .main-area{flex:1;margin-left:220px}
+.unified-payments .main-area{flex:1;margin-left:220px;margin-top: 100px;}
 .unified-payments .content{padding:2rem}
 .page-header{margin-bottom:2rem}
 .page-header h1{font-size:2rem;font-weight:700;color:#111;margin-bottom:.25rem}

@@ -24,7 +24,7 @@ const MarketplacePreviewModal = ({ page, onClose }) => {
         try {
             // Lấy pageData từ API
             const response = await axios.get(
-                `${API_BASE_URL}/api/marketplace/${page._id}/preview-data`,
+                `${API_BASE_URL}/api/marketplace/preview-data/${page._id}`,
                 {
                     headers: token ? { Authorization: `Bearer ${token}` } : {}
                 }
@@ -40,7 +40,7 @@ const MarketplacePreviewModal = ({ page, onClose }) => {
             // Fallback: load HTML only
             try {
                 const htmlResponse = await fetch(
-                    `${API_BASE_URL}/api/marketplace/${page._id}/preview`,
+                    `${API_BASE_URL}/api/marketplace/preview/${page._id}`,
                     {
                         headers: token ? { Authorization: `Bearer ${token}` } : {}
                     }

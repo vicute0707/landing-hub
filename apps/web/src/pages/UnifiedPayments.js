@@ -55,7 +55,20 @@ const UnifiedPayments = () => {
     const [viewMode, setViewMode] = useState('transactions'); // 'transactions' | 'orders' | 'sold'
     const [transactionStatus, setTransactionStatus] = useState({});
     const [orderTransactions, setOrderTransactions] = useState([]);
+    const buildParams = () => {
+        const p = new URLSearchParams({ page, limit: 20 });
+        if (filters.status !== 'all')       p.append('status', filters.status);
+        if (filters.paymentMethod !== 'all') p.append('paymentMethod', filters.paymentMethod);
+        if (filters.orderStatus !== 'all')   p.append('orderStatus', filters.orderStatus);
+        if (filters.startDate)               p.append('startDate', filters.startDate);
+        if (filters.endDate)                 p.append('endDate', filters.endDate);
+        return p;
+    };
 
+    const params = buildParams();
+    const url = userRole === 'admin'
+        ? `${API_BASE_URL}/api/payment/admin/transactions?${params}`
+        : `${API_BASE_URL}/api/payment/transactions?${params}`;
     // Auth useEffect
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -138,7 +151,6 @@ const UnifiedPayments = () => {
             const token = localStorage.getItem('token');
             if (!token) throw new Error('No token found');
 
-            const params = new URLSearchParams({ page, limit: 20, ...filters });
             const url = userRole === 'admin'
                 ? `${API_BASE_URL}/api/payment/admin/transactions?${params}`
                 : `${API_BASE_URL}/api/payment/transactions?${params}`;
@@ -332,7 +344,22 @@ const UnifiedPayments = () => {
     // Current data to display based on view mode
     const currentData = viewMode === 'orders' || viewMode === 'sold' ? orderTransactions : transactions;
     const currentExport = viewMode === 'orders' || viewMode === 'sold' ? exportOrdersCSV : exportCSV;
+    // Lọc theo ngày trên frontend
+    const filteredData = useMemo(() => {
+        if (!filters.startDate && !filters.endDate) return currentData;
+        console.log('currentData', currentData); // ← xem có PROCESSING không
 
+        const start = filters.startDate ? new Date(filters.startDate) : null;
+        const end   = filters.endDate   ? new Date(filters.endDate)   : null;
+        end?.setDate(end.getDate() + 1); // include end-date
+
+        return currentData.filter(item => {
+            const d = new Date(item.created_at || item.createdAt);
+            if (start && d < start) return false;
+            if (end   && d >= end)  return false;
+            return true;
+        });
+    }, [currentData, filters.startDate, filters.endDate]);
     return (
         <div className="unified-payments">
             <Sidebar role={userRole} />
@@ -453,26 +480,19 @@ const UnifiedPayments = () => {
                         </select>
                         {(viewMode === 'orders' || viewMode === 'sold') && (
                             <select
-                                value={filters.orderStatus}
-                                onChange={(e) => setFilters({ ...filters, orderStatus: e.target.value })}
+                                value={filters.status}
+                                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                             >
-                                <option value="all">Tất cả trạng thái đơn</option>
-                                <option value="pending">Chờ xử lý</option>
-                                <option value="processing">Đang xử lý</option>
-                                <option value="delivered">Đã giao</option>
-                                <option value="cancelled">Đã hủy</option>
-                                <option value="refunded">Hoàn tiền</option>
+                                <option value="all">Tất cả trạng thái giao dịch</option>
+                                <option value="COMPLETED">Hoàn thành</option>
+                                <option value="PENDING">Chờ xử lý</option>
+                                <option value="PROCESSING">Đang xử lý</option> {/* ✅ thêm dòng này */}
+                                <option value="FAILED">Thất bại</option>
+                                <option value="CANCELLED">Đã hủy</option>
+                                <option value="REFUNDED">Hoàn tiền</option>
                             </select>
                         )}
-                        <select
-                            value={filters.paymentMethod}
-                            onChange={(e) => setFilters({ ...filters, paymentMethod: e.target.value })}
-                        >
-                            <option value="all">Tất cả phương thức</option>
-                            <option value="MOMO">MOMO</option>
-                            <option value="VNPAY">VNPay</option>
-                            <option value="SANDBOX">Sandbox</option>
-                        </select>
+
                         <input
                             type="date"
                             value={filters.startDate}
@@ -541,7 +561,7 @@ const UnifiedPayments = () => {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {currentData.map((item) => {
+                                        {filteredData.map((item) => {
                                             const tx = viewMode === 'orders' || viewMode === 'sold' ? item : item;
                                             const orderInfo = viewMode === 'orders' || viewMode === 'sold' ? item : null;
 

@@ -490,7 +490,7 @@ exports.getAllTransactionsAdmin = async (req, res) => {
         let query = {};
 
         if (status) {
-            query.status = status;
+            query.status = status.toUpperCase(); // force giống DB
         }
 
         if (payment_method) {
