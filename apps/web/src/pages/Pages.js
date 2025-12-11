@@ -61,8 +61,9 @@ const Pages = () => {
     return (
         <div className="pages-container">
             <Header role={userRole} />
+            <Sidebar role={userRole} isCompact={isCompact} />
+
             <div className="pages-main">
-                <Sidebar role={userRole} isCompact={isCompact} />
                 <div className="pages-content">{renderContentPage()}</div>
             </div>
         </div>
