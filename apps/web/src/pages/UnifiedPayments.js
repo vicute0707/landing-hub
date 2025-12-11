@@ -362,9 +362,10 @@ const UnifiedPayments = () => {
     }, [currentData, filters.startDate, filters.endDate]);
     return (
         <div className="unified-payments">
+            <Header />
+
             <Sidebar role={userRole} />
             <div className="main-area">
-                <Header />
                 <div className="content">
                     {/* Page Header */}
                     <div className="page-header" data-aos="fade-down">

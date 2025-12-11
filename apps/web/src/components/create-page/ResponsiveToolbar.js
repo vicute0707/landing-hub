@@ -6,6 +6,7 @@ import styled from 'styled-components';
 
 const ToolbarWrapper = styled.div`
     display: flex;
+    margin-top: 60px;
     gap: 12px;
     align-items: center;
     padding: 8px;

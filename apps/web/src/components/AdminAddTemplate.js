@@ -790,43 +790,43 @@ const Templates = () => {
                 )}
 
                 {showEditModal && selectedTemplate && (
-                    <div className="modal-overlay1">
-                        <div className="modal-content1">
-                            <div className="modal-header1">
-                                <h2 className="modal-title1">
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h2 className="modal-title">
                                     <Edit size={20} /> Chỉnh sửa Template
                                 </h2>
-                                <button onClick={() => setShowEditModal(false)} className="modal-close1">
+                                <button onClick={() => setShowEditModal(false)} className="modal-close">
                                     <X size={20} />
                                 </button>
                             </div>
-                            <form onSubmit={handleEditSubmit} className="modal-form1">
+                            <form onSubmit={handleEditSubmit} className="modal-form">
                                 <div>
-                                    <label className="modal-form__label1">Tên Template *</label>
+                                    <label className="modal-form__label">Tên Template *</label>
                                     <input
                                         type="text"
                                         value={editForm.name}
                                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                                         required
-                                        className="modal-form__input1"
+                                        className="modal-form__input"
                                     />
                                 </div>
                                 <div>
-                                    <label className="modal-form__label1">Mô tả</label>
+                                    <label className="modal-form__label">Mô tả</label>
                                     <textarea
                                         value={editForm.description}
                                         onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                                         rows={3}
-                                        className="modal-form__textarea1"
+                                        className="modal-form__textarea"
                                     />
                                 </div>
-                                <div className="modal-form__grid1">
+                                <div className="modal-form__grid">
                                     <div>
-                                        <label className="modal-form__label1">Danh mục</label>
+                                        <label className="modal-form__label">Danh mục</label>
                                         <select
                                             value={editForm.category}
                                             onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
-                                            className="modal-form__select1"
+                                            className="modal-form__select"
                                         >
                                             {categories.map((cat) => (
                                                 <option key={cat} value={cat}>{cat}</option>
@@ -845,7 +845,7 @@ const Templates = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="modal-form__label1">Tags</label>
+                                    <label className="modal-form__label">Tags</label>
                                     <input
                                         type="text"
                                         value={editForm.tags}
@@ -855,19 +855,19 @@ const Templates = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="modal-form__label1">Trạng thái</label>
+                                    <label className="modal-form__label">Trạng thái</label>
                                     <select
                                         value={editForm.status}
                                         onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                                        className="modal-form__select1"
+                                        className="modal-form__select"
                                     >
                                         <option value="ACTIVE">Hoạt động</option>
                                         <option value="INACTIVE">Tạm ẩn</option>
                                         <option value="DRAFT">Nháp</option>
                                     </select>
                                 </div>
-                                <div className="modal-form__checkbox-group1">
-                                    <label className="modal-form__checkbox-label1">
+                                <div className="modal-form__checkbox-group">
+                                    <label className="modal-form__checkbox-label">
                                         <input
                                             type="checkbox"
                                             checked={editForm.is_premium}
@@ -878,20 +878,20 @@ const Templates = () => {
                                             <Crown size={14} /> Premium
                                         </span>
                                     </label>
-                                    <label className="modal-form__checkbox-label1">
+                                    <label className="modal-form__checkbox-label">
                                         <input
                                             type="checkbox"
                                             checked={editForm.is_featured}
                                             onChange={(e) => setEditForm({ ...editForm, is_featured: e.target.checked })}
-                                            className="modal-form__checkbox1"
+                                            className="modal-form__checkbox"
                                         />
-                                        <span className="modal-form__checkbox-text1">
+                                        <span className="modal-form__checkbox-text">
                                             <Star size={14} /> Nổi bật
                                         </span>
                                     </label>
                                 </div>
-                                <div className="modal-footer1">
-                                    <button type="button" onClick={() => setShowEditModal(false)} className="button-cancel1">Hủy</button>
+                                <div className="modal-footer">
+                                    <button type="button" onClick={() => setShowEditModal(false)} className="button-cancel">Hủy</button>
                                     <button type="submit" disabled={isSaving} className="button-submit">
                                         {isSaving ? (
                                             <>

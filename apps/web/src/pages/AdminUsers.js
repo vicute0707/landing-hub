@@ -100,9 +100,9 @@ const AdminUser = () => {
 
     return (
         <div className="admin-user-container">
-            <Sidebar role={userRole} />
+            <Header />
             <div className="admin-user-main">
-                <Header />
+                <Sidebar role={userRole} />
                 <div className="admin-user-content" data-aos="fade-up">
                     <div className="admin-header">
                         <div className="header-title">

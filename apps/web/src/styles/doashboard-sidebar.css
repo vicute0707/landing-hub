@@ -17,9 +17,9 @@
     position: fixed;
 
     overflow: hidden;
-    margin: 0px;
     height: calc(100vh);
     z-index: 1000;
+
 }
 
 .sidebar.compact {

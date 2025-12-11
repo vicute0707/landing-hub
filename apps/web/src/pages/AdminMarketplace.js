@@ -500,8 +500,8 @@ const AdminMarketplace = () => {
     return (
         <div className="admin-marketplace-container">
             <Header />
+            <Sidebar role={userRole} />
             <div className="admin-marketplace-main">
-                <Sidebar role={userRole} />
                 <div className="admin-marketplace-content">
                     <div className="admin-marketplace-header" data-aos="fade-down">
                         <div>
