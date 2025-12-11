@@ -1,0 +1,161 @@
+name: Deploy tuongvi-dev to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - tuongvi-dev
+    paths:
+      - 'backend/**'
+
+env:
+  NODE_VERSION: '18'
+  DEPLOY_PATH: /home/ubuntu/backend
+
+jobs:
+  deploy-backend:
+    name: 🚀 Deploy Backend (Self-hosted)
+    runs-on: self-hosted  # ⚡ Chạy trực tiếp trên EC2!
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📝 Create .env file
+        working-directory: backend
+        run: |
+          cat > .env << EOF
+          NODE_ENV=production
+          PORT=3000
+          MONGO_URI=${{ secrets.MONGO_URI }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          FRONTEND_URL=https://landinghub.shop
+          AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
+          AWS_CLOUDFRONT_DISTRIBUTION_ID=${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_CLOUDFRONT_DOMAIN=${{ secrets.AWS_CLOUDFRONT_DOMAIN }}
+          AWS_ROUTE53_BASE_DOMAIN=${{ secrets.AWS_ROUTE53_BASE_DOMAIN }}
+          AWS_ROUTE53_HOSTED_ZONE_ID=${{ secrets.AWS_ROUTE53_HOSTED_ZONE_ID }}
+          AWS_ACM_CERTIFICATE_ARN=${{ secrets.AWS_ACM_CERTIFICATE_ARN }}
+          AWS_REGION=ap-southeast-1
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+          GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }}
+          GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT=${{ secrets.EMAIL_PORT }}
+          EMAIL_USER=${{ secrets.EMAIL_USER }}
+          EMAIL_PASS=${{ secrets.EMAIL_PASS }}
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }}
+          MOMO_ENDPOINT=${{ secrets.MOMO_ENDPOINT }}
+          MOMO_PARTNER_CODE=${{ secrets.MOMO_PARTNER_CODE }}
+          MOMO_ACCESS_KEY=${{ secrets.MOMO_ACCESS_KEY }}
+          MOMO_SECRET_KEY=${{ secrets.MOMO_SECRET_KEY }}
+          VNPAY_TMN_CODE=${{ secrets.VNPAY_TMN_CODE }}
+          VNPAY_SECRET_KEY=${{ secrets.VNPAY_SECRET_KEY }}
+          VNPAY_API_URL=${{ secrets.VNPAY_API_URL }}
+          VNPAY_URL=${{ secrets.VNPAY_URL }}
+          EOF
+
+      - name: 🗂️ Backup old version
+        run: |
+          if [ -d "${{ env.DEPLOY_PATH }}/old" ]; then
+            rm -rf ${{ env.DEPLOY_PATH }}/old
+          fi
+          if [ -d "${{ env.DEPLOY_PATH }}/current" ]; then
+            mv ${{ env.DEPLOY_PATH }}/current ${{ env.DEPLOY_PATH }}/old
+          fi
+          mkdir -p ${{ env.DEPLOY_PATH }}/current
+
+      - name: 📦 Copy files to deploy directory
+        run: |
+          rsync -av --delete \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='*.log' \
+            backend/ ${{ env.DEPLOY_PATH }}/current/
+
+      - name: 📥 Install dependencies
+        working-directory: ${{ env.DEPLOY_PATH }}/current
+        run: npm ci --production
+
+      - name: 🔄 Restart application with PM2
+        working-directory: ${{ env.DEPLOY_PATH }}/current
+        run: |
+          pm2 delete backend || true
+          pm2 start npm --name "backend" -- start
+          pm2 save
+
+      - name: 🏥 Health Check
+        run: |
+          echo "⏳ Waiting for app to start..."
+          sleep 5
+          
+          # Check PM2 status
+          if pm2 status | grep -q "backend.*online"; then
+            echo "✅ Application is running"
+          
+            # Test local endpoint
+            for i in {1..5}; do
+              if curl -f http://localhost:3000/health > /dev/null 2>&1; then
+                echo "✅ Health check passed"
+                exit 0
+              fi
+              echo "⏳ Attempt $i/5 - Waiting..."
+              sleep 3
+            done
+          
+            echo "⚠️ Health check failed, checking logs..."
+            pm2 logs backend --lines 30 --nostream
+          else
+            echo "❌ Application failed to start"
+            pm2 logs backend --lines 50 --nostream
+            exit 1
+          fi
+
+      - name: 📊 Deployment Summary
+        if: success()
+        run: |
+          echo "### 🎉 tuongvi-dev Deployed Successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 **API**: https://api.landinghub.shop" >> $GITHUB_STEP_SUMMARY
+          echo "- 📅 **Branch**: tuongvi-dev" >> $GITHUB_STEP_SUMMARY
+          echo "- ⏰ **Time**: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- 📦 **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**PM2 Status:**" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          pm2 status >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: 🔙 Rollback on failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed! Rolling back..."
+          if [ -d "${{ env.DEPLOY_PATH }}/old" ]; then
+            rm -rf ${{ env.DEPLOY_PATH }}/current
+            mv ${{ env.DEPLOY_PATH }}/old ${{ env.DEPLOY_PATH }}/current
+            cd ${{ env.DEPLOY_PATH }}/current
+            pm2 delete backend || true
+            pm2 start npm --name "backend" -- start
+            pm2 save
+            echo "✅ Rolled back to previous version"
+          fi
+
+      - name: 🧹 Cleanup
+        if: always()
+        run: |
+          # Clean up old backups (keep last 2)
+          cd ${{ env.DEPLOY_PATH }}
+          ls -t | grep -E '^backup-' | tail -n +3 | xargs -r rm -rf
