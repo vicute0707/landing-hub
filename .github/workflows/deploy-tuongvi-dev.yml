@@ -9,13 +9,14 @@ on:
       - 'backend/**'
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   DEPLOY_PATH: /home/ubuntu/backend
 
 jobs:
   deploy-backend:
     name: 🚀 Deploy Backend (Self-hosted)
     runs-on: self-hosted  # ⚡ Chạy trực tiếp trên EC2!
+    timeout-minutes: 30  # Tăng timeout lên 30 phút
 
     steps:
       - name: 📥 Checkout code
@@ -25,6 +26,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
       - name: 📝 Create .env file
         working-directory: backend
