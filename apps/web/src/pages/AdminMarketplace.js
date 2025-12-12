@@ -170,6 +170,8 @@ const AdminMarketplace = () => {
             const response = await axios.get(`${API_BASE_URL}/api/admin/marketplace/refunds`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+
+
             // Refund request là danh sách các Transaction
             setRefundRequests(response.data.data || []);
             // Không có pagination cho refunds
@@ -183,19 +185,18 @@ const AdminMarketplace = () => {
     }, [API_BASE_URL]);
 
     useEffect(() => {
+        console.log('[DEBUG] userRole=', userRole, 'currentTab=', currentTab); // ← thêm ngay
         if (userRole === 'admin') {
             if (currentTab === 'pages') {
-                loadPages();
-                loadStats();
-            } else if (currentTab === 'transactions') {
-                loadTransactions();
-            } else if (currentTab === 'refunds') {
-                loadRefundRequests();
+                loadPages(); loadStats();
             } else if (currentTab === 'orders') {
                 loadOrders();
+            } else if (currentTab === 'refunds') {
+                console.log('[DEBUG] ĐANG GỌI loadRefundRequests'); // ← thêm ngay
+                loadRefundRequests();
             }
         }
-    }, [userRole, currentTab, loadPages, loadStats, loadTransactions, loadRefundRequests, loadOrders]);
+    }, [userRole, currentTab]);
 
     const handleApprove = async (id) => {
         if (!window.confirm('Bạn có chắc muốn duyệt landing page này?')) return;

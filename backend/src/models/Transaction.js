@@ -503,13 +503,11 @@ TransactionSchema.statics.calculateRevenue = async function(options = {}) {
     };
 };
 
-TransactionSchema.statics.findRefundRequests = function() {
-    return this.find({
-        status: 'REFUND_PENDING'
-    })
+TransactionSchema.statics.findRefundRequests = function () {
+    return this.find({ status: 'REFUND_PENDING' })
         .populate('buyer_id', 'name email')
         .populate('seller_id', 'name email')
-        .populate('marketplace_page_id')
+        .populate('marketplace_page_id', 'title')
         .sort({ 'refund.requested_at': 1 });
 };
 

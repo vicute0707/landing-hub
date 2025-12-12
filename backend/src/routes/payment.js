@@ -23,7 +23,7 @@ router.get('/admin/top-buyers', authMiddleware, isAdmin, paymentController.getTo
 router.get('/admin/payment-method-stats', authMiddleware, isAdmin, paymentController.getPaymentMethodStats);
 router.get('/admin/performance-metrics', authMiddleware, isAdmin, paymentController.getPerformanceMetrics);
 
-router.get('/marketplace/refunds', authMiddleware, paymentController.getRefundRequestsAdmin);
+router.get('/admin/marketplace/refunds', authMiddleware, isAdmin, paymentController.getRefundRequestsAdmin);
 router.get('/orders', authMiddleware, isAdmin, paymentController.getAllOrdersAdmin);
 /**
  * Protected routes - yêu cầu authentication

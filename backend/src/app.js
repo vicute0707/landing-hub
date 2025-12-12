@@ -70,8 +70,11 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/orders', require('./routes/orderRoutes'));
-// app.use('/api/admin/marketplace',require('./marketplaceRouter'));
+// app.use('/api/admin/marketplace',require('./routes/templateRoutes'));
 app.use('/api/admin', require('./routes/payment'));
+app.use('/api/admin/marketplace', require('./routes/adminMarketplace'));
+const adminMarketplaceRouter = require('./routes/adminMarketplace');
+app.use('/api/admin/marketplace', adminMarketplaceRouter);
 
 // Health-check route
 app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
