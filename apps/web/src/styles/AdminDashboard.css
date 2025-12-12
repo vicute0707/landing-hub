@@ -1,476 +1,566 @@
-/* ========== ADMIN DASHBOARD ========== */
-.admin-dashboard {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 30px 20px;
+/* =======================================
+   ADMIN DASHBOARD V2 - Sleek & Premium Design
+   ======================================= */
+
+:root {
+    --color-primary: #10b981; /* Xanh lá - Success/Revenue */
+    --color-secondary: #3b82f6; /* Xanh dương - Info/Fees */
+    --color-warning: #f59e0b; /* Vàng - Warning/Users */
+    --color-error: #ef4444; /* Đỏ - Error/Failed */
+    --color-dark: #1f2937; /* Màu chữ chính */
+    --color-text-subtle: #6b7280; /* Màu chữ phụ */
+    --color-bg: #f9fafb; /* Màu nền tổng thể */
+    --color-card-bg: #ffffff; /* Màu nền card */
+    --border-radius-lg: 16px;
+    --box-shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-/* ========== LOADING & ERROR STATES ========== */
+.admin-dashboard-v2 {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background-color: var(--color-bg);
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Loading & Error --- */
 .admin-dashboard-loading,
 .admin-dashboard-error {
+    /* (Giữ nguyên phong cách cũ hoặc cải tiến nhẹ nếu cần) */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 400px;
+    min-height: 500px;
     gap: 20px;
+    background: var(--color-card-bg);
+    border-radius: var(--border-radius-lg);
 }
+/* ... CSS cho loading/error ... */
 
-.admin-dashboard-error h3 {
-    margin: 0;
-    font-size: 24px;
-    color: #1f2937;
-}
 
-.admin-dashboard-error p {
-    color: #6b7280;
-    margin: 0;
-}
-
-.btn-retry {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.btn-retry:hover {
-    background: #2563eb;
-}
-
-.spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ========== HEADER ========== */
-.admin-dashboard .dashboard-header {
+/* --- HEADER --- */
+.dashboard-header-v2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 40px;
 }
 
-.admin-dashboard .header-content h1 {
+.dashboard-header-v2 h1 {
     margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-    color: #1f2937;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--color-dark);
 }
 
-.admin-dashboard .header-content p {
+.dashboard-header-v2 .header-content-v2 p {
     margin: 5px 0 0 0;
-    color: #6b7280;
-    font-size: 14px;
+    color: var(--color-text-subtle);
+    font-size: 16px;
 }
 
-.admin-dashboard .btn-refresh {
+.dashboard-header-v2 .beta-tag {
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 10px;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 8px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+.btn-refresh-v2 {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 12px 20px;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: white;
+    border-radius: 10px;
+    background: var(--color-card-bg);
     cursor: pointer;
     transition: all 0.2s;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--color-dark);
 }
 
-.admin-dashboard .btn-refresh:hover {
-    background: #f9fafb;
-    border-color: #3b82f6;
+.btn-refresh-v2:hover {
+    background: #e5e7eb;
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
 }
 
-/* ========== OVERVIEW GRID ========== */
-.admin-dashboard .overview-grid {
+/* --- OVERVIEW STATS GRID --- */
+.overview-grid-v2 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+    gap: 25px;
+    margin-bottom: 40px;
 }
 
-.admin-dashboard .stat-card {
+.stat-card-v2 {
     display: flex;
-    align-items: center;
-    gap: 20px;
+    flex-direction: column;
     padding: 30px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.2s;
+    background: var(--color-card-bg);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-subtle);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
 }
 
-.admin-dashboard .stat-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    transform: translateY(-2px);
+.stat-card-v2:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.admin-dashboard .stat-card .card-icon {
-    flex-shrink: 0;
+/* Hiệu ứng màu viền theo loại */
+.stat-card-v2.primary { border-left: 5px solid var(--color-primary); }
+.stat-card-v2.secondary { border-left: 5px solid var(--color-secondary); }
+.stat-card-v2.info { border-left: 5px solid #06b6d4; }
+.stat-card-v2.warning { border-left: 5px solid var(--color-warning); }
+
+.stat-card-v2 .card-icon-v2 {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    opacity: 0.15;
 }
 
-.admin-dashboard .stat-card.revenue .card-icon svg {
-    color: #10b981;
+.stat-card-v2 .card-icon-v2 svg {
+    width: 60px;
+    height: 60px;
+    color: var(--color-dark);
 }
 
-.admin-dashboard .stat-card.fees .card-icon svg {
-    color: #3b82f6;
-}
-
-.admin-dashboard .stat-card.pages .card-icon svg {
-    color: #f59e0b;
-}
-
-.admin-dashboard .stat-card.transactions .card-icon svg {
-    color: #8b5cf6;
-}
-
-.admin-dashboard .stat-card .card-content {
-    flex: 1;
-}
-
-.admin-dashboard .stat-card h3 {
-    margin: 0 0 8px 0;
-    font-size: 13px;
-    color: #6b7280;
+.stat-card-v2 .card-title {
+    font-size: 14px;
+    color: var(--color-text-subtle);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    margin-bottom: 5px;
 }
 
-.admin-dashboard .stat-card .value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 4px;
+.stat-card-v2 .card-value {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin: 0 0 10px 0;
 }
 
-.admin-dashboard .stat-card .meta {
+.stat-card-v2 .card-meta {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--color-text-subtle);
+    min-height: 20px;
 }
 
-/* ========== SECTIONS ========== */
-.admin-dashboard .section {
-    background: white;
+.stat-card-v2 .card-badge {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 8px 30px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-card-v2 .card-badge.success { background-color: var(--color-primary); }
+.stat-card-v2 .card-badge.info { background-color: #06b6d4; }
+.stat-card-v2 .card-badge.warning { background-color: var(--color-warning); }
+
+
+/* --- MAIN CONTENT LAYOUT --- */
+.main-content-grid-v2 {
+    display: grid;
+    grid-template-columns: 3fr 1.5fr; /* Cột biểu đồ lớn hơn cột danh sách */
+    gap: 25px;
+}
+
+.column-left {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.column-right {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.section-v2 {
+    background: var(--color-card-bg);
     padding: 30px;
-    border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--box-shadow-subtle);
+    border: 1px solid #e5e7eb;
 }
 
-.admin-dashboard .section h2 {
-    margin: 0 0 20px 0;
-    font-size: 18px;
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 15px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 22px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-dark);
 }
 
-/* ========== TWO COLUMN LAYOUT ========== */
-.admin-dashboard .two-column-section {
+.section-header .subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-subtle);
+}
+
+/* --- TRANSACTION STATUS --- */
+.transaction-grid-v2 {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
-    margin-bottom: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
 }
 
-/* ========== TRANSACTION GRID ========== */
-.admin-dashboard .transaction-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
-}
-
-.admin-dashboard .transaction-card {
+.transaction-card-v2 {
     padding: 20px;
     border-radius: 12px;
     border: 2px solid;
-    text-align: center;
     transition: all 0.2s;
 }
 
-.admin-dashboard .transaction-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.transaction-card-v2.status-completed {
+    background: #ecfdf5;
+    border-color: var(--color-primary);
+}
+.transaction-card-v2.status-completed .status-label { color: var(--color-primary); }
+
+.transaction-card-v2.status-pending {
+    background: #fffbeb;
+    border-color: var(--color-warning);
+}
+.transaction-card-v2.status-pending .status-label { color: var(--color-warning); }
+
+.transaction-card-v2.status-failed {
+    background: #fef2f2;
+    border-color: var(--color-error);
+}
+.transaction-card-v2.status-failed .status-label { color: var(--color-error); }
+
+.transaction-card-v2:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.admin-dashboard .transaction-card.status-completed {
-    background: #f0fdf4;
-    border-color: #10b981;
+.transaction-card-v2 .status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
 }
 
-.admin-dashboard .transaction-card.status-pending {
-    background: #fef3c7;
-    border-color: #f59e0b;
-}
-
-.admin-dashboard .transaction-card.status-failed {
-    background: #fee2e2;
-    border-color: #ef4444;
-}
-
-.admin-dashboard .transaction-card .status {
+.transaction-card-v2 .status-label {
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 12px;
-    margin-bottom: 8px;
+    font-size: 13px;
     letter-spacing: 0.5px;
 }
 
-.admin-dashboard .transaction-card .count {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 2px;
+.transaction-card-v2 .count-v2 {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--color-dark);
+    margin-bottom: 15px;
+    line-height: 1;
 }
 
-.admin-dashboard .transaction-card .label {
-    font-size: 12px;
-    color: #6b7280;
-    margin-bottom: 12px;
+.transaction-card-v2 .details p {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--color-text-subtle);
+    margin: 4px 0;
+    padding: 2px 0;
+    border-bottom: 1px dashed #e5e7eb;
 }
 
-.admin-dashboard .transaction-card .amount {
-    font-size: 14px;
+.transaction-card-v2 .details p:last-child {
+    border-bottom: none;
+}
+
+.transaction-card-v2 .details span {
     font-weight: 600;
-    margin-bottom: 4px;
+    color: var(--color-dark);
 }
 
-.admin-dashboard .transaction-card .fees {
-    font-size: 11px;
-    color: #6b7280;
+/* --- TOP LISTS (SELLERS/BUYERS) --- */
+.top-list-v2 {
+    height: 100%; /* Đảm bảo cả hai cột bằng nhau */
 }
 
-/* ========== TOP LISTS (SELLERS/BUYERS) ========== */
-.admin-dashboard .top-list {
+.list-items-v2 {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
-.admin-dashboard .top-item {
+.top-item-v2 {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 16px;
-    background: #f9fafb;
-    border-radius: 12px;
+    gap: 15px;
+    padding: 15px 20px;
+    background: #f8fafc;
+    border-radius: 10px;
     transition: all 0.2s;
+    border-left: 4px solid var(--color-secondary);
 }
 
-.admin-dashboard .top-item:hover {
-    background: #f3f4f6;
+.top-item-v2:hover {
+    background: #f1f5f9;
     transform: translateX(4px);
+    border-color: var(--color-primary);
 }
 
-.admin-dashboard .top-item .rank {
-    font-size: 20px;
-    font-weight: 700;
-    color: #3b82f6;
+.top-item-v2 .rank-v2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--color-secondary);
     min-width: 40px;
+    text-align: center;
 }
 
-.admin-dashboard .top-item .info {
+.top-item-v2:nth-child(1) .rank-v2 { color: #f59e0b; } /* Gold */
+.top-item-v2:nth-child(2) .rank-v2 { color: #9ca3af; } /* Silver */
+.top-item-v2:nth-child(3) .rank-v2 { color: #b45309; } /* Bronze */
+
+.top-item-v2 .info-v2 {
     flex: 1;
 }
 
-.admin-dashboard .top-item .id {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1f2937;
+.top-item-v2 .id-v2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-dark);
     margin-bottom: 4px;
     font-family: monospace;
 }
 
-.admin-dashboard .top-item .stats {
-    font-size: 12px;
-    color: #6b7280;
+.top-item-v2 .stats-v2 {
+    font-size: 13px;
+    color: var(--color-text-subtle);
 }
 
-/* ========== DAILY CHART ========== */
-.admin-dashboard .daily-chart {
+.top-item-v2 .revenue-v2,
+.top-item-v2 .spent-v2 {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.top-item-v2 .award-icon {
+    color: var(--color-primary);
+}
+
+/* --- DAILY CHART --- */
+.daily-revenue-chart-v2 {
+    flex-grow: 1;
+}
+
+.daily-chart-v2 {
     display: flex;
     align-items: flex-end;
-    gap: 6px;
-    height: 280px;
-    padding: 20px 10px;
+    gap: 8px;
+    height: 250px;
+    padding: 10px 5px;
     overflow-x: auto;
+    border-bottom: 2px solid #e5e7eb;
 }
 
-.admin-dashboard .chart-bar-wrapper {
+.chart-bar-wrapper-v2 {
     flex: 1;
-    min-width: 30px;
+    min-width: 35px;
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 100%;
+    position: relative;
+    cursor: pointer;
 }
 
-.admin-dashboard .bar-info {
+.bar-info-v2 {
+    margin-bottom: 5px;
+    position: absolute;
+    top: -30px;
+    display: none; /* Ẩn mặc định, chỉ hiện khi hover */
+}
+
+.chart-bar-wrapper-v2:hover .bar-info-v2 {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 8px;
-    min-height: 36px;
 }
 
-.admin-dashboard .bar-info .value {
-    font-size: 9px;
-    font-weight: 600;
-    color: #1f2937;
-    text-align: center;
+.bar-info-v2 .value-v2 {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--color-primary);
+    background-color: #ecfdf5;
+    padding: 3px 6px;
+    border-radius: 4px;
 }
 
-.admin-dashboard .bar-info .count {
-    font-size: 8px;
-    color: #6b7280;
-}
-
-.admin-dashboard .chart-bar {
+.chart-bar-v2 {
     width: 100%;
-    max-width: 32px;
-    background: #f3f4f6;
+    max-width: 35px;
+    background: #d1fae5; /* Màu nền nhạt */
     border-radius: 4px 4px 0 0;
     overflow: hidden;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 }
 
-.admin-dashboard .chart-bar:hover {
-    box-shadow: 0 -2px 8px rgba(16, 185, 129, 0.3);
+.chart-bar-wrapper-v2:hover .chart-bar-v2 {
+    background: #a7f3d0;
 }
 
-.admin-dashboard .bar-fill {
+.bar-fill-v2 {
     width: 100%;
     height: 100%;
-    background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    background: var(--color-primary);
 }
 
-.admin-dashboard .bar-label {
-    margin-top: 8px;
-    font-size: 9px;
-    color: #6b7280;
-    writing-mode: horizontal-tb;
+.bar-label-v2 {
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--color-text-subtle);
     text-align: center;
 }
 
-/* ========== PAYMENT GRID ========== */
-.admin-dashboard .payment-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
+.chart-axis-label {
+    text-align: right;
+    font-size: 12px;
+    color: var(--color-text-subtle);
+    margin-top: 10px;
+    font-style: italic;
 }
 
-.admin-dashboard .payment-card {
+/* --- PAYMENT METHODS --- */
+.payment-grid-v2 {
     display: flex;
-    flex-direction: column;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.payment-card-v2 {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
     align-items: center;
-    padding: 24px;
-    background: #f9fafb;
-    border-radius: 12px;
-    text-align: center;
+    gap: 15px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 10px;
     transition: all 0.2s;
+    border-left: 4px solid var(--color-secondary);
 }
 
-.admin-dashboard .payment-card:hover {
-    background: #f3f4f6;
+.payment-card-v2:hover {
+    background: #f1f5f9;
     transform: translateY(-2px);
+    border-color: #06b6d4;
 }
 
-.admin-dashboard .payment-card svg {
-    margin-bottom: 12px;
-    color: #3b82f6;
+.payment-card-v2 svg {
+    color: #06b6d4;
+    flex-shrink: 0;
 }
 
-.admin-dashboard .payment-card .method {
+.payment-card-v2 .method-info {
+    flex: 1;
+}
+
+.payment-card-v2 .method-label {
     font-weight: 700;
-    margin-bottom: 8px;
-    color: #1f2937;
+    margin-bottom: 5px;
+    color: var(--color-dark);
     text-transform: uppercase;
     font-size: 12px;
 }
 
-.admin-dashboard .payment-card .count {
+.payment-card-v2 .count-amount {
+    display: flex;
+    justify-content: space-between;
     font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 4px;
+    color: var(--color-text-subtle);
 }
 
-.admin-dashboard .payment-card .amount {
-    font-size: 16px;
+.payment-card-v2 .amount-v2 {
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-primary);
 }
 
-/* ========== FOOTER ========== */
-.admin-dashboard .dashboard-footer {
+
+/* --- FOOTER --- */
+.dashboard-footer-v2 {
     text-align: center;
     padding: 20px;
-    color: #6b7280;
+    color: var(--color-text-subtle);
     font-size: 13px;
-    background: #f9fafb;
-    border-radius: 12px;
+    background: var(--color-card-bg);
+    border-radius: var(--border-radius-lg);
+    margin-top: 40px;
+    box-shadow: var(--box-shadow-subtle);
 }
 
-.admin-dashboard .dashboard-footer p {
+.dashboard-footer-v2 p {
     margin: 0;
 }
 
-/* ========== RESPONSIVE ========== */
+/* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+    .main-content-grid-v2 {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 768px) {
-    .admin-dashboard {
+    .admin-dashboard-v2 {
         padding: 20px 10px;
     }
 
-    .admin-dashboard .dashboard-header {
+    .dashboard-header-v2 {
         flex-direction: column;
-        gap: 16px;
         align-items: flex-start;
+        gap: 15px;
     }
 
-    .admin-dashboard .overview-grid {
+    .dashboard-header-v2 h1 {
+        font-size: 28px;
+    }
+
+    .overview-grid-v2 {
         grid-template-columns: 1fr;
     }
 
-    .admin-dashboard .two-column-section {
+    .stat-card-v2 .card-value {
+        font-size: 28px;
+    }
+
+    .transaction-grid-v2 {
         grid-template-columns: 1fr;
     }
 
-    .admin-dashboard .transaction-grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-
-    .admin-dashboard .daily-chart {
-        height: 200px;
+    .daily-chart-v2 {
+        height: 180px;
         gap: 4px;
     }
 
-    .admin-dashboard .chart-bar {
-        max-width: 24px !important;
-    }
-
-    .admin-dashboard .payment-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .admin-dashboard .stat-card {
-        padding: 20px;
-    }
-
-    .admin-dashboard .stat-card .value {
-        font-size: 24px;
+    .payment-card-v2 {
+        min-width: 100%;
     }
 }
