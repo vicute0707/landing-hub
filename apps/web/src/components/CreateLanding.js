@@ -15,7 +15,7 @@ import ResponsiveToolbar from './create-page/ResponsiveToolbar';
 import SectionPopup from '../components/create-page/SectionPopup';
 import LayerManager from './create-page/LayerManager';
 import PopupLayerManager from './create-page/PopupLayerManager';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { initializeResponsiveData } from '../utils/responsiveSync';

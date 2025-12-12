@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/doashboard-sidebar.css'
+import api from '../utils/api';
 
 const Sidebar = ({ role }) => {
     const [isCompact, setIsCompact] = useState(false);

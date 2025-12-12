@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';

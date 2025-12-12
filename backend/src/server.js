@@ -23,6 +23,7 @@ const io = new Server(server, {
 
             const allowedOrigins = [
                 process.env.FRONTEND_URL || 'http://localhost:3000',
+                "https://landinghub.shop",
                 'http://localhost:3000',
                 'http://localhost:5000',
                 process.env.REACT_APP_API_URL

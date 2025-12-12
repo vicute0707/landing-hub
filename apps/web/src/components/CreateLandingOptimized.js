@@ -13,7 +13,7 @@ import Toolbar from './create-page/Toolbar';
 import ResponsiveToolbar from './create-page/ResponsiveToolbar';
 import SectionPopup from '../components/create-page/SectionPopup';
 import LayerManager from './create-page/LayerManager';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { parseHTMLToPageData, renderStaticHTML } from '../utils/pageUtils';

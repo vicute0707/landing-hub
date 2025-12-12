@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import api from "@landinghub/api";
+import api from '../utils/api';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import DogLoader from "../components/Loader";

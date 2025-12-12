@@ -4,7 +4,7 @@
  * Now uses backend AI endpoints (powered by DeepSeek)
  */
 
-import api from '@landinghub/api';
+import api from '../utils/api';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 

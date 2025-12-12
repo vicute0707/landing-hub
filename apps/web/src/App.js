@@ -1,3 +1,5 @@
+import api from './utils/api';
+import './utils/axiosConfig';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
@@ -34,7 +36,7 @@ import PageAbout from './components/about_public/Pages ';
 import Blog from './components/about_public/Blog';
 import AdminAddTemplate from './components/AdminAddTemplate'; // Thêm component cho admin
 import AdminMarketplace from './pages/AdminMarketplace';
-    import AdminUser from "./pages/AdminUsers";
+import AdminUser from "./pages/AdminUsers";
 import UnifiedPayments from './pages/UnifiedPayments';
 import DeploymentSettings from './components/DeploymentSettings';
 import AdminSupport from './pages/AdminSupport';

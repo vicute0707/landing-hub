@@ -4,7 +4,7 @@ import {
     Calendar, CreditCard, User, Package, CheckCircle, XCircle,
     Clock, AlertCircle, RotateCcw
 } from 'lucide-react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import '../styles/AdminTransactions.css';
 
 const AdminTransactions = () => {

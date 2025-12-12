@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 
 const Users = () => {
 

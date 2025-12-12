@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import UserProfile from './UserProfile';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import logo from '../assets/logo.png';
 import '../styles/header.css';
 import { FiBell, FiX } from 'react-icons/fi';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '@landinghub/api';
+import api from '../../utils/api';
 import { toast } from 'react-toastify';
 import '../../styles/LandingList.css';
 

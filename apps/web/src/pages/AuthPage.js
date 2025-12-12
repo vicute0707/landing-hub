@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
+import { setAuthToken } from '../utils/axiosConfig';
 import { UserContext } from '../context/UserContext';
 import Login from '../components/Login';
 import Register from '../components/Register';
 import Background from '../components/Background';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import '../styles/AuthPage.css';
 const AuthPage = () => {
     const { setUser } = useContext(UserContext);
@@ -16,27 +17,23 @@ const AuthPage = () => {
         try {
             const decoded = jwtDecode(credentialResponse.credential);
             console.log('Decoded Token from Google:', decoded);
-            const userData = {
-                role: 'user',
-                name: decoded.name || decoded.given_name || decoded.email.split('@')[0],
-                userId: decoded.sub,
-            };
+
             const token = credentialResponse.credential;
+
+            // ✅ lưu và gắn header SAU khi có token
             localStorage.setItem('token', token);
+            setAuthToken(token); // ➜ thêm dòng này
 
             const API_URL = process.env.REACT_APP_API_URL || 'https://api.landinghub.shop';
             await fetch(`${API_URL}/api/auth/google-callback`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: decoded.email, name: userData.name }),
+                body: JSON.stringify({ email: decoded.email, name: decoded.name }),
             });
 
             const res = await api.get('/api/user/info');
             const backendUser = res.data;
-            setUser({
-                ...backendUser,
-                userId: backendUser._id,
-            });
+            setUser({ ...backendUser, userId: backendUser._id });
             window.location.href = '/dashboard';
         } catch (err) {
             setError('Lỗi khi xử lý đăng nhập: ' + err.message);

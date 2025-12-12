@@ -3,7 +3,7 @@ import {
     Activity, Users, DollarSign, TrendingUp, Award, CreditCard,
     RefreshCw, Download, Calendar
 } from 'lucide-react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import '../styles/AdminSystemReport.css';
 
 const AdminSystemReport = () => {

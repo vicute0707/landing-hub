@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import AOS from 'aos';
 import 'aos/dist/aos.css';

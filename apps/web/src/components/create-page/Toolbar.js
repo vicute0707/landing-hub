@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import logo from "../../assets/logo.png";
 import '../../styles/Toolbar.css';
-import {toast} from "react-toastify";
-import {syncAllElements} from "../../utils/responsiveSync";
+
 
 const Toolbar = ({
                      onSave,

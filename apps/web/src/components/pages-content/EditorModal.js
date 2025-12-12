@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import GrapesJS from 'grapesjs';
 import 'grapesjs/dist/css/grapes.min.css';
 import 'grapesjs-preset-webpage';
-import api from '@landinghub/api';
+import api from '../../utils/api';
 
 const EditorModal = ({ showEditorModal, setShowEditorModal, editingPage, handleSavePage }) => {
     const editorRef = useRef(null);

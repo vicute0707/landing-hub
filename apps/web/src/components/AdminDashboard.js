@@ -3,7 +3,7 @@ import {
     Activity, Users, DollarSign, TrendingUp, Award, CreditCard,
     RefreshCw, AlertCircle, ShoppingCart, User, Zap
 } from 'lucide-react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import '../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {

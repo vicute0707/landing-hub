@@ -3,7 +3,7 @@ import {
     DollarSign, TrendingUp, TrendingDown, ShoppingCart, ShoppingBag,
     Award, BarChart3, Calendar, Download, Filter, RefreshCw
 } from 'lucide-react';
-import api from '@landinghub/api';
+import api from '../utils/api';
 import '../styles/FinancialReport.css';
 
 const FinancialReport = () => {

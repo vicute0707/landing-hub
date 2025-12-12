@@ -10,35 +10,35 @@ const templateRoutes = require('./routes/templateRoutes');
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:5000',
 
-// CORS Configuration - Allow multiple origins including CloudFront domains
+    // Frontend CloudFront + domain
+    'https://landinghub.shop',
+    'https://www.landinghub.shop',
+    'https://app.landinghub.shop',
+    'https://d197hx8bwkos4.cloudfront.net',
+];
+// CORS Configuration
 const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps, Postman, etc.)
         if (!origin) return callback(null, true);
 
-        const allowedOrigins = [
-            process.env.FRONTEND_URL || 'http://localhost:3000',
-            process.env.REACT_APP_API_URL || 'http://localhost:3000',
-            'http://localhost:3000',
-            'http://localhost:5000',
-        ];
-
-        // Allow CloudFront domains (*.cloudfront.net)
-        if (origin.includes('.cloudfront.net') ||
-            origin.includes('.landinghub.app') ||
-            allowedOrigins.indexOf(origin) !== -1) {
+        if (
+            allowedOrigins.includes(origin) ||
+            origin.endsWith('.landinghub.shop') ||
+            origin.endsWith('.cloudfront.net')
+        ) {
             callback(null, true);
         } else {
-            console.warn('CORS blocked origin:', origin);
+            console.warn('❌ CORS BLOCKED:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-    exposedHeaders: ['Content-Length', 'X-Request-Id'],
-    maxAge: 86400, // 24 hours
 };
 
 app.use(cors(corsOptions));
