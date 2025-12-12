@@ -148,6 +148,8 @@ const Reports = () => {
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 14;
+        const defaultFontSize = 11;
         const primaryColor = [102, 126, 234]; // Màu xanh chính
 
         /*
@@ -159,157 +161,376 @@ const Reports = () => {
         ================================================================================
         */
         addVietnameseFont(doc);
+
+        let y = margin; // Điểm bắt đầu Y sau lề trên
+
+        const addNewPageIfNeeded = (requiredSpace) => {
+            if (y + requiredSpace > pageHeight - margin) {
+                doc.addPage();
+                y = margin;
+                // Vẽ lại Header và Footer (tùy chọn)
+                doc.setFontSize(10);
+                doc.setTextColor(150);
+                doc.text(`Báo cáo LandingHub - Trang ${doc.internal.pages.length - 1}`, pageWidth - margin, 10, { align: 'right' });
+                y = margin + 15; // Bắt đầu lại sau lề
+            }
+        };
+        const drawSectionTitle = (title, color = [0]) => {
+            doc.setFontSize(16);
+            doc.setTextColor(color[0], color.length > 1 ? color[1] : 0, color.length > 1 ? color[2] : 0);
+            doc.text(title, margin, y);
+            y += 8;
+        };
         // doc.setFont('RobotoCustom');
         // --- HEADER (Tiêu đề) ---
 
         doc.setFontSize(24);
         doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text('BÁO CÁO PHÂN TÍCH HỆ THỐNG', pageWidth / 2, 20, { align: 'center' });
+        doc.text('BÁO CÁO PHÂN TÍCH HỆ THỐNG', pageWidth / 2, y, { align: 'center' });
+        y += 8;
 
         doc.setFontSize(12);
         doc.setTextColor(100);
-        doc.text(`LandingHub Analytics • Ngày tạo: ${new Date().toLocaleString('vi-VN')}`, pageWidth / 2, 28, { align: 'center' });
+        doc.text(`LandingHub Analytics • Ngày tạo: ${new Date().toLocaleString('vi-VN')}`, pageWidth / 2, y, { align: 'center' });
+        y += 5;
 
-        doc.line(14, 32, pageWidth - 14, 32); // Đường kẻ ngang phân cách
-
-        let y = 40;
-
+        doc.line(margin, y, pageWidth - margin, y); // Đường kẻ ngang phân cách
+        y += 7;
         if (reportData.systemReport) {
-            doc.setFontSize(18);
-            doc.setTextColor(0);
-            doc.text('TỔNG QUAN HỆ THỐNG', 14, y);
-            y += 8;
+            addNewPageIfNeeded(70);
+            drawSectionTitle('TỔNG QUAN KINH DOANH', primaryColor);
 
-            const overview = [
-                ['Tổng Doanh Thu', toVNDExport(reportData.systemReport.overview.totalRevenueRaw || 0)],
-                ['Phí Nền Tảng', toVNDExport(reportData.systemReport.overview.platformFeesRaw || 0)],
-                ['Tổng Trang Marketplace', (reportData.systemReport.marketplace.totalPages || 0).toLocaleString('vi-VN')],
-                ['Tổng Lead', (reportData.systemReport.leads?.total || 0).toLocaleString('vi-VN')],
-                ['Tổng Tin Nhắn', (reportData.summary?.totalChats || 0).toLocaleString('vi-VN')]
+            const s = reportData.systemReport.overview;
+            const m = reportData.systemReport.marketplace;
+            const l = reportData.systemReport.leads;
+            const sum = reportData.summary;
+
+            const overviewData = [
+                ['Tổng Doanh Thu (Hoàn thành)', toVNDExport(s.totalRevenueRaw || 0), 'Tỷ lệ phí', s.feePercentage || '0%'],
+                ['Phí Nền Tảng', toVNDExport(s.platformFeesRaw || 0), 'Giá trung bình', m.priceStats?.avg || '0 ₫'],
+                ['Tổng Trang Marketplace', (m.totalPages || 0).toLocaleString('vi-VN'), 'Tình trạng Trang', `${(m.byStatus?.find(i => i._id === 'published')?.count || 0)} Đang bán`],
+                ['Tổng Lead (Form Submissions)', (l.total || 0).toLocaleString('vi-VN'), 'Lead hôm nay', (l.today || 0).toLocaleString('vi-VN')],
+                ['Tổng Tin Nhắn (Chat)', (sum?.totalChats || 0).toLocaleString('vi-VN'), 'Tin nhắn đang mở', (sum?.openChats || 0).toLocaleString('vi-VN')],
             ];
 
             doc.autoTable({
                 startY: y,
-                head: [['CHỈ SỐ', 'GIÁ TRỊ']],
-                body: overview,
+                body: overviewData,
+                theme: 'plain',
+                styles: { font: FONT_NAME, fontSize: defaultFontSize, cellPadding: 3, textColor: 50 },
+                columnStyles: {
+                    1: { halign: 'right', fontStyle: 'bold', textColor: [16, 185, 129] },
+                    3: { halign: 'right', fontStyle: 'bold', textColor: [245, 158, 11] },
+                }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+        if (reportData.systemReport?.dailyRevenue?.length > 0) {
+            addNewPageIfNeeded(180);
+            drawSectionTitle('PHÂN TÍCH DOANH THU THEO NGÀY (30 Ngày)', [68, 150, 255]);
+
+            const dailyRevenueData = reportData.systemReport.dailyRevenue.map(d => [
+                d.date,
+                d.count,
+                toVNDExport(d.revenueRaw),
+                toVNDExport(d.platformFeesRaw)
+            ]);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Ngày', 'Số Đơn', 'Doanh Thu', 'Phí Nền Tảng']],
+                body: dailyRevenueData,
                 theme: 'striped',
-                styles: {
-                    font: FONT_NAME, // Đã thay 'RobotoCustom' bằng FONT_NAME
-                    fontSize: 11,
-                    cellPadding: 3
-                },
-                headStyles: {
-                    fillColor: primaryColor,
-                    textColor: 255,
-                    fontSize: 12,
-                    fontStyle: 'bold'
-                },
-                columnStyles: { 1: { halign: 'right', fontStyle: 'bold' } }
+                headStyles: { fillColor: [68, 150, 255], textColor: 255, fontSize: defaultFontSize + 1 },
+                styles: { font: FONT_NAME, fontSize: defaultFontSize, cellPadding: 2 },
+                columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right', textColor: [16, 185, 129] }, 3: { halign: 'right' } }
             });
-            y = doc.lastAutoTable.finalY + 15;
+            y = doc.lastAutoTable.finalY + 10;
         }
 
-        // --- 2. TOP NGƯỜI BÁN XUẤT SẮC ---
-        if (reportData.systemReport?.topSellers?.length > 0) {
-            doc.setFontSize(18);
-            doc.text('TOP NGƯỜI BÁN XUẤT SẮC', 14, y);
-            y += 8;
+        // --- 4. TOP NGƯỜI BÁN VÀ KHÁCH HÀNG ---
+        if (reportData.systemReport?.topSellers?.length > 0 || reportData.systemReport?.topBuyers?.length > 0) {
+            addNewPageIfNeeded(150);
 
-            const topSellersData = reportData.systemReport.topSellers.slice(0, 10).map(s => [
-                `#${s.rank}`,
-                s.sellerName || `ID: ${s.sellerId.substring(0, 8)}...`,
-                (s.totalSales || 0).toLocaleString('vi-VN'),
-                toVNDExport(s.totalRevenueRaw || 0)
+            // --- TOP NGƯỜI BÁN XUẤT SẮC ---
+            if (reportData.systemReport?.topSellers?.length > 0) {
+                drawSectionTitle('TOP 10 NGƯỜI BÁN XUẤT SẮC', [255, 193, 7]);
+
+                const topSellersData = reportData.systemReport.topSellers.slice(0, 10).map(s => [
+                    `#${s.rank}`,
+                    s.sellerName || `ID: ${s.sellerId.substring(0, 8)}...`,
+                    (s.totalSales || 0).toLocaleString('vi-VN'),
+                    s.feePercentage,
+                    toVNDExport(s.totalRevenueRaw || 0),
+                    toVNDExport(s.totalEarnedRaw || 0),
+                ]);
+
+                doc.autoTable({
+                    startY: y,
+                    head: [['Hạng', 'ID Người bán', 'Số đơn', 'Phí %', 'Doanh thu', 'Thực nhận']],
+                    body: topSellersData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [255, 193, 7], textColor: 0, fontStyle: 'bold', fontSize: defaultFontSize + 1 },
+                    styles: { font: FONT_NAME, fontSize: defaultFontSize },
+                    columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right', textColor: [16, 185, 129] }, 5: { halign: 'right', fontStyle: 'bold' } }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            }
+
+            // --- TOP KHÁCH HÀNG THÂN THIẾT ---
+            if (reportData.systemReport?.topBuyers?.length > 0) {
+                addNewPageIfNeeded(100);
+                drawSectionTitle('TOP 10 KHÁCH HÀNG THÂN THIẾT', [76, 175, 80]);
+
+                const topBuyersData = reportData.systemReport.topBuyers.slice(0, 10).map(b => [
+                    `#${b.rank}`,
+                    b.buyerName || `ID: ${b.buyerId.substring(0, 8)}...`,
+                    (b.totalPurchases || 0).toLocaleString('vi-VN'),
+                    toVNDExport(b.totalSpentRaw || 0)
+                ]);
+
+                doc.autoTable({
+                    startY: y,
+                    head: [['Hạng', 'ID Khách hàng', 'Số lần mua', 'Tổng chi']],
+                    body: topBuyersData,
+                    theme: 'grid',
+                    headStyles: { fillColor: [76, 175, 80], textColor: 255, fontStyle: 'bold', fontSize: defaultFontSize + 1 },
+                    styles: { font: FONT_NAME, fontSize: defaultFontSize },
+                    columnStyles: { 2: { halign: 'right' }, 3: { halign: 'right', fontStyle: 'bold', textColor: [245, 158, 11] } }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            }
+        }
+
+        // --- 5. THỐNG KÊ GIAO DỊCH VÀ THANH TOÁN ---
+        if (reportData.systemReport?.transactions) {
+            addNewPageIfNeeded(120);
+            drawSectionTitle('THỐNG KÊ GIAO DỊCH VÀ THANH TOÁN', [14, 165, 230]);
+
+            // --- Trạng Thái Giao Dịch ---
+            const statusMap = { 'COMPLETED': 'Hoàn thành', 'PENDING': 'Chờ xử lý', 'CANCELLED': 'Đã hủy', 'FAILED': 'Thất bại' };
+            const orderStatusData = reportData.systemReport.transactions.byStatus.map(item => [
+                statusMap[item._id] || item._id,
+                item.count.toLocaleString('vi-VN'),
+                toVNDExport(item.totalAmountRaw || 0),
+                toVNDExport(item.platformFeesRaw || 0),
             ]);
 
             doc.autoTable({
                 startY: y,
-                head: [['Hạng', 'ID Người bán', 'Số đơn', 'Doanh thu']],
-                body: topSellersData,
+                head: [['Trạng Thái', 'Số lượng', 'Tổng giá trị', 'Tổng phí']],
+                body: orderStatusData,
+                title: 'Trạng Thái Giao Dịch',
                 theme: 'grid',
-                headStyles: { fillColor: [255, 193, 7], textColor: 0, fontStyle: 'bold' },
-                styles: {
-                    font: FONT_NAME, // Đã thay 'RobotoCustom' bằng FONT_NAME
-                    fontSize: 11
-                },
-                columnStyles: { 3: { halign: 'right', fontStyle: 'bold', textColor: [16, 185, 129] } }
+                headStyles: { fillColor: [240, 98, 146], textColor: 255, fontSize: defaultFontSize + 1 },
+                styles: { font: FONT_NAME, fontSize: defaultFontSize },
+                columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
             });
-            y = doc.lastAutoTable.finalY + 15;
-        }
+            y = doc.lastAutoTable.finalY + 10;
 
-        // --- 3. TOP KHÁCH HÀNG THÂN THIẾT ---
-        if (reportData.systemReport?.topBuyers?.length > 0) {
-            doc.setFontSize(18);
-            doc.text('TOP KHÁCH HÀNG THÂN THIẾT', 14, y);
-            y += 8;
-
-            const topBuyersData = reportData.systemReport.topBuyers.slice(0, 10).map(b => [
-                `#${b.rank}`,
-                b.buyerName || `ID: ${b.buyerId.substring(0, 8)}...`, // <--- ĐÃ SỬA
-                (b.totalPurchases || 0).toLocaleString('vi-VN'),
-                toVNDExport(b.totalSpentRaw || 0)
+            // --- Phương Thức Thanh Toán ---
+            addNewPageIfNeeded(80);
+            const methodMap = { 'vnpay': 'VNPay', 'momo': 'MoMo', 'bank_transfer': 'Chuyển khoản' };
+            const paymentMethodData = reportData.systemReport.transactions.byPaymentMethod.map(item => [
+                methodMap[item._id] || item._id,
+                item.count.toLocaleString('vi-VN'),
+                toVNDExport(item.totalAmountRaw || 0)
             ]);
 
             doc.autoTable({
                 startY: y,
-                head: [['Hạng', 'ID Khách hàng', 'Số lần mua', 'Tổng chi']],
-                body: topBuyersData,
+                head: [['Phương Thức', 'Số lượng', 'Tổng giá trị']],
+                body: paymentMethodData,
+                title: 'Phương Thức Thanh Toán',
                 theme: 'grid',
-                headStyles: { fillColor: [76, 175, 80], textColor: 255, fontStyle: 'bold' },
-                styles: {
-                    font: FONT_NAME, // Đã thay 'RobotoCustom' bằng FONT_NAME
-                    fontSize: 11
-                },
-                columnStyles: { 3: { halign: 'right', fontStyle: 'bold', textColor: [245, 158, 11] } }
+                headStyles: { fillColor: [39, 174, 96], textColor: 255, fontSize: defaultFontSize + 1 },
+                styles: { font: FONT_NAME, fontSize: defaultFontSize },
+                columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } }
             });
+            y = doc.lastAutoTable.finalY + 10;
         }
+
+        // --- 6. THỐNG KÊ LEADS (FORM SUBMISSIONS) ---
+        if (reportData.systemReport?.leads?.topPages?.length > 0) {
+            addNewPageIfNeeded(120);
+            drawSectionTitle('TOP 10 TRANG TẠO LEAD (FORM SUBMISSIONS)', [255, 152, 0]);
+
+            const topLeadsData = reportData.systemReport.leads.topPages.map(p => {
+                const date = p.latestSubmission ? new Date(p.latestSubmission).toLocaleString('vi-VN') : 'Chưa có';
+                return [
+                    `#${p.rank}`,
+                    p.pageId, // Do backend không trả về pageTitle, chỉ dùng pageId
+                    p.leadsCount.toLocaleString('vi-VN'),
+                    date
+                ];
+            });
+
+            doc.autoTable({
+                startY: y,
+                head: [['Hạng', 'ID Trang', 'Số Lead', 'Lần gửi gần nhất']],
+                body: topLeadsData,
+                theme: 'grid',
+                headStyles: { fillColor: [255, 152, 0], textColor: 255, fontStyle: 'bold', fontSize: defaultFontSize + 1 },
+                styles: { font: FONT_NAME, fontSize: defaultFontSize },
+                columnStyles: { 2: { halign: 'right' } }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+
+        // --- 7. GỢI Ý THÔNG MINH TỪ AI ---
+        if (reportData.summary?.aiRecommendations) {
+            addNewPageIfNeeded(150);
+            drawSectionTitle('TRÍ TUỆ KINH DOANH: GỢI Ý TỪ AI', [102, 126, 234]);
+
+            const recommendations = parseRecommendations(reportData.summary.aiRecommendations);
+
+            recommendations.forEach((rec, i) => {
+                addNewPageIfNeeded(20 + rec.details.length * 5);
+
+                doc.setFontSize(defaultFontSize + 2);
+                doc.setTextColor(50);
+                doc.text(`${i + 1}. ${rec.title}`, margin + 2, y);
+                y += 6;
+
+                if (rec.details.length > 0) {
+                    doc.setFontSize(defaultFontSize);
+                    doc.setTextColor(100);
+                    const listText = rec.details.map(d => `• ${d}`);
+                    listText.forEach(line => {
+                        const lines = doc.splitTextToSize(line, pageWidth - 2 * margin - 5);
+                        doc.text(lines, margin + 4, y);
+                        y += (lines.length * 5); // Tăng y theo số dòng thực tế
+                    });
+                    y += 5;
+                }
+            });
+            y += 5;
+        }
+
 
         // --- FOOTER ---
         doc.setFontSize(10);
         doc.setTextColor(150);
-        doc.text(`© ${new Date().getFullYear()} LandingHub Analytics. Báo cáo được tạo tự động.`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-        doc.setFont(FONT_NAME); // Đã thay 'RobotoCustom' bằng FONT_NAME
-        doc.save(`BaoCao_LandingHub_${new Date().toISOString().split('T')[0]}.pdf`);
+        const totalPages = doc.internal.pages.length - 1; // Trừ trang cuối cùng thêm vào do addNewPageIfNeeded
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.text(`Trang ${i} / ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: 'right' });
+            doc.text(`© ${new Date().getFullYear()} LandingHub Analytics. Báo cáo được tạo tự động.`, margin, pageHeight - 10, { align: 'left' });
+        }
+
+        doc.setFont(FONT_NAME);
+        doc.save(`BaoCao_LandingHub_ChiTiet_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
     // XUẤT EXCEL CHUẨN
     const exportToExcel = () => {
         const wb = XLSX.utils.book_new();
 
-        // Sheet Tổng quan
+        // --- 1. Sheet Tổng quan ---
         const overview = [
             ['BÁO CÁO HỆ THỐNG LANDINGHUB'],
             ['Ngày tạo', new Date().toLocaleString('vi-VN')],
             [],
-            ['TỔNG QUAN'],
-            ['Tổng Doanh Thu', reportData.systemReport?.overview?.totalRevenue || toVND(0)],
+            ['TỔNG QUAN HIỆU SUẤT'],
+            ['Tổng Doanh Thu (Hoàn thành)', reportData.systemReport?.overview?.totalRevenue || toVND(0)],
             ['Phí Nền Tảng', reportData.systemReport?.overview?.platformFees || '0 ₫'],
-            ['Tổng Trang', reportData.systemReport?.marketplace?.totalPages || 0],
-            ['Tổng Lead', reportData.systemReport?.leads?.total || 0],
+            ['Tỷ lệ thành công', reportData.systemReport?.transactions?.successRate || '0%'],
+            ['Tổng Trang Marketplace', reportData.systemReport?.marketplace?.totalPages || 0],
+            ['Giá trị TB đơn hàng', reportData.systemReport?.marketplace?.priceStats?.avg || '0 ₫'],
+            ['Tổng Lead (Form Submissions)', reportData.systemReport?.leads?.total || 0],
             ['Tổng Tin Nhắn', reportData.summary?.totalChats || 0]
         ];
         const ws1 = XLSX.utils.aoa_to_sheet(overview);
         XLSX.utils.book_append_sheet(wb, ws1, 'Tổng Quan');
 
-        // Sheet Top Người Bán
+        // --- 2. Sheet Doanh thu hàng ngày ---
+        if (reportData.systemReport?.dailyRevenue?.length > 0) {
+            const dailyRevenueHeaders = ['Ngày', 'Số Đơn', 'Doanh Thu (VND)', 'Phí Nền Tảng (VND)', 'Doanh Thu (Raw)', 'Phí Nền Tảng (Raw)'];
+            const dailyRevenueData = reportData.systemReport.dailyRevenue.map(d => [
+                d.date,
+                d.count,
+                d.revenue, // Dạng chuỗi đã format
+                d.platformFees, // Dạng chuỗi đã format
+                d.revenueRaw, // Dạng số thô
+                d.platformFeesRaw // Dạng số thô
+            ]);
+            const ws2 = XLSX.utils.aoa_to_sheet([dailyRevenueHeaders, ...dailyRevenueData]);
+            XLSX.utils.book_append_sheet(wb, ws2, 'Doanh Thu Hàng Ngày');
+        }
+
+        // --- 3. Sheet Top Người Bán ---
         if (reportData.systemReport?.topSellers?.length > 0) {
-            // Mã ĐÃ SỬA
-
-            // Reports.js (dòng 333)
-            const topSellers = [['Hạng', 'ID Người bán', 'Số đơn', 'Doanh thu'], ...reportData.systemReport.topSellers.map(s => [s.rank, s.sellerName || `ID: ${s.sellerId.substring(0, 8)}...`, s.totalSales, s.totalRevenue])];
-            XLSX.utils.book_append_sheet(wb, ws2, 'Top Người Bán');
+            const topSellersHeaders = ['Hạng', 'ID Người bán', 'Tên Người Bán', 'Số đơn', 'Phần trăm Phí (%)', 'Doanh thu (VND)', 'Thực nhận (VND)', 'ID Thô'];
+            const topSellersData = reportData.systemReport.topSellers.map(s => [
+                s.rank,
+                s.sellerId.substring(0, 8) + '...', // ID rút gọn
+                s.sellerName || 'N/A',
+                s.totalSales,
+                s.feePercentage,
+                s.totalRevenue,
+                s.totalEarned,
+                s.sellerId // ID thô
+            ]);
+            const ws3 = XLSX.utils.aoa_to_sheet([topSellersHeaders, ...topSellersData]);
+            XLSX.utils.book_append_sheet(wb, ws3, 'Top Người Bán');
         }
 
-        // Sheet Top Khách Hàng
+        // --- 4. Sheet Top Khách Hàng ---
         if (reportData.systemReport?.topBuyers?.length > 0) {
-            // Mã ĐÃ SỬA
-            // Dòng 340 (ĐÃ SỬA):
-            const topBuyers = [['Hạng', 'ID Khách hàng', 'Số lần mua', 'Tổng chi'], ...reportData.systemReport.topBuyers.map(b => [b.rank, b.buyerName || `ID: ${b.buyerId.substring(0, 8)}...`, b.totalPurchases, b.totalSpent])];
-            const ws3 = XLSX.utils.aoa_to_sheet(topBuyers);
-            XLSX.utils.book_append_sheet(wb, ws3, 'Top Khách Hàng');
+            const topBuyersHeaders = ['Hạng', 'ID Khách hàng', 'Tên Khách Hàng', 'Số lần mua', 'Tổng chi (VND)', 'ID Thô'];
+            const topBuyersData = reportData.systemReport.topBuyers.map(b => [
+                b.rank,
+                b.buyerId.substring(0, 8) + '...', // ID rút gọn
+                b.buyerName || 'N/A',
+                b.totalPurchases,
+                b.totalSpent,
+                b.buyerId // ID thô
+            ]);
+            const ws4 = XLSX.utils.aoa_to_sheet([topBuyersHeaders, ...topBuyersData]);
+            XLSX.utils.book_append_sheet(wb, ws4, 'Top Khách Hàng');
         }
 
-        XLSX.writeFile(wb, `BaoCao_LandingHub_${new Date().toISOString().split('T')[0]}.xlsx`);
+        // --- 5. Sheet Thống kê Giao Dịch ---
+        if (reportData.systemReport?.transactions?.byStatus?.length > 0) {
+            const statusMap = { 'COMPLETED': 'Hoàn thành', 'PENDING': 'Chờ xử lý', 'CANCELLED': 'Đã hủy', 'FAILED': 'Thất bại' };
+            const transactionStatusHeaders = ['Trạng Thái', 'Số lượng', 'Tổng giá trị (VND)', 'Tổng phí (VND)'];
+            const transactionStatusData = reportData.systemReport.transactions.byStatus.map(item => [
+                statusMap[item._id] || item._id,
+                item.count,
+                toVND(item.totalAmountRaw || 0),
+                toVND(item.platformFeesRaw || 0)
+            ]);
+            const ws5 = XLSX.utils.aoa_to_sheet([transactionStatusHeaders, ...transactionStatusData]);
+            XLSX.utils.book_append_sheet(wb, ws5, 'Thống Kê Giao Dịch');
+        }
+
+        // --- 6. Sheet Thống kê Phương thức TT ---
+        if (reportData.systemReport?.transactions?.byPaymentMethod?.length > 0) {
+            const methodMap = { 'vnpay': 'VNPay', 'momo': 'MoMo', 'bank_transfer': 'Chuyển khoản' };
+            const paymentMethodHeaders = ['Phương Thức', 'Số lượng', 'Tổng giá trị (VND)'];
+            const paymentMethodData = reportData.systemReport.transactions.byPaymentMethod.map(item => [
+                methodMap[item._id] || item._id,
+                item.count,
+                toVND(item.totalAmountRaw || 0)
+            ]);
+            const ws6 = XLSX.utils.aoa_to_sheet([paymentMethodHeaders, ...paymentMethodData]);
+            XLSX.utils.book_append_sheet(wb, ws6, 'Phương Thức Thanh Toán');
+        }
+
+        // --- 7. Sheet Top Leads Pages ---
+        if (reportData.systemReport?.leads?.topPages?.length > 0) {
+            const topLeadsHeaders = ['Hạng', 'ID Trang', 'Số Lead', 'Lần gửi gần nhất'];
+            const topLeadsData = reportData.systemReport.leads.topPages.map(p => [
+                p.rank,
+                p.pageTitle || p.pageId.substring(0, 20) + '...', // Dùng title hoặc ID rút gọn
+                p.leadsCount,
+                p.latestSubmission ? new Date(p.latestSubmission).toLocaleDateString('vi-VN') : 'Chưa có'
+            ]);
+            const ws7 = XLSX.utils.aoa_to_sheet([topLeadsHeaders, ...topLeadsData]);
+            XLSX.utils.book_append_sheet(wb, ws7, 'Top Leads Pages');
+        }
+
+        XLSX.writeFile(wb, `BaoCao_LandingHub_ChiTiet_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
     const handlePrint = () => window.print();
@@ -463,9 +684,7 @@ const Reports = () => {
                                     <Grid item xs={12} sm={6} md={3}>
                                         <KPICard title="TỔNG TIN NHẮN" value={summary?.totalChats?.toLocaleString() || 0} subtitle={`${summary?.todayChats || 0} hôm nay`} icon={Chat} color="#06b6d4" trend="up" trendValue="+15.2%" />
                                     </Grid>
-                                    <Grid item xs={12} sm={6} md={3}>
-                                        <KPICard title="TỔNG LEAD" value={systemReport?.leads?.total || 0} subtitle={`${systemReport?.leads?.today || 0} hôm nay`} icon={Description} color="#f59e0b" trend="down" trendValue="-2.1%" />
-                                    </Grid>
+
                                 </Grid>
 
                                 <Grid container spacing={3} mb={4}>
@@ -607,7 +826,6 @@ const Reports = () => {
                                                         {systemReport.topSellers.slice(0, 5).map(s => (
                                                             <TableRow key={s.sellerId}>
                                                                 <TableCell><Chip label={`#${s.rank}`} size="small" color={s.rank <= 3 ? 'warning' : 'default'} /></TableCell>
-                                                                // Mã GỐC (Dòng ~624)
                                                                 <TableCell sx={{ fontWeight: 600 }}>{s.sellerName || s.sellerId.substring(0, 12) + '...'}</TableCell>
                                                                 <TableCell align="right"><Chip label={s.totalSales} color="primary" /></TableCell>
                                                                 <TableCell align="right" sx={{ color: 'success.main', fontWeight: 'bold' }}>{s.totalRevenue}</TableCell>
@@ -630,7 +848,6 @@ const Reports = () => {
                                                         {systemReport.topBuyers.slice(0, 5).map(b => (
                                                             <TableRow key={b.buyerId}>
                                                                 <TableCell><Chip label={`#${b.rank}`} size="small" color={b.rank <= 3 ? 'success' : 'default'} /></TableCell>
-                                                                // Mã GỐC (Dòng ~643)
                                                                 <TableCell sx={{ fontWeight: 600 }}>{b.buyerName || b.buyerId.substring(0, 12) + '...'}</TableCell>
                                                                 <TableCell align="right"><Chip label={b.totalPurchases} color="info" /></TableCell>
                                                                 <TableCell align="right" sx={{ color: 'warning.main', fontWeight: 'bold' }}>{b.totalSpent}</TableCell>

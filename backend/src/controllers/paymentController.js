@@ -1299,3 +1299,69 @@ exports.deliverOrder = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi khi giao page', error: error.message });
     }
 };
+/**
+ * ADMIN: Lấy tất cả Order (Đơn hàng)
+ */
+exports.getAllOrdersAdmin = async (req, res) => {
+    try {
+        const { status, search, page = 1, limit = 10 } = req.query;
+
+        let query = {};
+        if (status) {
+            query.status = status;
+        }
+
+        // Tạm thời bỏ qua search phức tạp để tập trung vào order status
+        // Nếu cần search phức tạp, cần dùng aggregation hoặc index
+
+        const skip = (page - 1) * limit;
+
+        const orders = await Order.find(query)
+            .populate('buyerId', 'name email')
+            .populate('sellerId', 'name email')
+            .populate('marketplacePageId', 'title price')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+
+        const total = await Order.countDocuments(query);
+
+        res.json({
+            success: true,
+            data: orders,
+            pagination: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(total / limit)
+            }
+        });
+    } catch (error) {
+        console.error('Get All Orders Admin Error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách đơn hàng', error: error.message });
+    }
+};
+
+/**
+ * ADMIN: Lấy tất cả yêu cầu hoàn tiền (Transaction status: REFUND_PENDING)
+ */
+exports.getRefundRequestsAdmin = async (req, res) => {
+    try {
+        // Chỉ lấy các giao dịch đang chờ hoàn tiền
+        const refundRequests = await Transaction.find({ status: 'REFUND_PENDING' })
+            .populate('buyer_id', 'name email')
+            .populate('seller_id', 'name email')
+            .populate('marketplace_page_id', 'title price')
+            .sort({ created_at: -1 });
+
+        // Lưu ý: Hàm này không có phân trang (pagination) để đơn giản hóa việc quản lý yêu cầu hoàn tiền
+
+        res.json({
+            success: true,
+            data: refundRequests
+        });
+    } catch (error) {
+        console.error('Get Refund Requests Admin Error:', error);
+        res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách yêu cầu hoàn tiền', error: error.message });
+    }
+};
