@@ -170,7 +170,10 @@ const AdminMarketplace = () => {
             const response = await axios.get(`${API_BASE_URL}/api/admin/marketplace/refunds`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
+            // Refund request là danh sách các Transaction
             setRefundRequests(response.data.data || []);
+            // Không có pagination cho refunds
+            setTotalPages(1);
         } catch (err) {
             console.error('Load refund requests error:', err);
             toast.error(err.response?.data?.message || 'Không thể tải danh sách yêu cầu hoàn tiền');
