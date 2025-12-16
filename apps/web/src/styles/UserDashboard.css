@@ -341,3 +341,258 @@
         text-align: center;
     }
 }
+/* ============================================ RESPONSIVE DESIGN - CẢI TIẾN CHO MOBILE ============================================ */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+    .user-dashboard {
+        padding: 24px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .welcome-banner {
+        padding: 28px;
+        border-radius: 14px;
+    }
+
+    .banner-content h2 {
+        font-size: 26px;
+    }
+
+    .banner-stats {
+        gap: 28px;
+    }
+
+    .banner-stat-value {
+        font-size: 36px;
+    }
+
+    .stat-card.modern {
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 30px;
+    }
+
+    .stat-card.highlighted .stat-value {
+        font-size: 34px;
+    }
+
+    .quick-actions {
+        gap: 14px;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .user-dashboard {
+        padding: 20px 16px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    .dashboard-title {
+        font-size: 26px;
+        line-height: 1.2;
+    }
+
+    .dashboard-subtitle {
+        font-size: 15px;
+    }
+
+    .btn-refresh {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px;
+        gap: 24px;
+        border-radius: 12px;
+    }
+
+    .banner-content h2 {
+        font-size: 24px;
+    }
+
+    .banner-content p {
+        font-size: 15px;
+    }
+
+    .banner-stats {
+        gap: 32px;
+        justify-content: center;
+    }
+
+    .banner-stat-value {
+        font-size: 34px;
+    }
+
+    .banner-stat-label {
+        font-size: 13px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .stat-card.modern {
+        padding: 22px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+    }
+
+    .stat-card.highlighted .stat-value {
+        font-size: 32px;
+    }
+
+    .stat-header {
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .stat-footer {
+        font-size: 12px;
+    }
+
+    .quick-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .action-btn {
+        width: 100%;
+        padding: 16px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    .action-btn.primary {
+        padding: 18px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) - Tối ưu trải nghiệm điện thoại */
+@media (max-width: 480px) {
+    .user-dashboard {
+        padding: 16px 12px;
+    }
+
+    .dashboard-title {
+        font-size: 24px;
+    }
+
+    .welcome-banner {
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .banner-content h2 {
+        font-size: 22px;
+    }
+
+    .banner-content p {
+        font-size: 14.5px;
+    }
+
+    .banner-stats {
+        gap: 24px;
+        flex-wrap: wrap;
+    }
+
+    .banner-stat-value {
+        font-size: 30px;
+    }
+
+    .banner-stat-label {
+        font-size: 12.5px;
+    }
+
+    .stat-card.modern {
+        padding: 18px;
+    }
+
+    .stat-value {
+        font-size: 26px;
+    }
+
+    .stat-card.highlighted .stat-value {
+        font-size: 30px;
+    }
+
+    .stat-label {
+        font-size: 12.5px;
+    }
+
+    .balance-badge {
+        padding: 3px 10px;
+        font-size: 11px;
+    }
+
+    .stat-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+    .quick-actions {
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 15px;
+        font-size: 15px;
+    }
+
+    /* Loading & Error States */
+    .dashboard-loading,
+    .dashboard-error {
+        min-height: 50vh;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .btn-retry {
+        padding: 14px 28px;
+        font-size: 15px;
+    }
+}
+
+/* Thêm touch feedback cho tương tác tốt hơn trên mobile */
+@media (max-width: 768px) {
+    .stat-card.modern,
+    .btn-refresh,
+    .action-btn,
+    .btn-retry {
+        transition: all 0.2s ease;
+    }
+
+    .stat-card.modern:active,
+    .btn-refresh:active,
+    .action-btn:active,
+    .btn-retry:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}

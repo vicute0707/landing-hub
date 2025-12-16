@@ -733,3 +733,254 @@
         height: 28px;
     }
 }
+/* ============================================ MARKETPLACE DETAIL - LUXURY INTERFACE FULLY OPTIMIZED & MOBILE RESPONSIVE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn (đã rất tinh tế và sang trọng!), chỉ bổ sung/tối ưu phần responsive để hoàn hảo trên mobile */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .marketplace-detail-content {
+        width: 85%;
+        margin-left: 200px;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1.3fr 1fr;
+        gap: var(--space-lg);
+    }
+
+    .detail-header h1 {
+        font-size: 2rem;
+    }
+
+    .current-price {
+        font-size: 1.8rem;
+    }
+
+    .purchase-btn {
+        padding: 14px 24px;
+        font-size: 1.05rem;
+    }
+
+    .thumbnail-gallery {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .marketplace-detail-container {
+        margin-top: 60px;
+    }
+
+    .marketplace-detail-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .breadcrumb {
+        font-size: 0.85rem;
+        margin-bottom: var(--space-lg);
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+
+    .detail-right {
+        position: static;
+        top: auto;
+        padding: var(--space-lg);
+    }
+
+    .detail-header h1 {
+        font-size: 1.9rem;
+    }
+
+    .detail-header .category-badge {
+        font-size: 0.75rem;
+    }
+
+    .meta-info,
+    .seller-info {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .price-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+        padding: var(--space-md);
+    }
+
+    .price-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .current-price {
+        font-size: 1.8rem;
+    }
+
+    .action-buttons-secondary {
+        grid-template-columns: 1fr;
+    }
+
+    .action-btn {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .purchase-btn {
+        padding: 16px;
+        font-size: 1.1rem;
+    }
+
+    .main-image img {
+        height: 320px;
+        object-fit: cover;
+    }
+
+    .thumbnail-gallery {
+        grid-template-columns: repeat(5, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .info-section h3 {
+        font-size: 1.4rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-item {
+        padding: var(--space-md);
+    }
+
+    .review-list,
+    .review-box {
+        padding: var(--space-lg);
+    }
+
+    .review-list h4,
+    .review-box h4 {
+        font-size: 1.5rem;
+    }
+
+    .review-box .stars svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .review-box textarea {
+        min-height: 120px;
+        font-size: 16px; /* Tránh zoom iOS */
+    }
+
+    .review-box button {
+        padding: 14px;
+        font-size: 1rem;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .marketplace-detail-content {
+        padding: 0.75rem;
+    }
+
+    .detail-header h1 {
+        font-size: 1.7rem;
+    }
+
+    .current-price {
+        font-size: 1.6rem;
+    }
+
+    .price-section {
+        padding: var(--space-sm);
+    }
+
+    .purchase-btn {
+        padding: 14px;
+        font-size: 1rem;
+    }
+
+    .main-image img {
+        height: 280px;
+    }
+
+    .thumbnail-gallery {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+
+    .info-section h3 {
+        font-size: 1.3rem;
+    }
+
+    .review-list h4,
+    .review-box h4 {
+        font-size: 1.4rem;
+    }
+
+    .review-item {
+        padding: var(--space-md) 0;
+    }
+
+    .review-item:hover {
+        padding-left: 0;
+        margin-left: 0;
+    }
+
+    .review-box .stars svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .review-box textarea {
+        padding: var(--space-sm);
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .featured-card,
+    .marketplace-card,
+    .action-btn,
+    .purchase-btn,
+    .demo-btn,
+    .like-btn,
+    .view-detail-btn,
+    .preview-quick-btn,
+    .review-box button,
+    .thumbnail {
+        transition: var(--transition);
+    }
+
+    .featured-card:active,
+    .marketplace-card:active,
+    .action-btn:active,
+    .purchase-btn:active,
+    .demo-btn:active,
+    .like-btn:active,
+    .view-detail-btn:active,
+    .preview-quick-btn:active,
+    .review-box button:active,
+    .thumbnail:active {
+        transform: scale(0.96);
+        opacity: 0.9;
+    }
+}
+
+/* Scroll mượt cho modal & thumbnail trên mobile */
+.modal-content1,
+.thumbnail-gallery {
+    -webkit-overflow-scrolling: touch;
+}

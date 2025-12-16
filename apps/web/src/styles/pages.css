@@ -368,3 +368,207 @@
 .pages-content::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to bottom, rgba(244, 114, 182, 0.5), rgba(59, 130, 246, 0.5));
 }
+/* Mobile enhancements cho Pages Dashboard/Container */
+@media (max-width: 768px) {
+    .pages-main {
+        flex-direction: column;
+    }
+
+    .pages-content {
+        padding: 12px 8px;
+        margin-left: 0; /* Đảm bảo không bị lệch nếu có sidebar */
+        transition: none; /* Giảm animation không cần thiết trên mobile */
+    }
+
+    /* Loại bỏ hoặc giảm hiệu ứng background tinh tế để tăng hiệu năng */
+    .pages-container::before,
+    .pages-container::after {
+        display: none; /* Đã có trong code gốc, giữ để chắc chắn */
+    }
+
+    .pages-content::before {
+        top: 4px;
+        left: 4px;
+        right: 4px;
+        bottom: 4px;
+        border-radius: 14px;
+        backdrop-filter: blur(8px); /* Giảm blur nhẹ để mượt hơn */
+    }
+
+    /* Loading & Error */
+    .pages-loading,
+    .pages-error {
+        min-height: 50vh;
+        font-size: 15px;
+        padding: 20px;
+    }
+
+    .pages-loading::before {
+        width: 20px;
+        height: 20px;
+    }
+
+    .pages-error-box {
+        padding: 18px 20px;
+    }
+
+    /* Stats Grid */
+    .pages-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .pages-stat-item {
+        padding: 20px;
+    }
+
+    .pages-stat-number {
+        font-size: 26px;
+    }
+
+    .pages-stat-label {
+        font-size: 12.5px;
+    }
+
+    /* Cards & Sections */
+    .pages-card,
+    .pages-chart-wrapper,
+    .pages-table-container {
+        padding: 18px;
+        border-radius: 12px;
+    }
+
+    .pages-section {
+        margin-bottom: 28px;
+    }
+
+    .pages-section-title {
+        font-size: 19px;
+        margin-bottom: 14px;
+    }
+
+    .pages-chart-title {
+        font-size: 17px;
+        margin-bottom: 16px;
+    }
+
+    .pages-table-header {
+        padding: 14px 18px;
+    }
+
+    .pages-table-title {
+        font-size: 15.5px;
+    }
+
+    /* Buttons */
+    .pages-btn,
+    .pages-btn-secondary {
+        padding: 12px 20px;
+        font-size: 14.5px;
+        min-height: 48px; /* Touch target tốt */
+        width: 100%; /* Full width trên mobile nếu cần */
+        justify-content: center;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Grid layouts */
+    .pages-grid-2,
+    .pages-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    /* Scrollbar nhẹ hơn */
+    .pages-content::-webkit-scrollbar {
+        width: 4px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .pages-content {
+        padding: 8px 4px;
+    }
+
+    .pages-content::before {
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+        border-radius: 12px;
+        backdrop-filter: blur(6px); /* Giảm thêm để tối ưu hiệu năng */
+    }
+
+    /* Loading & Error */
+    .pages-loading,
+    .pages-error {
+        font-size: 14.5px;
+        padding: 16px;
+    }
+
+    .pages-error-box {
+        padding: 16px;
+    }
+
+    /* Stats */
+    .pages-stat-item {
+        padding: 18px;
+    }
+
+    .pages-stat-number {
+        font-size: 24px;
+    }
+
+    .pages-stat-label {
+        font-size: 12px;
+    }
+
+    /* Cards */
+    .pages-card,
+    .pages-chart-wrapper,
+    .pages-table-container {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .pages-section-title {
+        font-size: 18px;
+    }
+
+    .pages-chart-title,
+    .pages-table-title {
+        font-size: 16px;
+    }
+
+    /* Buttons full width & lớn hơn */
+    .pages-btn,
+    .pages-btn-secondary {
+        padding: 14px 18px;
+        font-size: 15px;
+        min-height: 50px;
+    }
+
+    /* Tối ưu touch target cho các phần tử tương tác */
+    .pages-btn:hover,
+    .pages-btn-secondary:hover,
+    .pages-stat-item:hover,
+    .pages-card:hover {
+        transform: none; /* Giảm hiệu ứng hover nặng trên mobile */
+    }
+
+    .pages-btn:active,
+    .pages-btn-secondary:active {
+        transform: scale(0.98);
+    }
+
+    /* Scrollbar siêu mỏng */
+    .pages-content::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .pages-content::-webkit-scrollbar-thumb {
+        border-radius: 6px;
+    }
+}

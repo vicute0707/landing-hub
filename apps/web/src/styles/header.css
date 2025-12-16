@@ -185,3 +185,220 @@
     from{opacity: 0; transform: translateY(-8px);}
     to{opacity: 1; transform: translateY(0);}
 }
+/* ============================================ HEADER & NOTIFICATION - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & mobile-friendly dưới đây */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .header__wrapper {
+        padding: 0 20px;
+    }
+
+    .header__right {
+        gap: 16px;
+    }
+
+    .notif__panel {
+        width: 320px;
+        right: -20px;
+    }
+
+    .user__popover {
+        width: 300px;
+        right: -10px;
+    }
+}
+
+/* Tablet nhỏ (≤992px) */
+@media (max-width: 992px) {
+    .header__right {
+        gap: 12px;
+    }
+
+    .user__name {
+        display: none; /* Ẩn tên user để tiết kiệm không gian */
+    }
+
+    .notif__panel {
+        width: 300px;
+        max-height: 400px;
+    }
+}
+
+/* Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .header {
+        height: 64px;
+    }
+
+    .header__wrapper {
+        padding: 0 16px;
+    }
+
+    .header__logo {
+        height: 32px;
+    }
+
+    .header__right {
+        gap: 10px;
+    }
+
+    .notif__btn,
+    .user__avatarWrap {
+        padding: 6px;
+    }
+
+    /* Panel thông báo full width, gần như full màn hình */
+    .notif__panel {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: none;
+        max-height: calc(100vh - 64px);
+        border-radius: 0;
+        box-shadow: none;
+        animation: slideDown 0.3s ease;
+    }
+
+    .notif__header {
+        padding: 16px 20px;
+        font-size: 16px;
+    }
+
+    .notif__item {
+        padding: 16px 20px;
+    }
+
+    .notif__title {
+        font-size: 15px;
+    }
+
+    .notif__msg {
+        font-size: 14px;
+    }
+
+    .notif__time {
+        font-size: 12px;
+    }
+
+    .notif__empty {
+        padding: 40px 20px;
+        font-size: 15px;
+    }
+
+    /* User popover cũng full width trên mobile */
+    .user__popover {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: none;
+        border-radius: 0;
+        padding: 24px 20px;
+        box-shadow: none;
+        animation: slideDown 0.3s ease;
+    }
+
+    .user__close {
+        padding: 12px 0;
+        font-size: 15px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .header {
+        height: 60px;
+    }
+
+    .header__wrapper {
+        padding: 0 12px;
+    }
+
+    .header__logo {
+        height: 30px;
+    }
+
+    .header__right {
+        gap: 8px;
+    }
+
+    .notif__btn,
+    .user__avatarWrap {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user__avatarWrap {
+        border-width: 2px;
+    }
+
+    /* Ẩn hoàn toàn tên nếu còn hiển thị */
+    .user__name {
+        display: none;
+    }
+
+    .user__loginBtn,
+    .user__logout {
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    .notif__header {
+        padding: 14px 16px;
+    }
+
+    .notif__item {
+        padding: 14px 16px;
+    }
+
+    .user__popover {
+        padding: 20px 16px;
+    }
+}
+
+/* Animation slide down cho panel trên mobile */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Thêm touch feedback cho các nút trên mobile */
+@media (max-width: 768px) {
+    .notif__btn,
+    .user__avatarWrap,
+    .user__loginBtn,
+    .user__logout,
+    .user__close,
+    .notif__item {
+        transition: all 0.2s ease;
+    }
+
+    .notif__btn:active,
+    .user__avatarWrap:active,
+    .user__loginBtn:active,
+    .user__logout:active,
+    .user__close:active,
+    .notif__item:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+}
+
+/* Cải thiện scroll mượt trên mobile cho notification body */
+.notif__body {
+    -webkit-overflow-scrolling: touch;
+}

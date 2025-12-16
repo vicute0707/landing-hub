@@ -132,3 +132,150 @@
 .login-container .btn.google:hover {
     border: 1px solid #2d79f3;
 }
+/* Mobile enhancements cho Login Page */
+@media (max-width: 768px) {
+    .login-container {
+        width: 95%;
+        margin: 0 auto;
+        padding: 20px 0;
+        border-radius: 16px;
+        flex-direction: column;
+        background-color: transparent; /* Loại bỏ background để dễ tích hợp với trang lớn hơn */
+        box-shadow: none;
+    }
+
+    .login-container .form {
+        max-width: 100%;
+        padding: 32px 24px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-container .form h2 {
+        font-size: 1.8rem;
+        margin-bottom: 24px;
+    }
+
+    .login-container .flex-column > label {
+        font-size: 0.95rem;
+    }
+
+    .login-container .inputForm {
+        height: 54px;
+        padding-left: 12px;
+    }
+
+    .login-container .input {
+        font-size: 1rem; /* ≥16px để tránh zoom trên iOS */
+        margin-left: 12px;
+    }
+
+    .login-container .flex-row {
+        gap: 12px;
+    }
+
+    .login-container .flex-row > div > label,
+    .login-container .span {
+        font-size: 0.9rem;
+    }
+
+    .login-container .button-submit,
+    .login-container .btn.google {
+        height: 54px;
+        font-size: 1rem;
+        min-height: 50px; /* Touch target tốt */
+    }
+
+    .login-container .p {
+        font-size: 0.9rem;
+    }
+
+    /* Tăng khoảng cách tổng thể */
+    .login-container .form > * {
+        margin-bottom: 16px;
+    }
+
+    .login-container .button-submit {
+        margin: 24px 0 16px 0;
+    }
+
+    .login-container .btn.google {
+        margin-top: 12px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .login-container {
+        width: 100%;
+        padding: 16px 12px;
+        border-radius: 0; /* Full màn hình trên mobile nhỏ */
+    }
+
+    .login-container .form {
+        padding: 28px 20px;
+        border-radius: 20px;
+    }
+
+    .login-container .form h2 {
+        font-size: 1.7rem;
+        margin-bottom: 20px;
+    }
+
+    .login-container .flex-column > label {
+        font-size: 0.9rem;
+    }
+
+    .login-container .inputForm {
+        height: 52px;
+        padding-left: 14px;
+    }
+
+    .login-container .input {
+        font-size: 1rem;
+    }
+
+    .login-container .flex-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .login-container .flex-row > div {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .login-container .flex-row > div > label,
+    .login-container .span {
+        font-size: 0.88rem;
+    }
+
+    .login-container .button-submit,
+    .login-container .btn.google {
+        height: 52px;
+        font-size: 0.98rem;
+        padding: 0 16px;
+    }
+
+    .login-container .p {
+        font-size: 0.88rem;
+    }
+
+    /* Tăng touch target cho checkbox nếu có */
+    .login-container input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Hover nhẹ hơn trên mobile nhỏ */
+    .login-container .button-submit:hover:not(:disabled),
+    .login-container .btn.google:hover {
+        transform: none;
+    }
+
+    .login-container .button-submit:active:not(:disabled),
+    .login-container .btn.google:active {
+        transform: scale(0.98);
+    }
+}

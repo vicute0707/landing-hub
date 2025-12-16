@@ -409,3 +409,271 @@
         grid-template-columns: 1fr;
     }
 }
+/* ============================================ AI PAGE ANALYZER MODAL - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .ai-analyzer-modal {
+        width: 92%;
+        max-width: 900px;
+    }
+
+    .ai-analyzer-header {
+        padding: var(--spacing-lg) var(--spacing-xl);
+    }
+
+    .ai-analyzer-header h3 {
+        font-size: var(--font-size-xl);
+    }
+
+    .ai-overall-score {
+        gap: var(--spacing-xl);
+        padding: var(--spacing-xl);
+    }
+
+    .ai-score-circle {
+        width: 100px;
+        height: 100px;
+    }
+
+    .ai-score-number {
+        font-size: var(--font-size-3xl);
+    }
+
+    .ai-scores-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+
+    .ai-analysis-section {
+        padding: var(--spacing-md);
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .ai-analyzer-modal {
+        width: 96%;
+        max-width: none;
+        max-height: 95vh;
+        border-radius: var(--radius-xl);
+    }
+
+    .ai-analyzer-header {
+        padding: var(--spacing-md) var(--spacing-lg);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .ai-analyzer-header h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    .ai-analyzer-close {
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+    }
+
+    .ai-analyzer-body {
+        padding: var(--spacing-lg);
+    }
+
+    .ai-analyzer-intro {
+        padding: var(--spacing-xl) var(--spacing-md);
+    }
+
+    .ai-analyzer-icon {
+        font-size: 52px;
+    }
+
+    .ai-analyzer-intro h4 {
+        font-size: var(--font-size-2xl);
+    }
+
+    .ai-analyzer-intro p {
+        font-size: var(--font-size-sm);
+    }
+
+    .ai-analyzer-intro ul {
+        padding: 0 var(--spacing-md);
+    }
+
+    .ai-analyzer-intro ul li {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-analyzer-loading {
+        padding: 50px var(--spacing-md);
+    }
+
+    .ai-analyzer-spinner {
+        width: 50px;
+        height: 50px;
+    }
+
+    .ai-overall-score {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+    }
+
+    .ai-score-circle {
+        width: 110px;
+        height: 110px;
+    }
+
+    .ai-score-number {
+        font-size: var(--font-size-3xl);
+    }
+
+    .ai-score-info h3 {
+        font-size: var(--font-size-2xl);
+    }
+
+    .ai-score-status {
+        font-size: var(--font-size-base);
+    }
+
+    .ai-detailed-scores h4 {
+        font-size: var(--font-size-base);
+    }
+
+    .ai-scores-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .ai-score-card {
+        padding: var(--spacing-lg);
+    }
+
+    .ai-analysis-section {
+        padding: var(--spacing-md);
+    }
+
+    .ai-analysis-section h4 {
+        font-size: var(--font-size-base);
+    }
+
+    .ai-analysis-section ul li {
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-suggestions-list {
+        gap: var(--spacing-sm);
+    }
+
+    .ai-suggestion-card {
+        padding: var(--spacing-sm);
+    }
+
+    .ai-suggestion-card h5 {
+        font-size: var(--font-size-sm);
+    }
+
+    .ai-suggestion-card p {
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-analyzer-btn-reanalyze {
+        padding: var(--spacing-lg);
+        font-size: var(--font-size-base);
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .ai-analyzer-modal {
+        width: 98%;
+        border-radius: var(--radius-lg);
+    }
+
+    .ai-analyzer-header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .ai-analyzer-header h3 {
+        font-size: var(--font-size-md);
+    }
+
+    .ai-analyzer-body {
+        padding: var(--spacing-md);
+    }
+
+    .ai-analyzer-intro {
+        padding: var(--spacing-lg) var(--spacing-sm);
+    }
+
+    .ai-analyzer-icon {
+        font-size: 48px;
+    }
+
+    .ai-analyzer-intro h4 {
+        font-size: var(--font-size-xl);
+    }
+
+    .ai-analyzer-loading {
+        padding: 40px var(--spacing-sm);
+    }
+
+    .ai-analyzer-spinner {
+        width: 44px;
+        height: 44px;
+    }
+
+    .ai-overall-score {
+        padding: var(--spacing-md);
+    }
+
+    .ai-score-circle {
+        width: 90px;
+        height: 90px;
+    }
+
+    .ai-score-number {
+        font-size: 2.5rem;
+    }
+
+    .ai-score-info h3 {
+        font-size: var(--font-size-xl);
+    }
+
+    .ai-analysis-section {
+        padding: var(--spacing-sm);
+    }
+
+    .ai-analyzer-btn-reanalyze {
+        padding: var(--spacing-md);
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Thêm touch feedback cho các nút trên mobile */
+@media (max-width: 768px) {
+    .ai-analyzer-close,
+    .ai-analyzer-btn-start,
+    .ai-analyzer-btn-reanalyze {
+        transition: all 0.2s ease;
+    }
+
+    .ai-analyzer-close:active,
+    .ai-analyzer-btn-start:active,
+    .ai-analyzer-btn-reanalyze:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+}
+
+/* Scroll mượt trên mobile */
+.ai-analyzer-modal {
+    -webkit-overflow-scrolling: touch;
+}

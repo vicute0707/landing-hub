@@ -576,3 +576,177 @@ iframe {
 .Toastify__toast--info {
     background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
 }
+/* Mobile optimizations cho Global Smooth Transitions & Animations */
+@media (max-width: 768px) {
+    /* Giảm thời gian transition tổng thể để phản hồi nhanh hơn */
+    *,
+    *::before,
+    *::after {
+        transition-duration: 150ms !important;
+    }
+
+    /* Tắt hoặc giảm hiệu ứng hover lift nặng */
+    button:hover,
+    a:hover,
+    .hover-item:hover,
+    .card:hover,
+    .panel:hover,
+    .hover-lift:hover {
+        transform: translateY(-1px) !important; /* Giảm độ nâng */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    button:active,
+    .card:active,
+    .panel:active {
+        transform: translateY(0) !important;
+    }
+
+    /* Ripple effect nhẹ hơn (giảm kích thước) */
+    button::after {
+        transition: width 0.4s, height 0.4s;
+    }
+
+    button:active::after {
+        width: 200px;
+        height: 200px;
+    }
+
+    /* Giảm độ nâng của draggable */
+    .draggable:active {
+        transform: scale(1.02) rotate(1deg) !important;
+    }
+
+    /* Tắt một số animation nặng khi không cần thiết */
+    .gradient-animate {
+        animation-duration: 8s !important; /* Chậm hơn để tiết kiệm pin */
+    }
+
+    .pulse-animate {
+        animation-duration: 4s !important;
+    }
+
+    /* Scrollbar mỏng hơn */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    /* Giảm blur backdrop trên modal/panel để mượt hơn */
+    .modal-overlay.active {
+        backdrop-filter: blur(4px);
+    }
+
+    .glass {
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+
+    /* Focus visible rõ hơn nhưng nhẹ */
+    *:focus-visible {
+        outline: 2px solid #667eea;
+        outline-offset: 2px;
+    }
+
+    /* Tắt hover transform trên các element lớn */
+    .lpb-canvas-element:hover,
+    .properties-panel:hover,
+    .popup-layer-manager:hover {
+        transform: none !important;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    /* Tắt hầu hết transform hover để tối ưu hiệu suất */
+    button:hover,
+    a:hover,
+    .card:hover,
+    .panel:hover,
+    .hover-lift:hover,
+    .draggable:active,
+    .lpb-canvas-element:hover {
+        transform: none !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    button:active {
+        transform: scale(0.98) !important;
+    }
+
+    /* Tắt hoàn toàn ripple effect nếu cần (tùy chọn) */
+    button::after {
+        display: none;
+    }
+
+    /* Giảm thời gian animation */
+    *,
+    *::before,
+    *::after {
+        transition-duration: 100ms !important;
+    }
+
+    /* Tắt gradient animation và pulse */
+    .gradient-animate,
+    .pulse-animate {
+        animation: none !important;
+    }
+
+    /* Scrollbar siêu mỏng */
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+    }
+
+    /* Tắt backdrop blur nặng */
+    .modal-overlay.active {
+        backdrop-filter: blur(2px);
+    }
+
+    .glass {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        background: rgba(255, 255, 255, 0.85);
+    }
+
+    /* Toast nhẹ hơn */
+    .Toastify__toast {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        backdrop-filter: blur(6px);
+    }
+
+    /* Hardware acceleration nhẹ hơn */
+    .hardware-accelerated {
+        will-change: auto;
+    }
+}
+
+/* Tôn trọng cài đặt giảm motion của người dùng trên mọi thiết bị */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after,
+    html {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    button::after,
+    .ripple::after {
+        display: none !important;
+    }
+
+    .gradient-animate,
+    .pulse-animate,
+    .rotate-animate {
+        animation: none !important;
+    }
+}

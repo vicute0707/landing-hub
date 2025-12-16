@@ -492,3 +492,236 @@
         font-size: 2rem;
     }
 }
+/* Mobile enhancements cho Sell Page (Form bán hàng) */
+@media (max-width: 768px) {
+    .sell-page-main {
+        margin-top: 60px; /* Giảm nếu header mobile nhỏ hơn */
+    }
+
+    .sell-page-content {
+        padding: 24px 16px;
+    }
+
+    /* Header */
+    .sell-page-header {
+        margin-bottom: 40px;
+    }
+
+    .sell-page-header h1 {
+        font-size: 2.2rem;
+        letter-spacing: 0.3px;
+    }
+
+    .sell-page-header p {
+        font-size: 1rem;
+    }
+
+    /* Form layout */
+    .form-row {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 28px;
+    }
+
+    .form-group label {
+        font-size: 0.95rem;
+    }
+
+    .label-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Inputs */
+    .sell-form input,
+    .sell-form select,
+    .sell-form textarea {
+        padding: 16px 18px;
+        font-size: 1rem; /* ≥16px tránh zoom iOS */
+        border-radius: 10px;
+    }
+
+    .sell-form select {
+        background-position: right 16px center;
+        padding-right: 50px;
+    }
+
+    .char-count {
+        bottom: -20px;
+        font-size: 0.85rem;
+    }
+
+    .help-text {
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+
+    /* Special help text (price calculation) */
+    .form-group:has(input[type="number"]) .help-text:nth-of-type(1) {
+        padding: 16px;
+        font-size: 0.95rem;
+    }
+
+    /* Info box */
+    .info-box {
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .info-box h3 {
+        font-size: 1.2rem;
+    }
+
+    .info-box li {
+        font-size: 0.95rem;
+        padding-left: 28px;
+    }
+
+    .info-box li::before {
+        font-size: 1.2em;
+    }
+
+    .info-box-feature {
+        padding: 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .info-box-feature div {
+        font-size: 0.95rem;
+    }
+
+    /* Test mode banner & section */
+    .test-mode-banner {
+        padding: 18px 20px;
+        flex-direction: column;
+        text-align: center;
+        gap: 14px;
+    }
+
+    .test-mode-section {
+        padding: 20px;
+    }
+
+    .test-mode-button {
+        padding: 14px;
+        font-size: 1rem;
+        min-height: 52px;
+    }
+
+    .test-mode-note {
+        font-size: 0.9rem;
+    }
+
+    /* Feature badge */
+    .feature-badge {
+        font-size: 0.9rem;
+        padding: 8px 14px;
+    }
+
+    /* Form actions */
+    .form-actions-full {
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 36px;
+        padding-top: 28px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1.05rem;
+        min-height: 56px; /* Touch target cực tốt */
+        border-radius: 12px;
+    }
+
+    /* Tooltip trên mobile (chạm để hiển thị nếu cần, nhưng giữ đơn giản) */
+    .tooltip-content {
+        font-size: 0.9rem;
+        white-space: normal;
+        max-width: 280px;
+        left: 0;
+        transform: none;
+    }
+
+    .tooltip-content::after {
+        left: 20px;
+        transform: none;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .sell-page-content {
+        padding: 20px 12px;
+    }
+
+    .sell-page-header h1 {
+        font-size: 2rem;
+    }
+
+    .sell-page-header p {
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .sell-form input,
+    .sell-form select,
+    .sell-form textarea {
+        padding: 15px 16px;
+        font-size: 1rem;
+    }
+
+    .info-box {
+        padding: 20px;
+    }
+
+    .info-box h3 {
+        font-size: 1.15rem;
+    }
+
+    .info-box li {
+        font-size: 0.92rem;
+        padding-left: 24px;
+    }
+
+    .test-mode-banner {
+        padding: 16px;
+    }
+
+    .form-actions-full {
+        gap: 14px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        padding: 15px 18px;
+        font-size: 1rem;
+        min-height: 54px;
+    }
+
+    /* Tắt hover transform trên mobile nhỏ */
+    .btn-primary:hover:not(:disabled),
+    .btn-secondary:hover:not(:disabled) {
+        transform: none;
+    }
+
+    .btn-primary:active:not(:disabled),
+    .btn-secondary:active:not(:disabled) {
+        transform: scale(0.98);
+    }
+
+    /* Animation nhẹ hơn */
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+}

@@ -679,3 +679,283 @@
         width: 95%;
     }
 }
+/* ============================================ TEMPLATES PAGE - CẢI TIẾN & RESPONSIVE MOBILE HOÀN HẢO ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ */
+
+/* Tối ưu chung */
+.templates-page {
+    overflow-x: hidden; /* Tránh scroll ngang do bubble lớn */
+}
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .stats-section {
+        margin-left: 180px;
+        margin-top: 5rem;
+    }
+
+    .controls-section {
+        margin-left: 60px;
+    }
+
+    .controls-grid {
+        margin-left: 120px;
+    }
+
+    .templates-content {
+        margin-left: 150px;
+    }
+
+    .templates-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.8rem;
+    }
+
+    /* Thu nhỏ bubble nền để nhẹ hơn */
+    .templates-page::before {
+        width: 400px;
+        height: 400px;
+        top: -40%;
+        left: -15%;
+    }
+
+    .templates-page::after {
+        width: 500px;
+        height: 500px;
+        bottom: -25%;
+        right: -10%;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .templates-page {
+        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #f0fdf4 100%);
+    }
+
+    /* Giảm hiệu ứng bubble nền để tăng performance & tập trung nội dung */
+    .templates-page::before,
+    .templates-page::after {
+        width: 300px;
+        height: 300px;
+        filter: blur(50px);
+        opacity: 0.6;
+    }
+
+    .templates-page::before {
+        top: -20%;
+        left: -30%;
+    }
+
+    .templates-page::after {
+        bottom: -15%;
+        right: -20%;
+    }
+
+    .header {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stats-section {
+        margin-left: 0;
+        margin-top: 4rem;
+        padding: 0 1rem;
+    }
+
+    .controls-section {
+        margin-left: 0;
+        padding: 0 1rem;
+    }
+
+    .controls-grid {
+        margin-left: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .search-input,
+    .filter-select,
+    .button-upload,
+    .button-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .search-input {
+        min-width: unset;
+        padding-left: 2.5rem;
+        font-size: 16px; /* Tránh zoom trên iOS */
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .stats-card {
+        padding: 1.25rem;
+    }
+
+    .stats-card__value {
+        font-size: 1.75rem;
+    }
+
+    .templates-content {
+        margin-left: 0;
+        padding: 0 1rem;
+    }
+
+    .templates-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .template-card {
+        border-radius: 14px;
+    }
+
+    .card-content {
+        padding: 1.25rem;
+    }
+
+    .card-title {
+        font-size: 1.15rem;
+    }
+
+    .card-description {
+        font-size: 0.825rem;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+
+    .card-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+        border-radius: 16px;
+    }
+
+    .modal-form__grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .modal-form__input,
+    .modal-form__textarea,
+    .modal-form__select {
+        font-size: 16px; /* Tránh zoom */
+    }
+
+    .end-message {
+        padding: 2.5rem;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .templates-page::before,
+    .templates-page::after {
+        width: 220px;
+        height: 220px;
+        filter: blur(40px);
+        opacity: 0.4;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+
+    .stats-card {
+        padding: 1rem;
+    }
+
+    .stats-card__value {
+        font-size: 1.6rem;
+    }
+
+    .stats-card__label {
+        font-size: 0.8rem;
+    }
+
+    .templates-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .card-media {
+        aspect-ratio: 16 / 10;
+    }
+
+    .card-content {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-description {
+        font-size: 0.8rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .badge-container {
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .modal-header,
+    .modal-form,
+    .modal-footer {
+        padding: 1.25rem;
+    }
+
+    .modal-title {
+        font-size: 1.15rem;
+    }
+
+    .end-message {
+        padding: 2rem;
+    }
+
+    .end-message svg {
+        font-size: 2.5rem;
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .stats-card,
+    .template-card,
+    .button-upload,
+    .button-toggle,
+    .card-overlay .btn {
+        transition: all 0.2s ease;
+    }
+
+    .stats-card:active,
+    .template-card:active,
+    .button-upload:active,
+    .button-toggle:active,
+    .card-overlay .btn:active {
+        transform: scale(0.96);
+        opacity: 0.9;
+    }
+}

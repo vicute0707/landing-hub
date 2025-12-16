@@ -304,3 +304,169 @@
         grid-template-columns: 1fr;
     }
 }
+/* Mobile enhancements cho My Payouts Page */
+@media (max-width: 640px) {
+    .my-payouts-container {
+        margin-top: 60px; /* Giảm margin top nếu header mobile nhỏ hơn */
+    }
+
+    .my-payouts-content {
+        padding: 1rem; /* Giảm padding để tận dụng không gian */
+    }
+
+    /* Header */
+    .payouts-header {
+        padding-bottom: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .payouts-header-title h1 {
+        font-size: 2rem; /* Giảm kích thước title */
+        letter-spacing: -0.5px;
+    }
+
+    .payouts-header p {
+        font-size: 1rem;
+    }
+
+    .btn-back {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.95rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    /* Filters */
+    .payouts-filters {
+        padding: 0.75rem;
+    }
+
+    .payouts-filters .filter-select {
+        width: 100%;
+        min-width: auto;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Table - cải thiện scroll ngang */
+    .payouts-table {
+        padding: 1rem;
+    }
+
+    .payouts-table th,
+    .payouts-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Status badge nhỏ hơn */
+    .status-badge2 {
+        padding: 0.25rem 0.6rem;
+        font-size: 0.7rem;
+    }
+
+    /* Notes nhỏ hơn */
+    .success-note,
+    .error-note,
+    .info-note,
+    .pending-note {
+        font-size: 0.7rem;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state p {
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 0.85rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* Pagination */
+    .pagination {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra small devices (dưới 480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .my-payouts-content {
+        padding: 0.75rem;
+    }
+
+    .payouts-header-title h1 {
+        font-size: 1.75rem;
+    }
+
+    .payouts-header p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    /* Animation gradient title nhẹ hơn để tiết kiệm hiệu năng */
+    @keyframes payoutTitleGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Table tối ưu hơn */
+    .payouts-table th,
+    .payouts-table td {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    /* Đảm bảo touch target đủ lớn */
+    .btn-back,
+    .btn-primary,
+    .pagination button,
+    .filter-select {
+        min-height: 44px; /* iOS/Android touch target recommendation */
+    }
+}

@@ -111,3 +111,141 @@
         padding: 1.5rem;
     }
 }
+/* ============================================ USER PROFILE - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung và tối ưu phần responsive dưới đây */
+
+/* Tablet (≤768px) */
+@media (max-width: 768px) {
+    .upro-container {
+        padding: 1.5rem;
+        min-height: 100vh;
+    }
+
+    .upro-card {
+        padding: 2rem;
+        max-width: 100%;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .upro-title {
+        font-size: 1.75rem;
+        text-align: center;
+    }
+
+    .upro-error {
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 1rem;
+    }
+
+    .upro-form {
+        gap: 1.25rem;
+    }
+
+    .upro-label {
+        font-size: 0.925rem;
+    }
+
+    .upro-input {
+        padding: 0.875rem;
+        font-size: 1rem; /* Tránh zoom tự động trên iOS khi font < 16px */
+    }
+
+    .upro-btn {
+        padding: 0.875rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .upro-loaderWrap {
+        font-size: 0.95rem;
+        padding: 1rem;
+    }
+}
+
+/* Mobile (≤480px) - Tối ưu trải nghiệm điện thoại nhỏ */
+@media (max-width: 480px) {
+    .upro-container {
+        padding: 1rem;
+        background: white; /* Loại bỏ nền xám nhạt để card full bleed đẹp hơn */
+    }
+
+    .upro-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .upro-title {
+        font-size: 1.6rem;
+        line-height: 1.3;
+    }
+
+    .upro-error {
+        padding: 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    .upro-form {
+        gap: 1.125rem;
+    }
+
+    .upro-label {
+        font-size: 0.9rem;
+    }
+
+    .upro-input {
+        padding: 0.875rem;
+        font-size: 1rem;
+    }
+
+    .upro-btn {
+        padding: 1rem;
+        font-size: 1.025rem;
+        border-radius: 8px;
+    }
+
+    .upro-loaderWrap {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .upro-skeleton {
+        height: 380px;
+        border-radius: 8px;
+    }
+}
+
+/* Thêm touch feedback cho nút và input trên mobile */
+@media (max-width: 768px) {
+    .upro-btn,
+    .upro-input {
+        transition: all 0.2s ease;
+    }
+
+    .upro-btn:active {
+        transform: scale(0.98);
+        background: #444;
+        opacity: 0.95;
+    }
+
+    .upro-input:active {
+        border-color: #777;
+    }
+}
+
+/* Cải thiện accessibility & trải nghiệm tổng thể */
+.upro-input::placeholder {
+    color: #aaa;
+}
+
+.upro-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.upro-btn:disabled:hover {
+    background: #999;
+}

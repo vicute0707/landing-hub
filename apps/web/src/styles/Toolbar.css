@@ -190,3 +190,174 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-3px); }
 }
+/* ============================================ LPB TOOLBAR - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & mobile-friendly dưới đây */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .lpb-toolbar-inner {
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .lpb-toolbar-action-btn {
+        padding: 8px 14px;
+        font-size: 13.5px;
+    }
+
+    .lpb-layers-panel {
+        right: 10px;
+        left: 10px;
+        max-height: 400px;
+        min-width: auto;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .lpb-toolbar-container {
+        padding: 10px 15px;
+        position: sticky; /* Đảm bảo toolbar luôn ở top khi scroll */
+    }
+
+    .lpb-toolbar-inner {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .lpb-toolbar-left .logo-image {
+        height: 36px;
+    }
+
+    .lpb-toolbar-right {
+        gap: 8px;
+    }
+
+    .lpb-toolbar-action-btn {
+        padding: 10px 14px;
+        font-size: 14px;
+        min-width: 44px; /* Đảm bảo vùng chạm tối thiểu theo chuẩn mobile */
+        justify-content: center;
+    }
+
+    /* Ẩn text trên nút nhỏ nếu cần, giữ icon */
+    .lpb-toolbar-action-btn span {
+        display: none;
+    }
+
+    .lpb-toolbar-action-btn i {
+        margin-right: 0;
+    }
+
+    /* Khôi phục text cho nút chính (AI & Deploy) */
+    .lpb-ai-btn span,
+    .lpb-deploy-btn span {
+        display: inline;
+    }
+
+    .lpb-ai-btn,
+    .lpb-deploy-btn {
+        padding: 10px 18px;
+    }
+
+    .lpb-layers-panel {
+        top: 65px;
+        right: 8px;
+        left: 8px;
+        max-height: 50vh;
+        min-width: auto;
+    }
+
+    .lpb-layer-item {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .lpb-toolbar-container {
+        padding: 8px 10px;
+    }
+
+    .lpb-toolbar-inner {
+        justify-content: center;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .lpb-toolbar-left,
+    .lpb-toolbar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .lpb-toolbar-left .logo-image {
+        height: 32px;
+    }
+
+    .lpb-toolbar-right {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .lpb-toolbar-action-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+        flex: 1;
+        min-width: 100px;
+    }
+
+    /* Bật lại text cho tất cả nút trên màn rất nhỏ để dễ hiểu */
+    .lpb-toolbar-action-btn span {
+        display: inline;
+    }
+
+    .lpb-toolbar-action-btn i {
+        margin-right: 6px;
+    }
+
+    .lpb-ai-btn,
+    .lpb-deploy-btn {
+        flex: 1 1 48%;
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .lpb-layers-panel {
+        top: 120px; /* Tránh chồng toolbar cao hơn */
+        left: 8px;
+        right: 8px;
+        max-height: 60vh;
+    }
+}
+
+/* Thêm touch feedback tốt hơn trên mobile */
+@media (max-width: 768px) {
+    .lpb-toolbar-action-btn,
+    .lpb-ai-btn,
+    .lpb-deploy-btn,
+    .lpb-layer-item {
+        transition: all 0.2s ease;
+    }
+
+    .lpb-toolbar-action-btn:active,
+    .lpb-ai-btn:active,
+    .lpb-deploy-btn:active,
+    .lpb-layer-item:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+}
+
+/* Cải thiện scroll mượt cho layers panel trên mobile */
+.lpb-layers-panel {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Đảm bảo toolbar fixed/sticky đúng cách nếu cần */
+.lpb-toolbar-container {
+    position: sticky;
+    top: 0;
+}

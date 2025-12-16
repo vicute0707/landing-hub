@@ -368,3 +368,215 @@
 .dashboard-content::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(to bottom, rgba(244, 114, 182, 0.5), rgba(59, 130, 246, 0.5));
 }
+/* ============================================ DASHBOARD - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & mobile-friendly dưới đây */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .dashboard-content {
+        margin-left: 100px;
+        margin-top: 5rem;
+    }
+
+    .dash-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+    }
+
+    .dash-grid-2 {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+}
+
+/* Tablet (≤1024px) - Đã có một phần, bổ sung thêm */
+@media (max-width: 1024px) {
+    .dashboard-main {
+        flex-direction: column;
+    }
+
+    .dashboard-content {
+        margin-left: 0; /* Giả sử sidebar collapse hoặc hidden */
+        margin-top: 4rem;
+        padding: 24px;
+    }
+
+    .dashboard-content::before {
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+        border-radius: 14px;
+    }
+
+    .dash-section {
+        margin-bottom: 28px;
+    }
+
+    .dash-section-title {
+        font-size: 19px;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .dashboard-container {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    /* Ẩn hoàn toàn background shapes để tăng performance & tập trung nội dung */
+    .dashboard-container::before,
+    .dashboard-container::after {
+        display: none;
+    }
+
+    .dashboard-content {
+        margin-top: 3rem;
+        padding: 20px 16px;
+    }
+
+    .dashboard-content::before {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        border-radius: 12px;
+        backdrop-filter: blur(12px);
+    }
+
+    .dash-card,
+    .dash-stat-item,
+    .dash-chart-wrapper,
+    .dash-table-container {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .dash-stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .dash-grid-2,
+    .dash-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .dash-stat-number {
+        font-size: 26px;
+    }
+
+    .dash-stat-label {
+        font-size: 12.5px;
+    }
+
+    .dash-section-title {
+        font-size: 18px;
+        margin-bottom: 14px;
+    }
+
+    .dash-chart-title {
+        font-size: 17px;
+        margin-bottom: 16px;
+    }
+
+    .dash-btn {
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+
+    /* Loading & Error trên mobile */
+    .dashboard-loading,
+    .dashboard-error {
+        min-height: 50vh;
+        padding: 40px 20px;
+        font-size: 16px;
+    }
+
+    .dashboard-error-box {
+        padding: 24px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .dashboard-content {
+        margin-top: 2.5rem;
+        padding: 16px 12px;
+    }
+
+    .dashboard-content::before {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        border-radius: 10px;
+    }
+
+    .dash-card,
+    .dash-stat-item,
+    .dash-chart-wrapper,
+    .dash-table-container {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .dash-stat-number {
+        font-size: 24px;
+    }
+
+    .dash-section-title {
+        font-size: 17px;
+        margin-bottom: 12px;
+    }
+
+    .dash-chart-title {
+        font-size: 16px;
+    }
+
+    .dash-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 15.5px;
+    }
+
+    .dash-btn-secondary {
+        width: 100%;
+    }
+
+    /* Tăng touch target cho các phần tử tương tác */
+    .dash-btn,
+    .dash-stat-item {
+        min-height: 44px;
+    }
+}
+
+/* Thêm touch feedback cho các card và button trên mobile */
+@media (max-width: 768px) {
+    .dash-card,
+    .dash-stat-item,
+    .dash-chart-wrapper,
+    .dash-table-container,
+    .dash-btn {
+        transition: all 0.2s ease;
+    }
+
+    .dash-card:active,
+    .dash-stat-item:active,
+    .dash-chart-wrapper:active,
+    .dash-table-container:active,
+    .dash-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Scrollbar mượt hơn trên mobile */
+.dashboard-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dashboard-content::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+}

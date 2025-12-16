@@ -210,3 +210,205 @@
         flex-direction: column;
     }
 }
+/* Mobile enhancements cho Sandbox / Payment Testing Page */
+@media (max-width: 768px) {
+    .sandbox-container {
+        padding: 16px;
+        min-height: 100vh;
+    }
+
+    .sandbox-card {
+        border-radius: 20px;
+        max-width: 100%;
+    }
+
+    .sandbox-header {
+        padding: 36px 28px;
+    }
+
+    .sandbox-header h1 {
+        font-size: 2em;
+        margin-bottom: 12px;
+    }
+
+    .sandbox-header p {
+        font-size: 1.05em;
+    }
+
+    .sandbox-body {
+        padding: 32px 28px;
+    }
+
+    .transaction-info {
+        padding: 22px;
+        border-radius: 12px;
+        margin-bottom: 28px;
+    }
+
+    .transaction-info h2 {
+        font-size: 1.4em;
+        margin-bottom: 18px;
+        text-align: center;
+    }
+
+    .info-row {
+        padding: 12px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .info-row.highlight {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .info-row.highlight .value {
+        font-size: 1.4em;
+    }
+
+    .info-row .label {
+        font-size: 0.95em;
+    }
+
+    .info-row .value {
+        font-size: 1.05em;
+    }
+
+    .payment-actions {
+        margin-bottom: 28px;
+    }
+
+    .payment-actions h3 {
+        font-size: 1.25em;
+    }
+
+    .payment-actions p {
+        font-size: 0.95em;
+        margin-bottom: 22px;
+    }
+
+    .action-buttons {
+        gap: 14px;
+    }
+
+    .btn-success,
+    .btn-fail {
+        padding: 16px 28px;
+        font-size: 16px;
+        min-height: 54px; /* Touch target rất tốt */
+        width: 100%;
+        justify-content: center;
+    }
+
+    .sandbox-notice {
+        padding: 18px;
+        border-radius: 10px;
+    }
+
+    .sandbox-notice h4 {
+        font-size: 1.15em;
+        margin-bottom: 12px;
+    }
+
+    .sandbox-notice li {
+        font-size: 0.95em;
+        padding: 8px 0 8px 22px;
+    }
+
+    .sandbox-notice li:before {
+        left: 4px;
+    }
+
+    /* Spinner nhỏ hơn */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border-width: 5px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .sandbox-container {
+        padding: 12px;
+    }
+
+    .sandbox-card {
+        border-radius: 18px;
+    }
+
+    .sandbox-header {
+        padding: 32px 24px;
+    }
+
+    .sandbox-header h1 {
+        font-size: 1.8em;
+    }
+
+    .sandbox-header p {
+        font-size: 1em;
+    }
+
+    .sandbox-body {
+        padding: 28px 20px;
+    }
+
+    .transaction-info {
+        padding: 20px;
+    }
+
+    .transaction-info h2 {
+        font-size: 1.3em;
+    }
+
+    .info-row.highlight .value {
+        font-size: 1.3em;
+    }
+
+    .payment-actions h3 {
+        font-size: 1.2em;
+    }
+
+    .payment-actions p {
+        font-size: 0.9em;
+    }
+
+    .btn-success,
+    .btn-fail {
+        padding: 15px 24px;
+        font-size: 15.5px;
+        min-height: 52px;
+    }
+
+    .sandbox-notice {
+        padding: 16px;
+    }
+
+    .sandbox-notice h4 {
+        font-size: 1.1em;
+    }
+
+    .sandbox-notice li {
+        font-size: 0.9em;
+        padding-left: 20px;
+    }
+
+    /* Tắt hover transform trên mobile nhỏ để mượt hơn */
+    .btn-success:hover:not(:disabled),
+    .btn-fail:hover:not(:disabled) {
+        transform: none;
+    }
+
+    .btn-success:active:not(:disabled),
+    .btn-fail:active:not(:disabled) {
+        transform: scale(0.98);
+    }
+
+    /* Spinner nhỏ gọn */
+    .spinner {
+        width: 44px;
+        height: 44px;
+        border-width: 4px;
+    }
+}

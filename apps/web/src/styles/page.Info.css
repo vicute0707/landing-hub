@@ -389,3 +389,266 @@
         gap: 12px;
     }
 }
+/* Mobile enhancements cho Pages Landing Page */
+@media (max-width: 768px) {
+    .pages-hero,
+    .why-section,
+    .elements-section,
+    .types-section,
+    .pages-cta {
+        margin: 20px 0; /* Đã có trong code gốc, giữ nhất quán */
+        border-radius: 20px; /* Giảm nhẹ bo góc trên mobile */
+    }
+
+    .pages-hero {
+        padding: 80px 20px 60px;
+    }
+
+    .definition-section {
+        padding: 60px 20px;
+    }
+
+    /* Hero */
+    .pages-hero h1 {
+        font-size: 34px;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+        line-height: 1.7;
+    }
+
+    /* Definition */
+    .definition-card {
+        padding: 40px 24px;
+    }
+
+    .definition-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .definition-icon svg { /* Nếu dùng SVG icon */
+        width: 48px;
+        height: 48px;
+    }
+
+    .definition-card h2 {
+        font-size: 28px;
+    }
+
+    .definition-card p {
+        font-size: 16px;
+    }
+
+    /* Why & Types Section */
+    .section-title {
+        font-size: 30px;
+        margin-bottom: 44px;
+    }
+
+    .benefit-card,
+    .type-card {
+        padding: 32px 24px;
+    }
+
+    .benefit-icon {
+        width: 64px;
+        height: 64px;
+    }
+
+    .benefit-icon svg,
+    .type-card svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    .type-number {
+        font-size: 70px;
+        right: 16px;
+        top: -6px;
+    }
+
+    /* Elements */
+    .elements-list {
+        gap: 20px;
+    }
+
+    .element-item {
+        padding: 24px;
+        gap: 16px;
+    }
+
+    .check-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .check-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .element-content h4 {
+        font-size: 17px;
+    }
+
+    .element-content p {
+        font-size: 15px;
+    }
+
+    /* CTA */
+    .pages-cta {
+        padding: 80px 20px;
+    }
+
+    .pages-cta h2 {
+        font-size: 32px;
+    }
+
+    .pages-cta p {
+        font-size: 17px;
+    }
+
+    .cta-button {
+        padding: 16px 40px;
+        font-size: 16px;
+        min-height: 52px; /* Dễ chạm hơn */
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .pages-hero,
+    .why-section,
+    .elements-section,
+    .types-section,
+    .pages-cta {
+        margin: 16px 0;
+        padding: 60px 16px;
+        border-radius: 16px;
+    }
+
+    .definition-section {
+        padding: 50px 16px;
+    }
+
+    /* Hero */
+    .pages-hero {
+        padding: 70px 16px 50px;
+    }
+
+    .pages-hero h1 {
+        font-size: 28px;
+    }
+
+    .hero-subtitle {
+        font-size: 15.5px;
+    }
+
+    /* Definition */
+    .definition-card {
+        padding: 36px 20px;
+    }
+
+    .definition-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .definition-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .definition-card h2 {
+        font-size: 26px;
+    }
+
+    .definition-card p {
+        font-size: 15.5px;
+    }
+
+    /* Section title */
+    .section-title {
+        font-size: 28px;
+        margin-bottom: 36px;
+    }
+
+    /* Cards */
+    .benefit-card,
+    .type-card {
+        padding: 28px 20px;
+    }
+
+    .benefit-icon {
+        width: 58px;
+        height: 58px;
+    }
+
+    .benefit-card h3,
+    .type-card h3 {
+        font-size: 19px;
+    }
+
+    .benefit-card p,
+    .type-card p {
+        font-size: 14.5px;
+    }
+
+    .type-number {
+        font-size: 60px;
+        right: 12px;
+        top: -4px;
+    }
+
+    /* Elements - chuyển cột dọc hoàn toàn */
+    .element-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 24px 20px;
+    }
+
+    .check-icon {
+        align-self: center;
+    }
+
+    /* CTA */
+    .pages-cta h2 {
+        font-size: 28px;
+    }
+
+    .pages-cta p {
+        font-size: 16px;
+        margin-bottom: 28px;
+    }
+
+    .cta-button {
+        width: 100%;
+        max-width: 300px;
+        padding: 16px 32px;
+        font-size: 16px;
+        min-height: 52px;
+    }
+
+    /* Tối ưu touch target */
+    .cta-button,
+    .benefit-card,
+    .type-card,
+    .element-item {
+        min-height: 48px;
+    }
+
+    /* Giảm hiệu ứng hover nặng trên mobile (thay bằng focus nếu cần) */
+    .benefit-card:hover,
+    .type-card:hover,
+    .element-item:hover {
+        transform: none; /* Tránh lag khi chạm */
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+    }
+
+    .cta-button:hover {
+        transform: none;
+    }
+}

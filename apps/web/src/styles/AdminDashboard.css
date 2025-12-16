@@ -564,3 +564,264 @@
         min-width: 100%;
     }
 }
+/* ======================================= ADMIN DASHBOARD V2 - Sleek & Premium Design ======================================= */
+/* (Giữ nguyên toàn bộ CSS bạn đã cung cấp ở trên, tôi chỉ thêm phần responsive cải tiến bên dưới) */
+
+/* --- RESPONSIVE CẢI TIẾN --- */
+
+/* Tablet lớn & màn hình trung bình */
+@media (max-width: 1024px) {
+    .main-content-grid-v2 {
+        grid-template-columns: 1fr; /* Đã có, giữ nguyên */
+    }
+
+    .column-left,
+    .column-right {
+        gap: 20px;
+    }
+
+    .section-v2 {
+        padding: 25px;
+    }
+}
+
+/* Tablet nhỏ và mobile lớn (≤ 768px) */
+@media (max-width: 768px) {
+    .admin-dashboard-v2 {
+        padding: 20px 15px;
+    }
+
+    .dashboard-header-v2 {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .dashboard-header-v2 h1 {
+        font-size: 28px;
+    }
+
+    .dashboard-header-v2 .header-content-v2 p {
+        font-size: 15px;
+    }
+
+    .btn-refresh-v2 {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    .overview-grid-v2 {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .stat-card-v2 {
+        padding: 25px;
+    }
+
+    .stat-card-v2 .card-value {
+        font-size: 28px;
+    }
+
+    .stat-card-v2 .card-icon-v2 svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    .transaction-grid-v2 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .transaction-card-v2 {
+        padding: 18px;
+    }
+
+    .transaction-card-v2 .count-v2 {
+        font-size: 36px;
+    }
+
+    .daily-chart-v2 {
+        height: 200px;
+        gap: 4px;
+        padding: 10px 5px;
+    }
+
+    .chart-bar-wrapper-v2 {
+        min-width: 28px;
+    }
+
+    .chart-bar-v2 {
+        max-width: 28px;
+    }
+
+    .bar-label-v2 {
+        font-size: 9px;
+        transform: rotate(-45deg);
+        transform-origin: center;
+        white-space: nowrap;
+    }
+
+    .payment-grid-v2 {
+        flex-direction: column;
+    }
+
+    .payment-card-v2 {
+        min-width: 100%;
+    }
+
+    .top-list-v2 .list-items-v2 {
+        gap: 12px;
+    }
+
+    .top-item-v2 {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .top-item-v2 .rank-v2 {
+        font-size: 22px;
+        min-width: 35px;
+    }
+}
+
+/* Mobile nhỏ (≤ 480px) - Tối ưu trải nghiệm điện thoại */
+@media (max-width: 480px) {
+    .admin-dashboard-v2 {
+        padding: 15px 10px;
+    }
+
+    .dashboard-header-v2 h1 {
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    .dashboard-header-v2 .beta-tag {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+
+    .stat-card-v2 {
+        padding: 20px;
+    }
+
+    .stat-card-v2 .card-value {
+        font-size: 26px;
+    }
+
+    .stat-card-v2 .card-title {
+        font-size: 13px;
+    }
+
+    .stat-card-v2 .card-meta {
+        font-size: 12px;
+    }
+
+    .stat-card-v2 .card-icon-v2 svg {
+        width: 45px;
+        height: 45px;
+    }
+
+    .section-v2 {
+        padding: 20px;
+    }
+
+    .section-header h2 {
+        font-size: 20px;
+    }
+
+    .section-header .subtitle {
+        font-size: 13px;
+    }
+
+    /* Biểu đồ cột trên mobile rất nhỏ */
+    .daily-chart-v2 {
+        height: 180px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Cuộn mượt trên iOS */
+    }
+
+    .chart-bar-wrapper-v2 {
+        min-width: 24px;
+    }
+
+    .chart-bar-v2 {
+        max-width: 24px;
+    }
+
+    .bar-info-v2 .value-v2 {
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+
+    .bar-label-v2 {
+        font-size: 8px;
+    }
+
+    .transaction-card-v2 .count-v2 {
+        font-size: 32px;
+    }
+
+    .transaction-card-v2 .status-label {
+        font-size: 12px;
+    }
+
+    .top-item-v2 {
+        padding: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .top-item-v2 .rank-v2 {
+        align-self: center;
+        font-size: 28px;
+        min-width: auto;
+    }
+
+    .top-item-v2 .info-v2 {
+        width: 100%;
+    }
+
+    .top-item-v2 .id-v2 {
+        font-size: 15px;
+    }
+
+    .payment-card-v2 {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .payment-card-v2 svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .dashboard-footer-v2 {
+        font-size: 12px;
+        padding: 15px;
+    }
+}
+
+/* Thêm touch feedback cho các phần tử tương tác trên mobile */
+@media (max-width: 768px) {
+    .stat-card-v2,
+    .transaction-card-v2,
+    .top-item-v2,
+    .payment-card-v2,
+    .btn-refresh-v2 {
+        transition: all 0.2s ease;
+    }
+
+    .stat-card-v2:active,
+    .transaction-card-v2:active,
+    .top-item-v2:active,
+    .payment-card-v2:active,
+    .btn-refresh-v2:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}

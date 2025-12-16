@@ -548,3 +548,260 @@
 .lpb-component-library-wrapper::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #94a3b8, #64748b);
 }
+/* ============================================ LPB COMPONENT LIBRARY SIDEBAR - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .lpb-component-library {
+        height: 88vh;
+    }
+
+    .lpb-component-library-header {
+        padding: 12px 14px;
+    }
+
+    .lpb-component-library-title {
+        font-size: 14px;
+    }
+
+    .lpb-component-library-tab {
+        padding: 8px 10px;
+        font-size: 12.5px;
+    }
+
+    .lpb-component-library-search input {
+        padding: 9px 34px 9px 34px;
+        font-size: 13px;
+    }
+
+    .lpb-component-library-wrapper {
+        gap: 10px;
+    }
+
+    .lpb-component-library-category-btn {
+        padding: 8px 10px;
+        font-size: 12.5px;
+    }
+
+    .lpb-template-item {
+        margin: 8px;
+        padding: 4px 6px;
+    }
+
+    .lpb-template-item span {
+        font-size: 11.5px;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) - Chuyển thành bottom drawer hiện đại */
+@media (max-width: 768px) {
+    /* Ẩn sidebar mặc định, giả sử có trigger mở drawer (hoặc dùng JS để toggle class .open) */
+    .lpb-component-library {
+        position: fixed;
+        bottom: -100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        grid-template-columns: 1fr;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.15);
+        transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    /* Khi mở drawer */
+    .lpb-component-library.open {
+        bottom: 0;
+    }
+
+    .lpb-component-library-header {
+        padding: 16px 20px;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .lpb-component-library-title {
+        font-size: 16px;
+    }
+
+    .lpb-component-library-toggle {
+        font-size: 18px;
+    }
+
+    .lpb-component-library-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0 16px 12px 16px;
+        gap: 8px;
+    }
+
+    .lpb-component-library-tab {
+        min-width: 100px;
+        padding: 10px 12px;
+        font-size: 13.5px;
+    }
+
+    .lpb-component-library-tab.icon-only {
+        width: 48px;
+        height: 48px;
+    }
+
+    .lpb-component-library-search {
+        padding: 0 16px;
+        margin-bottom: 8px;
+    }
+
+    .lpb-component-library-wrapper {
+        grid-template-columns: 1fr;
+        padding: 0 16px 16px 16px;
+        gap: 16px;
+        overflow-y: auto;
+    }
+
+    .lpb-component-library-category-nav {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .lpb-component-library-category-btn {
+        white-space: nowrap;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .lpb-component-library-subcategory-nav {
+        padding-left: 0;
+        margin-top: 8px;
+    }
+
+    .lpb-component-library-template-column {
+        padding: 0;
+    }
+
+    .lpb-component-library-template-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+    }
+
+    .lpb-template-item {
+        margin: 0;
+        padding: 12px 8px;
+    }
+
+    .lpb-template-item i {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .lpb-template-item span {
+        font-size: 12.5px;
+    }
+
+    .lpb-no-results {
+        padding: 60px 20px;
+    }
+
+    .lpb-no-results i {
+        font-size: 60px;
+    }
+
+    .lpb-no-results p {
+        font-size: 16px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .lpb-component-library.open {
+        max-height: 85vh;
+    }
+
+    .lpb-component-library-header {
+        padding: 14px 16px;
+    }
+
+    .lpb-component-library-tabs {
+        padding: 0 12px 10px 12px;
+    }
+
+    .lpb-component-library-tab {
+        min-width: 90px;
+        font-size: 13px;
+    }
+
+    .lpb-component-library-search {
+        padding: 0 12px;
+    }
+
+    .lpb-component-library-wrapper {
+        padding: 0 12px 12px 12px;
+    }
+
+    .lpb-component-library-template-list {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 10px;
+    }
+
+    .lpb-template-item i {
+        font-size: 28px;
+    }
+
+    .lpb-template-item span {
+        font-size: 12px;
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .lpb-component-library-tab,
+    .lpb-component-library-category-btn,
+    .lpb-component-library-subcategory-btn,
+    .lpb-template-item,
+    .lpb-component-library-toggle,
+    .lpb-clear-search {
+        transition: all 0.2s ease;
+    }
+
+    .lpb-component-library-tab:active,
+    .lpb-component-library-category-btn:active,
+    .lpb-component-library-subcategory-btn:active,
+    .lpb-template-item:active,
+    .lpb-component-library-toggle:active,
+    .lpb-clear-search:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+}
+
+/* Scroll mượt trên mobile */
+.lpb-component-library-wrapper,
+.lpb-component-library-tabs,
+.lpb-component-library-category-nav {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Thêm handle kéo drawer trên mobile */
+.lpb-component-library-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 2px;
+}
+
+@media (min-width: 769px) {
+    .lpb-component-library-header::before {
+        display: none;
+    }
+}

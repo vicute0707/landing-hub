@@ -1088,3 +1088,298 @@ body {
         letter-spacing: 0.05em;
     }
 }
+/* ============================================ RESPONSIVE DESIGN - CẢI TIẾN CHO MOBILE ============================================ */
+
+/* Tablet (≤1200px) - Đã có một phần, bổ sung thêm tối ưu */
+@media (max-width: 1200px) {
+    .admin-page-item,
+    .transaction-item,
+    .refund-request-item {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .page-image {
+        height: 220px;
+    }
+
+    .page-image img {
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .page-actions {
+        align-items: stretch;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+    }
+
+    .btn-view,
+    .btn-approve,
+    .btn-reject,
+    .btn-suspend,
+    .btn-featured,
+    .btn-delete {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .admin-marketplace-content {
+        margin-left: 0; /* Giả sử sidebar collapse hoặc hidden trên mobile */
+        padding: var(--space-lg);
+    }
+
+    .admin-marketplace-header {
+        margin-bottom: var(--space-xl);
+        padding-bottom: var(--space-lg);
+    }
+
+    .admin-marketplace-header h1 {
+        font-size: 2rem;
+        line-height: 1.2;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .admin-marketplace-header p {
+        font-size: 1rem;
+    }
+
+    .tabs {
+        gap: var(--space-md);
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: var(--space-sm);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab {
+        font-size: 0.95rem;
+        padding: var(--space-sm) var(--space-md);
+        min-width: max-content;
+    }
+
+    .admin-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-md);
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-box {
+        min-width: 100%;
+        padding: var(--space-md);
+    }
+
+    .search-input {
+        font-size: 1rem; /* Tránh zoom trên iOS */
+    }
+
+    .status-filter,
+    .toolbar-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .stat-card {
+        padding: var(--space-lg);
+    }
+
+    .stat-icon {
+        min-width: 50px;
+        height: 50px;
+    }
+
+    .stat-icon svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .stat-value {
+        font-size: 1.6rem;
+    }
+
+    .bulk-selection-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-md);
+    }
+
+    .page-image {
+        height: 240px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-view,
+    .btn-approve,
+    .btn-reject,
+    .btn-suspend,
+    .btn-featured,
+    .btn-delete {
+        width: 100%;
+        min-width: unset;
+    }
+
+    /* Orders Table - Đã có stacked cards, bổ sung mượt hơn */
+    .orders-table-container {
+        border: none;
+        box-shadow: none;
+    }
+
+    .orders-table tr {
+        padding: var(--space-lg);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .orders-table td {
+        padding: 10px 0;
+    }
+
+    .modal-content1 {
+        width: 95%;
+        padding: var(--space-xl);
+    }
+}
+
+/* Mobile nhỏ (≤480px) - Tối ưu trải nghiệm điện thoại */
+@media (max-width: 480px) {
+    .admin-marketplace-content {
+        padding: var(--space-md);
+    }
+
+    .admin-marketplace-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .admin-marketplace-header p {
+        font-size: 0.95rem;
+    }
+
+    .tabs {
+        gap: var(--space-sm);
+    }
+
+    .tab {
+        font-size: 0.9rem;
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    .stat-card {
+        padding: var(--space-md);
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-md);
+    }
+
+    .stat-icon {
+        min-width: 60px;
+        height: 60px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .page-image {
+        height: 200px;
+    }
+
+    .page-header h3 {
+        font-size: 1.05rem;
+    }
+
+    .page-price {
+        font-size: 1.2rem;
+    }
+
+    .page-meta {
+        flex-direction: column;
+        gap: var(--space-sm);
+        font-size: 0.8rem;
+    }
+
+    .rejection-reason {
+        font-size: 0.85rem;
+        padding: var(--space-sm);
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding: var(--space-md);
+    }
+
+    .pagination button {
+        width: 100%;
+    }
+
+    .modal-content1 {
+        padding: var(--space-lg);
+    }
+
+    .modal-content1 h2 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Thêm touch feedback cho các phần tử tương tác trên mobile */
+@media (max-width: 768px) {
+    .stat-card,
+    .admin-page-item,
+    .transaction-item,
+    .refund-request-item,
+    .toolbar-btn,
+    .btn-view,
+    .btn-approve,
+    .btn-reject,
+    .btn-suspend,
+    .btn-featured,
+    .btn-delete,
+    .tab,
+    .pagination button {
+        transition: var(--transition);
+    }
+
+    .stat-card:active,
+    .admin-page-item:active,
+    .transaction-item:active,
+    .refund-request-item:active,
+    .toolbar-btn:active,
+    .btn-view:active,
+    .btn-approve:active,
+    .btn-reject:active,
+    .btn-suspend:active,
+    .btn-featured:active,
+    .btn-delete:active,
+    .tab.active:active,
+    .pagination button:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}

@@ -399,3 +399,524 @@ th {
         padding: 8px 12px;
     }
 }
+/* Mobile enhancements cho Unified Payments Page */
+@media (max-width: 768px) {
+    .unified-payments .main-area {
+        margin-left: 0;
+        margin-top: 80px; /* Giảm nếu header mobile nhỏ hơn */
+        padding: 1rem;
+    }
+
+    .unified-payments .content {
+        padding: 1rem;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+    }
+
+    /* View Toggle */
+    .view-toggle {
+        justify-content: center;
+        padding: 12px;
+        margin: 16px 0;
+    }
+
+    .view-toggle button {
+        padding: 10px 14px;
+        font-size: 13.5px;
+        min-height: 48px;
+    }
+
+    /* Stats Grid */
+    .stats-grid,
+    .stats-grid.enhanced {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-card .val {
+        font-size: 1.4rem;
+    }
+
+    .stat-card.highlight-card.payout-card {
+        padding: 1.25rem;
+    }
+
+    /* Status Breakdown */
+    .status-breakdown {
+        padding: 16px;
+        margin: 16px 0;
+    }
+
+    .status-breakdown h3 {
+        font-size: 1.1rem;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .status-item {
+        padding: 14px;
+    }
+
+    .status-count {
+        font-size: 1.6rem;
+    }
+
+    /* Enhanced Filters */
+    .filters.enhanced {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 16px;
+        margin: 16px 0;
+    }
+
+    .filters.enhanced input[type="date"],
+    .filters.enhanced button {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+
+    /* Table */
+    .table-wrapper,
+    .table-wrapper.enhanced {
+        padding: 0.75rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Mượt trên iOS */
+    }
+
+    .table-header {
+        padding: 16px;
+    }
+
+    .table-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .table-container table {
+        min-width: 800px; /* Đảm bảo scroll ngang hợp lý */
+    }
+
+    th, td {
+        padding: 10px 8px;
+        font-size: 0.85rem;
+    }
+
+    .product-info,
+    .user-info,
+    .payment-method,
+    .badge1,
+    .order-badge,
+    .action-btn {
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+    }
+
+    /* Pagination */
+    .pagination {
+        padding: 16px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        min-height: 44px;
+    }
+
+    .page-info {
+        font-size: 0.9rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+    }
+
+    .empty-text {
+        font-size: 1.1rem;
+    }
+
+    .empty-subtext {
+        font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        padding: 16px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .input-field {
+        padding: 12px;
+        font-size: 1rem; /* Tránh zoom iOS */
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        padding: 12px;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .unified-payments .main-area {
+        margin-top: 70px;
+        padding: 0.75rem;
+    }
+
+    .unified-payments .content {
+        padding: 0.75rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .view-toggle button {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .stat-card .val {
+        font-size: 1.3rem;
+    }
+
+    .status-breakdown h3 {
+        font-size: 1rem;
+    }
+
+    .status-count {
+        font-size: 1.5rem;
+    }
+
+    .filters.enhanced button {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+
+    th, td {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+
+    .pagination-btn {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        padding: 30px 12px;
+    }
+
+    .empty-text {
+        font-size: 1rem;
+    }
+
+    /* Tắt hover transform trên mobile nhỏ */
+    .stat-card.highlight-card.payout-card:hover,
+    .filters.enhanced button:hover:not(:disabled),
+    .pagination-btn:hover:not(:disabled),
+    .action-btn:hover {
+        transform: none;
+    }
+
+    .filters.enhanced button:active:not(:disabled),
+    .pagination-btn:active:not(:disabled),
+    .action-btn:active {
+        transform: scale(0.98);
+    }
+}
+/* ================== RESPONSIVE FIX HOÀN CHỈNH CHO UNIFIED PAYMENTS ================== */
+
+/* Tablet & Mobile chung */
+@media (max-width: 1024px) {
+    .unified-payments .main-area {
+        margin-left: 0 !important; /* Bỏ sidebar margin */
+        margin-top: 70px;
+        padding: 1rem;
+    }
+
+    .unified-payments .content {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .unified-payments .main-area {
+        margin-top: 60px;
+        padding: 0.75rem;
+    }
+
+    .unified-payments .content {
+        padding: 0.75rem;
+    }
+
+    /* Header */
+    .page-header {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem !important;
+    }
+
+    .page-header p {
+        font-size: 0.95rem;
+    }
+
+    /* View Toggle - full width, dễ chạm */
+    .view-toggle {
+        flex-direction: column;
+        padding: 12px;
+        margin: 16px 0;
+        background: #f8f9fa;
+        border-radius: 12px;
+    }
+
+    .view-toggle button {
+        width: 100%;
+        justify-content: center;
+        padding: 14px;
+        font-size: 1rem;
+        min-height: 52px;
+        border-radius: 10px;
+    }
+
+    /* Stats Grid - 1 cột */
+    .stats-grid,
+    .stats-grid.enhanced {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-card .val {
+        font-size: 1.5rem;
+    }
+
+    .stat-card.highlight-card.payout-card {
+        padding: 1.5rem;
+    }
+
+    /* Status Breakdown */
+    .status-breakdown {
+        padding: 16px;
+        margin: 20px 0;
+    }
+
+    .status-breakdown h3 {
+        font-size: 1.1rem;
+        justify-content: center;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .status-item {
+        padding: 16px;
+    }
+
+    .status-count {
+        font-size: 1.8rem;
+    }
+
+    /* Filters - dọc hoàn toàn */
+    .filters.enhanced {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .filters.enhanced input[type="date"],
+    .filters.enhanced select,
+    .filters.enhanced button {
+        padding: 14px;
+        font-size: 1rem;
+        min-height: 52px;
+        border-radius: 10px;
+    }
+
+    /* Table - scroll ngang mượt */
+    .table-wrapper.enhanced {
+        padding: 0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .table-header h3 {
+        font-size: 1.1rem;
+        justify-content: center;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-container table {
+        min-width: 900px; /* Đủ để scroll hợp lý */
+    }
+
+    th, td {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+    }
+
+    .product-info,
+    .user-info,
+    .payment-method,
+    .badge1,
+    .order-badge,
+    .action-btn {
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        min-width: 80px;
+        font-size: 0.8rem;
+    }
+
+    /* Pagination */
+    .pagination {
+        padding: 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+        min-height: 48px;
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .page-info {
+        width: 100%;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 50px 20px;
+    }
+
+    .empty-icon {
+        font-size: 56px;
+    }
+
+    .empty-text {
+        font-size: 1.2rem;
+    }
+
+    .empty-subtext {
+        font-size: 0.95rem;
+    }
+}
+
+/* Smartphone nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .unified-payments .main-area {
+        margin-top: 60px;
+        padding: 0.5rem;
+    }
+
+    .unified-payments .content {
+        padding: 0.5rem;
+    }
+
+    .page-header h1 {
+        font-size: 1.6rem !important;
+    }
+
+    .view-toggle button {
+        padding: 14px 10px;
+        font-size: 0.95rem;
+    }
+
+    .stat-card .val {
+        font-size: 1.4rem;
+    }
+
+    .status-count {
+        font-size: 1.6rem;
+    }
+
+    th, td {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+
+    .action-btn {
+        padding: 8px;
+        font-size: 0.75rem;
+        min-width: 70px;
+    }
+
+    .pagination-btn {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+        flex: 1;
+    }
+
+    /* Tắt hover nặng */
+    .stat-card.highlight-card.payout-card:hover,
+    .filters.enhanced button:hover,
+    .pagination-btn:hover,
+    .action-btn:hover {
+        transform: none !important;
+    }
+
+    .filters.enhanced button:active,
+    .pagination-btn:active,
+    .action-btn:active {
+        transform: scale(0.98);
+    }
+}

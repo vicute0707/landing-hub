@@ -1344,3 +1344,262 @@
     position: absolute !important;
     /* Absolute positioning overrides flex/grid */
 }
+/* ============================================ LPB LANDING PAGE BUILDER - CẢI TIẾN & RESPONSIVE MOBILE HOÀN HẢO ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số fix nhỏ */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .lpb-sidebar-left {
+        width: 400px;
+    }
+
+    .lpb-sidebar-right {
+        width: 280px;
+    }
+
+    .lpb-canvas-wrapper {
+        height: 82vh;
+    }
+
+    .lpb-canvas-mobile,
+    .lpb-canvas-tablet {
+        margin: 16px auto;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    /* Toolbar cố định, full width */
+    .lpb-toolbar-inner {
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .lpb-toolbar-title {
+        font-size: 18px;
+    }
+
+    .lpb-toolbar-action-btn {
+        padding: 8px 12px;
+        font-size: 13.5px;
+    }
+
+    .lpb-toolbar-action-primary {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    /* Sidebar left (Component Library) - Chuyển thành bottom drawer */
+    .lpb-sidebar-left {
+        position: fixed;
+        top: auto;
+        bottom: -100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.2);
+        transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 999;
+        padding-top: 0;
+    }
+
+    .lpb-sidebar-left.open {
+        bottom: 0;
+    }
+
+    /* Sidebar right (Properties) - Chuyển thành right drawer */
+    .lpb-sidebar-right {
+        position: fixed;
+        top: var(--toolbar-height);
+        right: -100%;
+        width: 320px;
+        max-width: 90vw;
+        height: calc(100vh - var(--toolbar-height));
+        border-radius: 20px 0 0 20px;
+        box-shadow: -12px 0 40px rgba(0, 0, 0, 0.2);
+        transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 998;
+    }
+
+    .lpb-sidebar-right.open {
+        right: 0;
+    }
+
+    .lpb-properties-panel-header {
+        padding: 16px;
+    }
+
+    .lpb-properties-panel-title {
+        font-size: 16px;
+    }
+
+    .lpb-properties-panel-content {
+        padding: 16px;
+    }
+
+    /* Canvas full width, thêm padding */
+    .lpb-canvas-wrapper {
+        height: calc(100vh - var(--toolbar-height));
+        padding: 16px;
+        margin-left: 0 !important;
+    }
+
+    .lpb-canvas {
+        margin: 0 auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Canvas viewports - ưu tiên mobile */
+    .lpb-canvas-mobile {
+        min-width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .lpb-canvas-tablet,
+    .lpb-canvas-desktop {
+        min-width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    /* Status bar ẩn trên mobile nhỏ để tiết kiệm không gian */
+    .lpb-status-bar {
+        display: none;
+    }
+
+    /* Quick edit toolkit nhỏ hơn */
+    .lpb-quick-edit-toolkit {
+        padding: 6px;
+        gap: 6px;
+    }
+
+    .lpb-quick-edit-toolkit button {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Context menu nhỏ hơn */
+    .lpb-context-menu {
+        min-width: 120px;
+    }
+
+    .lpb-context-menu-item {
+        padding: 10px 14px;
+        font-size: 13.5px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .lpb-toolbar-inner {
+        padding: 0 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .lpb-toolbar-title {
+        font-size: 16px;
+        width: 100%;
+        text-align: center;
+        order: 2;
+    }
+
+    .lpb-toolbar-left,
+    .lpb-toolbar-right {
+        width: auto;
+    }
+
+    .lpb-canvas-wrapper {
+        padding: 12px;
+    }
+
+    .lpb-quick-edit-toolkit {
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .lpb-quick-edit-toolkit button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .lpb-quick-edit-toolkit button i {
+        font-size: 13px;
+    }
+
+    /* Properties drawer full width trên màn rất nhỏ */
+    .lpb-sidebar-right {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        top: auto;
+        bottom: -100%;
+        right: 0;
+        left: 0;
+        height: auto;
+        max-height: 80vh;
+    }
+
+    .lpb-sidebar-right.open {
+        bottom: 0;
+        right: 0;
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .lpb-toolbar-action-btn,
+    .lpb-toolbar-menu-btn,
+    .lpb-toolbar-action-primary,
+    .lpb-quick-edit-toolkit button,
+    .lpb-selection-handle,
+    .lpb-context-menu-item {
+        transition: all 0.2s ease;
+    }
+
+    .lpb-toolbar-action-btn:active,
+    .lpb-toolbar-menu-btn:active,
+    .lpb-toolbar-action-primary:active,
+    .lpb-quick-edit-toolkit button:active,
+    .lpb-selection-handle:active,
+    .lpb-context-menu-item:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+}
+
+/* Handle kéo drawer trên mobile */
+.lpb-sidebar-left::before,
+.lpb-sidebar-right::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 2px;
+    z-index: 1;
+}
+
+@media (min-width: 769px) {
+    .lpb-sidebar-left::before,
+    .lpb-sidebar-right::before {
+        display: none;
+    }
+}
+
+/* Scroll mượt toàn bộ */
+.lpb-canvas-container,
+.lpb-canvas-wrapper,
+.lpb-properties-panel-content {
+    -webkit-overflow-scrolling: touch;
+}

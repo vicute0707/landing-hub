@@ -165,3 +165,175 @@
 .auth-page .tab-content .btn.google:hover {
     border: 1px solid #2d79f3;
 }
+/* ============================================ AUTH PAGE (LOGIN/REGISTER) - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ để hoàn hảo hơn trên mobile */
+
+/* Tối ưu chung */
+.auth-page {
+    min-height: 100vh;
+    padding: 20px 16px;
+    box-sizing: border-box;
+}
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .auth-page {
+        padding: 30px 20px;
+    }
+
+    .auth-page .tab-content {
+        width: 400px;
+    }
+
+    .auth-page .tab-container .tab_label {
+        width: 150px;
+        font-size: 0.85rem;
+    }
+
+    .auth-page .tab-container .indicator {
+        width: 150px;
+    }
+
+    .auth-page .tab-container .indicator.register {
+        left: calc(150px + 3px);
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .auth-page {
+        padding: 20px 16px;
+        justify-content: flex-start;
+    }
+
+    .auth-page .tab-container {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .auth-page .tab-container .tab_label {
+        width: 50%;
+        font-size: 0.95rem;
+    }
+
+    .auth-page .tab-container .indicator {
+        width: calc(50% - 3px);
+    }
+
+    .auth-page .tab-container .indicator.login {
+        left: 3px;
+    }
+
+    .auth-page .tab-container .indicator.register {
+        left: calc(50% + 3px);
+    }
+
+    .auth-page .tab-content {
+        width: 100%;
+        max-width: 420px;
+        padding: 30px 24px;
+    }
+
+    .auth-page .tab-content form {
+        width: 100%;
+        gap: 16px;
+    }
+
+    .auth-page .tab-content .flex-column > label {
+        font-size: 0.95rem;
+    }
+
+    .auth-page .tab-content .inputForm {
+        height: 54px;
+        padding-left: 14px;
+    }
+
+    .auth-page .tab-content .input {
+        font-size: 16px; /* Tránh zoom trên iOS */
+    }
+
+    .auth-page .tab-content .button-submit {
+        height: 54px;
+        font-size: 16px;
+        margin: 24px 0 12px 0;
+    }
+
+    .auth-page .tab-content .btn.google {
+        height: 54px;
+        font-size: 15.5px;
+    }
+
+    .auth-page .tab-content .p {
+        font-size: 14.5px;
+    }
+
+    .auth-page .tab-content .span {
+        font-size: 14.5px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .auth-page {
+        padding: 16px 12px;
+    }
+
+    .auth-page .tab-container {
+        border-radius: 10px;
+    }
+
+    .auth-page .tab-container .tab_label {
+        font-size: 0.9rem;
+        height: 44px;
+    }
+
+    .auth-page .tab-container .indicator {
+        height: 38px;
+        top: 3px;
+    }
+
+    .auth-page .tab-content {
+        padding: 24px 20px;
+        border-radius: 14px;
+    }
+
+    .auth-page .tab-content .inputForm {
+        height: 50px;
+    }
+
+    .auth-page .tab-content .button-submit,
+    .auth-page .tab-content .btn.google {
+        height: 50px;
+    }
+
+    .auth-page .tab-content .p {
+        font-size: 14px;
+    }
+}
+
+/* Thêm touch feedback cho các phần tử tương tác trên mobile */
+@media (max-width: 768px) {
+    .auth-page .tab-container .tab_label,
+    .auth-page .tab-content .button-submit,
+    .auth-page .tab-content .btn.google,
+    .auth-page .tab-content .span {
+        transition: all 0.2s ease;
+    }
+
+    .auth-page .tab-container .tab_label:active,
+    .auth-page .tab-content .button-submit:active,
+    .auth-page .tab-content .btn.google:active,
+    .auth-page .tab-content .span:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Cải thiện focus visible cho accessibility */
+.auth-page .tab-content .input:focus,
+.auth-page .tab-content .inputForm:focus-within {
+    box-shadow: 0 0 0 3px rgba(45, 121, 243, 0.2);
+}

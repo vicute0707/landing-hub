@@ -274,3 +274,169 @@
         padding: var(--spacing-md);
     }
 }
+/* ============================================ AI CONTENT MODAL - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ để hoàn hảo hơn trên mobile */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .ai-content-modal {
+        width: 92%;
+        max-width: 700px;
+    }
+
+    .ai-modal-header {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .ai-modal-header h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    .ai-options-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .ai-content-modal {
+        width: 96%;
+        max-width: none;
+        max-height: 95vh;
+        border-radius: var(--radius-lg);
+    }
+
+    .ai-modal-header {
+        padding: var(--spacing-md) var(--spacing-lg);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .ai-modal-header h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    .ai-modal-subtitle {
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-modal-close {
+        position: absolute;
+        top: var(--spacing-sm);
+        right: var(--spacing-sm);
+    }
+
+    .ai-modal-body {
+        padding: var(--spacing-lg);
+    }
+
+    .ai-form-group {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .ai-input,
+    .ai-select,
+    .ai-result-textarea {
+        padding: var(--spacing-lg);
+        font-size: 16px; /* Tránh zoom tự động trên iOS/Android */
+    }
+
+    .ai-options-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .ai-generate-btn {
+        padding: var(--spacing-lg);
+        font-size: var(--font-size-base);
+    }
+
+    .ai-result {
+        padding: var(--spacing-lg);
+    }
+
+    .ai-modal-footer {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-lg);
+    }
+
+    .ai-btn-cancel,
+    .ai-btn-insert {
+        width: 100%;
+        padding: var(--spacing-md);
+        font-size: var(--font-size-base);
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .ai-content-modal {
+        width: 98%;
+        border-radius: var(--radius-md);
+    }
+
+    .ai-modal-header {
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .ai-modal-header h3 {
+        font-size: var(--font-size-md);
+    }
+
+    .ai-modal-body {
+        padding: var(--spacing-md);
+    }
+
+    .ai-form-group label {
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-label-hint {
+        display: block;
+        margin-left: 0;
+        margin-top: var(--spacing-xs);
+    }
+
+    .ai-input-hint,
+    .ai-hint {
+        font-size: 11px;
+    }
+
+    .ai-result label {
+        font-size: var(--font-size-xs);
+    }
+
+    .ai-result-textarea {
+        min-height: 120px;
+    }
+}
+
+/* Thêm touch feedback cho các phần tử tương tác trên mobile */
+@media (max-width: 768px) {
+    .ai-modal-close,
+    .ai-generate-btn,
+    .ai-btn-cancel,
+    .ai-btn-insert {
+        transition: all 0.2s ease;
+    }
+
+    .ai-modal-close:active,
+    .ai-generate-btn:active,
+    .ai-btn-cancel:active,
+    .ai-btn-insert:active {
+        transform: scale(0.95);
+        opacity: 0.9;
+    }
+}
+
+/* Scroll mượt hơn cho modal trên mobile */
+.ai-content-modal {
+    -webkit-overflow-scrolling: touch;
+}

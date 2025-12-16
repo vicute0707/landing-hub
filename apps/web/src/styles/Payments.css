@@ -478,3 +478,242 @@
         padding: 0.5rem;
     }
 }
+/* Mobile enhancements cho Payments / Transactions Page */
+@media (max-width: 768px) {
+    .payments-container {
+        margin-top: 60px; /* Giảm nếu header mobile nhỏ hơn */
+    }
+
+    .payments-content {
+        padding-left: 0;
+        padding: 1rem;
+    }
+
+    /* Header */
+    .payments-header {
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .payments-header h1 {
+        font-size: 2.2rem;
+        letter-spacing: -0.8px;
+    }
+
+    .payments-header p {
+        font-size: 1rem;
+        max-width: 100%;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+    }
+
+    .stat-sublabel {
+        font-size: 0.7rem;
+    }
+
+    /* Filters */
+    .payments-filters {
+        padding: 1.25rem;
+    }
+
+    .filter-row {
+        gap: 0.75rem;
+    }
+
+    .filter-select,
+    .date-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+
+    .filter-btn,
+    .export-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        min-height: 48px; /* Touch target tốt */
+    }
+
+    /* Table */
+    .transactions-table {
+        padding: 1rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Mượt hơn trên iOS */
+    }
+
+    .transactions-table table {
+        min-width: 800px; /* Đảm bảo scroll ngang hợp lý */
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .transaction-id,
+    .payment-method,
+    .status-badge1,
+    .view-detail-btn {
+        font-size: 0.7rem;
+    }
+
+    .view-detail-btn {
+        padding: 0.4rem 0.6rem;
+    }
+
+    /* Pagination */
+    .pagination {
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.85rem;
+    }
+
+    .pagination span {
+        font-size: 0.85rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 2.5rem 1rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        padding: 16px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.4rem;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 0.75rem;
+    }
+
+    .detail-row .label {
+        font-size: 0.85rem;
+    }
+
+    .detail-row code {
+        font-size: 0.7rem;
+        word-break: break-all;
+    }
+
+    .close-btn {
+        padding: 0.85rem;
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .payments-content {
+        padding: 0.75rem;
+    }
+
+    .payments-header h1 {
+        font-size: 1.9rem;
+    }
+
+    .payments-header p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 1.3rem;
+    }
+
+    /* Filters nhỏ hơn */
+    .payments-filters {
+        padding: 1rem;
+    }
+
+    .filter-select,
+    .date-input,
+    .filter-btn,
+    .export-btn {
+        font-size: 0.9rem;
+        padding: 0.75rem;
+    }
+
+    /* Table tối ưu hơn */
+    .transactions-table th,
+    .transactions-table td {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.75rem;
+    }
+
+    /* Modal full hơn */
+    .modal-content {
+        width: 100%;
+        height: 90vh;
+        max-height: none;
+        border-radius: 16px 16px 0 0; /* Bottom sheet style nhẹ */
+        padding: 1.25rem;
+    }
+
+    /* Animation gradient nhẹ hơn để tiết kiệm hiệu năng */
+    @keyframes paymentTitleGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Touch target tối ưu */
+    .view-detail-btn,
+    .pagination button,
+    .close-btn,
+    .filter-btn,
+    .export-btn {
+        min-height: 44px;
+    }
+}

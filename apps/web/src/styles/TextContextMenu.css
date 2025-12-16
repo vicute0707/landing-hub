@@ -156,3 +156,156 @@
 .text-context-menu-items::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
+/* Mobile enhancements cho Text Context Menu */
+@media (max-width: 768px) {
+    .text-context-menu {
+        min-width: 300px;
+        max-width: 90vw; /* Chiếm phần lớn màn hình nhưng không full để tránh bị cắt */
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .text-context-menu-header {
+        padding: 14px 18px;
+    }
+
+    .text-context-menu-header span {
+        font-size: 14px;
+    }
+
+    .text-context-menu-items {
+        padding: 8px;
+        max-height: 60vh; /* Giới hạn chiều cao để không quá dài */
+    }
+
+    .text-context-menu-item {
+        padding: 14px 16px;
+        gap: 14px;
+        border-radius: 12px;
+    }
+
+    .text-context-menu-item-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 18px; /* Icon lớn hơn để dễ nhận biết */
+    }
+
+    .text-context-menu-item-label {
+        font-size: 14.5px;
+        font-weight: 600;
+    }
+
+    .text-context-menu-item-description {
+        font-size: 12.5px;
+    }
+
+    .text-context-menu-item-spinner .spinner {
+        width: 16px;
+        height: 16px;
+        border-width: 2.5px;
+    }
+
+    .text-context-menu-divider {
+        margin: 8px 0;
+    }
+
+    .text-context-menu-footer {
+        padding: 12px 18px;
+        font-size: 13px;
+    }
+
+    /* Scrollbar mượt hơn trên mobile */
+    .text-context-menu-items::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .text-context-menu-items::-webkit-scrollbar-thumb {
+        background: #9ca3af;
+        border-radius: 4px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .text-context-menu {
+        min-width: 92vw;
+        max-width: 96vw;
+        border-radius: 20px 20px 0 0; /* Bottom sheet style nhẹ nếu xuất hiện dưới */
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .text-context-menu-header {
+        padding: 16px 20px;
+    }
+
+    .text-context-menu-header span {
+        font-size: 15px;
+    }
+
+    .text-context-menu-items {
+        padding: 10px;
+        max-height: 65vh;
+    }
+
+    .text-context-menu-item {
+        padding: 16px 18px;
+        gap: 16px;
+        border-radius: 14px;
+        min-height: 56px; /* Touch target tốt */
+    }
+
+    .text-context-menu-item-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 20px;
+    }
+
+    .text-context-menu-item-label {
+        font-size: 15px;
+    }
+
+    .text-context-menu-item-description {
+        font-size: 13px;
+    }
+
+    .text-context-menu-item-spinner .spinner {
+        width: 18px;
+        height: 18px;
+        border-width: 3px;
+    }
+
+    .text-context-menu-footer {
+        padding: 14px 20px;
+        font-size: 13.5px;
+    }
+
+    /* Animation nhẹ hơn */
+    @keyframes contextMenuFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.96) translateY(-6px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    /* Tắt hover, dùng active thay thế */
+    .text-context-menu-item:hover:not(:disabled) {
+        background: #f3f4f6;
+        transform: none;
+    }
+
+    .text-context-menu-item:active:not(:disabled) {
+        background: #e5e7eb;
+        transform: scale(0.98);
+    }
+
+    /* Scrollbar mỏng */
+    .text-context-menu-items::-webkit-scrollbar {
+        width: 6px;
+    }
+}

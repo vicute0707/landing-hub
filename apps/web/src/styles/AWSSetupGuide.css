@@ -510,3 +510,285 @@ code {
         padding: 8px 12px;
     }
 }
+/* ============================================ AWS SETUP GUIDE - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ */
+
+/* Tối ưu chung */
+.aws-guide-container {
+    padding: 40px 20px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .aws-guide-container {
+        padding: 32px 24px;
+    }
+
+    .guide-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+    }
+
+    .guide-header h1 {
+        font-size: 32px;
+    }
+
+    .guide-header p {
+        font-size: 17px;
+    }
+
+    .toc {
+        padding: 20px;
+    }
+
+    .guide-section {
+        margin-bottom: 48px;
+    }
+
+    .guide-section h2 {
+        font-size: 26px;
+    }
+
+    .next-steps {
+        padding: 32px;
+    }
+
+    .next-steps-grid {
+        gap: 20px;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .aws-guide-container {
+        padding: 32px 16px;
+    }
+
+    .guide-header {
+        margin-bottom: 36px;
+        padding-bottom: 18px;
+    }
+
+    .guide-header h1 {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    .guide-header p {
+        font-size: 16.5px;
+    }
+
+    .toc {
+        padding: 18px;
+    }
+
+    .toc h3 {
+        font-size: 17px;
+    }
+
+    .toc a {
+        font-size: 14.5px;
+    }
+
+    .guide-section {
+        margin-bottom: 40px;
+    }
+
+    .guide-section h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .guide-section h3 {
+        font-size: 19px;
+    }
+
+    .guide-section p,
+    .guide-section li {
+        font-size: 15px;
+    }
+
+    .info-box,
+    .warning-box,
+    .important-box {
+        padding: 16px;
+    }
+
+    .step {
+        padding: 18px;
+    }
+
+    .code-block {
+        padding: 14px;
+        font-size: 12.5px;
+        border-radius: 8px;
+    }
+
+    .btn-copy {
+        padding: 8px 14px;
+        font-size: 12.5px;
+    }
+
+    .checklist-item {
+        padding: 12px;
+    }
+
+    .architecture-diagram {
+        padding: 20px;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+        padding: 10px 12px;
+        font-size: 13.5px;
+    }
+
+    .estimate-box {
+        padding: 18px;
+    }
+
+    .next-steps {
+        padding: 32px 24px;
+        border-radius: 14px;
+    }
+
+    .next-steps-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .next-step-card {
+        padding: 20px;
+    }
+
+    .next-step-card a {
+        padding: 10px 18px;
+        font-size: 14.5px;
+    }
+
+    .support-box {
+        padding: 28px;
+    }
+
+    .support-box h3 {
+        font-size: 22px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .aws-guide-container {
+        padding: 24px 12px;
+    }
+
+    .guide-header {
+        margin-bottom: 32px;
+    }
+
+    .guide-header h1 {
+        font-size: 26px;
+    }
+
+    .guide-header p {
+        font-size: 16px;
+    }
+
+    .toc {
+        padding: 16px;
+    }
+
+    .toc h3 {
+        font-size: 16px;
+    }
+
+    .toc a {
+        font-size: 14px;
+    }
+
+    .guide-section {
+        margin-bottom: 36px;
+    }
+
+    .guide-section h2 {
+        font-size: 22px;
+    }
+
+    .guide-section h3 {
+        font-size: 18px;
+    }
+
+    .guide-section p,
+    .guide-section li {
+        font-size: 14.5px;
+    }
+
+    .info-box,
+    .warning-box,
+    .important-box,
+    .step,
+    .next-step-card {
+        padding: 16px;
+    }
+
+    .code-block {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    .next-steps {
+        padding: 28px 20px;
+    }
+
+    .support-box {
+        padding: 24px;
+    }
+
+    .support-box h3 {
+        font-size: 20px;
+    }
+
+    .support-box p {
+        font-size: 14.5px;
+    }
+}
+
+/* Thêm touch feedback cho các phần tử tương tác trên mobile */
+@media (max-width: 768px) {
+    .btn-copy,
+    .next-step-card a,
+    .toc a,
+    .guide-section a {
+        transition: all 0.2s ease;
+    }
+
+    .btn-copy:active,
+    .next-step-card a:active,
+    .toc a:active,
+    .guide-section a:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Cuộn ngang mượt cho code block & table trên mobile */
+.code-block,
+.architecture-diagram,
+.pricing-table table {
+    -webkit-overflow-scrolling: touch;
+}
+
+.pricing-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

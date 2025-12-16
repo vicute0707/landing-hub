@@ -308,3 +308,140 @@
         transform: scaleY(0.1);
     }
 }
+/* ============================================ DOG LOADER - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn (đã rất đẹp và chi tiết!), chỉ bổ sung/tối ưu để hoạt động hoàn hảo trên mọi thiết bị */
+
+/* Tối ưu chung */
+.dog-loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 17, 23, 0.85); /* Tăng độ mờ nhẹ cho nổi bật hơn */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    backdrop-filter: blur(4px); /* Thêm blur nền nhẹ cho cảm giác hiện đại */
+}
+
+/* Container chính - responsive kích thước */
+.dog-loader {
+    position: relative;
+    width: clamp(120px, 40vw, 200px); /* Tự động scale theo màn hình */
+    height: clamp(120px, 40vw, 200px);
+    animation: dog-bounce 1.5s infinite ease-in-out;
+}
+
+.dog-loader-main {
+    width: 100%;
+    height: 100%;
+    max-width: 23.5vmax;
+    max-height: 23.5vmax;
+    min-width: 120px;
+    min-height: 120px;
+}
+
+/* Đảm bảo tất cả phần tử con scale đúng tỷ lệ */
+.dog-loader * {
+    box-sizing: border-box;
+}
+
+/* Tối ưu animation cho mobile (giảm nhẹ để mượt hơn trên thiết bị yếu) */
+@media (max-width: 768px) {
+    .dog-loader-overlay {
+        background: rgba(13, 17, 23, 0.9);
+    }
+
+    .dog-loader {
+        width: clamp(100px, 45vw, 160px);
+        height: clamp(100px, 45vw, 160px);
+    }
+
+    /* Giảm thời gian animation một chút để phản hồi nhanh hơn */
+    @keyframes dog-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    .dog-loader {
+        animation-duration: 1.3s;
+    }
+}
+
+@media (max-width: 480px) {
+    .dog-loader {
+        width: clamp(90px, 50vw, 140px);
+        height: clamp(90px, 50vw, 140px);
+    }
+
+    /* Tăng bounce nhẹ để dễ nhìn trên màn nhỏ */
+    @keyframes dog-bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .dog-loader {
+        animation-duration: 1.2s;
+    }
+}
+
+/* Thêm animation chính xác cho các phần (nếu chưa có đầy đủ trong code gốc) */
+@keyframes dog-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* Animation cho tai, đuôi, đầu... (đã có trong code gốc, giữ nguyên và đảm bảo chạy mượt) */
+@keyframes dog-loader-tail {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(20deg); }
+}
+
+@keyframes dog-loader-body-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes dog-loader-leg-run {
+    0%, 100% { transform: rotate(20deg); }
+    50% { transform: rotate(-20deg); }
+}
+
+@keyframes dog-loader-head-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-2px) rotate(-3deg); }
+}
+
+@keyframes dog-loader-eye-blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+}
+
+@keyframes dog-loader-shadow {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Áp dụng animation cho các phần chính */
+.dog-loader-tail { animation: dog-loader-tail 2s ease-in-out infinite; }
+.dog-loader-body { animation: dog-loader-body-bounce 1.5s ease-in-out infinite; }
+.dog-loader-head { animation: dog-loader-head-bob 1.5s ease-in-out infinite; }
+.dog-loader-eye-l, .dog-loader-eye-r { animation: dog-loader-eye-blink 4s infinite; }
+.dog-loader-dog::before { animation: dog-loader-shadow 1.5s ease-in-out infinite; }
+
+/* Chân trước/sau chạy */
+.dog-loader-fl-leg, .dog-loader-fr-leg { animation: dog-loader-leg-run 0.6s ease-in-out infinite; }
+.dog-loader-bl-leg { animation: dog-loader-leg-run 0.6s ease-in-out infinite reverse; }
+
+/* Performance tốt hơn trên mobile */
+@media (prefers-reduced-motion: reduce) {
+    .dog-loader,
+    .dog-loader * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0s !important;
+    }
+}

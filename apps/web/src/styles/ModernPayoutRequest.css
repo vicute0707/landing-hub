@@ -472,3 +472,142 @@
         flex-direction: column;
     }
 }
+/* Mobile enhancements (dưới 480px - typical smartphone) */
+@media (max-width: 480px) {
+    .modern-payout-modal-overlay {
+        padding: 0; /* Loại bỏ padding để modal full màn hình */
+        align-items: flex-end; /* Đẩy modal lên từ dưới lên (bottom sheet style) */
+    }
+
+    .modern-payout-modal {
+        border-radius: 20px 20px 0 0; /* Chỉ bo góc trên */
+        max-height: 95vh;
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+        min-height: 80vh; /* Đảm bảo đủ không gian */
+    }
+
+    /* Header điều chỉnh cho mobile */
+    .modern-payout-header {
+        padding: 20px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .modern-payout-header h2 {
+        font-size: 22px;
+    }
+
+    .modern-payout-header p {
+        font-size: 13px;
+    }
+
+    .modern-close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* Amount summary */
+    .modern-amount-summary,
+    .payment-method-selector,
+    .modern-payout-form {
+        padding: 20px 16px;
+    }
+
+    .amount-breakdown {
+        padding: 20px 16px;
+    }
+
+    .breakdown-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .breakdown-value {
+        font-size: 16px;
+    }
+
+    .breakdown-value.success {
+        font-size: 22px;
+    }
+
+    /* Payment method */
+    .payment-methods {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .payment-method-btn {
+        padding: 16px;
+    }
+
+    .method-name {
+        font-size: 15px;
+    }
+
+    .method-desc {
+        font-size: 12px;
+    }
+
+    /* Form */
+    .form-group-modern label {
+        font-size: 13px;
+    }
+
+    .modern-input,
+    .modern-select,
+    .modern-textarea {
+        padding: 12px 14px;
+        font-size: 15px; /* Tránh zoom trên iOS */
+    }
+
+    .input-hint {
+        font-size: 12px;
+    }
+
+    /* QR code */
+    .qr-code-display {
+        padding: 20px 16px;
+    }
+
+    .qr-code-display img {
+        max-width: 200px;
+    }
+
+    /* Alert box */
+    .payout-alert-box {
+        padding: 16px;
+    }
+
+    .alert-header h4 {
+        font-size: 15px;
+    }
+
+    .alert-list {
+        font-size: 12.5px;
+        padding-left: 18px;
+    }
+
+    /* Action buttons */
+    .modern-payout-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-modern-cancel,
+    .btn-modern-submit {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+
+    /* Tối ưu font tổng thể trên mobile nhỏ */
+    body {
+        -webkit-text-size-adjust: 100%; /* Ngăn iOS tự động zoom text */
+    }
+}

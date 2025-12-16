@@ -1,10 +1,10 @@
-import { useState, useEffect, useContext } from "react"
+import  { useState, useEffect, useContext } from "react"
 import { UserContext } from "../context/UserContext"
 import Header from "../components/Header"
 import Sidebar from "../components/Sidebar"
 import { jwtDecode } from "jwt-decode"
 import { useNavigate, useParams } from "react-router-dom"
-import axios from "axios"
+import axios from '../utils/axiosConfig';
 import AOS from "aos"
 import "aos/dist/aos.css"
 import "../styles/MarketplaceDetail.css"

@@ -155,3 +155,291 @@
     font-size: 13px;
     color: #475569;
 }
+/* Mobile enhancements cho PageContent Header & Controls */
+@media (max-width: 1024px) {
+    .pages-main {
+        flex-direction: column;
+    }
+
+    .page-content {
+        margin-left: 0;
+        padding: 16px;
+    }
+
+    .page-content .content-header {
+        padding: 16px 20px;
+    }
+
+    .page-content .create-btn {
+        padding: 14px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-content {
+        padding: 12px;
+    }
+
+    .page-content .content-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .page-content .content-header h1 {
+        font-size: 18px;
+    }
+
+    .page-content .create-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 48px; /* Touch target tốt */
+    }
+
+    /* Controls - chuyển sang dạng cột để tránh bị ép ngang */
+    .page-content .controls {
+        flex-direction: column;
+        gap: 12px;
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    .page-content .search-box {
+        width: 100%;
+    }
+
+    .page-content .search-box input {
+        font-size: 15px; /* Tránh zoom trên iOS */
+    }
+
+    .page-content .filters {
+        justify-content: space-between;
+    }
+
+    .page-content .filter-select {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Đảm bảo sticky header vẫn hoạt động tốt */
+    .page-content .content-header {
+        position: sticky;
+        top: 0;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+}
+
+@media (max-width: 480px) {
+    .page-content {
+        padding: 8px;
+    }
+
+    .page-content .content-header {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .page-content .content-header h1 {
+        font-size: 17px;
+    }
+
+    .page-content .create-btn {
+        padding: 12px 16px;
+        font-size: 14.5px;
+        gap: 6px;
+    }
+
+    .page-content .create-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Filters xếp dọc nếu quá chật */
+    .page-content .filters {
+        flex-direction: column;
+    }
+
+    .page-content .filter-select {
+        width: 100%;
+        padding: 12px 10px;
+        font-size: 14.5px;
+    }
+
+    .page-content .search-box {
+        padding: 10px 12px;
+    }
+
+    .page-content .search-box input {
+        font-size: 16px; /* Đảm bảo không zoom trên iOS */
+    }
+
+    /* Các phần nhỏ khác nếu có trong list */
+    .page-content1 .page-url a {
+        font-size: 11.5px;
+    }
+
+    .page-content1 .status {
+        font-size: 11px;
+        padding: 3px 7px;
+    }
+
+    .page-content1 .status-info {
+        font-size: 11px;
+    }
+
+    .page-content1 .pagination {
+        font-size: 12.5px;
+    }
+
+    /* Touch target cho more-btn */
+    .page-content1 .more-btn {
+        padding: 8px;
+    }
+}
+/* Mobile optimizations cho LandingList & Action Buttons trong PageContent */
+@media (max-width: 768px) {
+    /* Card layout trong LandingList - đảm bảo không bị dãn */
+    .landing-list .page-card {
+        flex-direction: column;
+    }
+
+    /* Khu vực action buttons - tránh bị dãn rộng */
+    .page-actions,
+    .action-buttons1,
+    .page-actions .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 8px;
+        flex-wrap: wrap; /* Cho phép xuống dòng nếu quá chật */
+    }
+
+    /* Các nút action riêng lẻ - kích thước cố định, dễ chạm */
+    .btn-view1,
+    .btn-edit,
+    .btn-publish,
+    .btn-deploy,
+    .btn-delete,
+    .action-btn,
+    .view-detail-btn,
+    .more-btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-radius: 8px;
+        flex-shrink: 0; /* Không bị co lại */
+    }
+
+    /* Đặc biệt nút Deploy - tránh bị dãn */
+    .btn-deploy {
+        background: #7c3aed; /* Màu tím để nổi bật */
+        color: white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .btn-deploy:hover {
+        background: #6d28d9;
+    }
+
+    /* Nếu nút có icon + text, giới hạn chiều rộng */
+    .action-btn {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Menu dropdown (nếu dùng more-btn) */
+    .more-btn {
+        width: 44px;
+        height: 44px;
+        padding: 0;
+    }
+
+    /* Card content - tránh bị kéo dãn bởi nút */
+    .card-content,
+    .page-info {
+        flex: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-actions,
+    .action-buttons1 {
+        gap: 8px;
+        padding: 10px 6px;
+    }
+
+    .btn-view1,
+    .btn-edit,
+    .btn-publish,
+    .btn-deploy,
+    .btn-delete,
+    .action-btn {
+        min-width: 48px;
+        min-height: 48px;
+        padding: 10px;
+        font-size: 12.5px;
+    }
+
+    /* Ẩn text, chỉ giữ icon trên màn rất nhỏ để tiết kiệm không gian */
+    .btn-view1 span,
+    .btn-edit span,
+    .btn-publish span,
+    .btn-deploy span,
+    .btn-delete span,
+    .action-btn span {
+        display: none;
+    }
+
+    /* Chỉ giữ icon */
+    .btn-view1 svg,
+    .btn-edit svg,
+    .btn-publish svg,
+    .btn-deploy svg,
+    .btn-delete svg,
+    .action-btn svg {
+        margin: 0;
+    }
+
+    /* Tooltip khi hover/chạm (nếu có) sẽ hiển thị text */
+    .action-btn {
+        position: relative;
+    }
+
+    .action-btn::after {
+        content: attr(data-tooltip); /* Dùng data-tooltip trong JSX */
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 10;
+    }
+
+    .action-btn:hover::after,
+    .action-btn:active::after {
+        opacity: 1;
+    }
+}

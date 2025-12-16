@@ -397,3 +397,259 @@
         min-width: auto;
     }
 }
+/* Mobile enhancements cho Responsive Toolbar Enhanced */
+@media (max-width: 1024px) {
+    .responsive-toolbar-enhanced {
+        padding: 12px 16px;
+        gap: 12px;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-section {
+        gap: 10px;
+    }
+
+    .view-mode-group {
+        padding: 6px;
+        border-radius: 12px;
+    }
+
+    .view-mode-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+        min-height: 44px;
+    }
+
+    .mode-label {
+        display: none; /* Đã có, giữ để gọn */
+    }
+
+    .mode-width {
+        font-size: 10px;
+    }
+
+    .current-view-info {
+        display: none; /* Đã có */
+    }
+
+    .mobile-tips {
+        margin-left: 0;
+        padding: 8px 12px;
+    }
+
+    .mobile-tips .tip-text {
+        display: none; /* Đã có */
+    }
+
+    .toolbar-action-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+        min-height: 44px;
+    }
+
+    .toolbar-action-btn span {
+        display: none;
+    }
+
+    .zoom-text {
+        font-size: 13px;
+    }
+
+    .device-info-panel {
+        right: 12px;
+        left: 12px;
+        min-width: auto;
+        max-width: none;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .info-value {
+        font-size: 20px;
+    }
+
+    .mobile-warnings {
+        padding: 14px;
+    }
+
+    .mobile-warnings h4 {
+        font-size: 13px;
+    }
+
+    .mobile-warnings li {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .responsive-toolbar-enhanced {
+        padding: 10px 12px;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .toolbar-section {
+        gap: 8px;
+    }
+
+    .view-mode-group {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .view-mode-btn {
+        flex: 1;
+        padding: 12px 10px;
+        font-size: 13.5px;
+        min-height: 48px;
+    }
+
+    .sync-indicator {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .sync-indicator span {
+        display: inline; /* Hiển thị lại trên tablet nếu muốn */
+    }
+
+    .toolbar-action-btn {
+        padding: 12px;
+        min-height: 48px;
+        font-size: 13.5px;
+    }
+
+    .toolbar-action-btn span {
+        display: inline;
+    }
+
+    .device-info-panel {
+        right: 8px;
+        left: 8px;
+        padding: 20px;
+    }
+
+    .info-grid {
+        gap: 20px;
+    }
+
+    .info-value {
+        font-size: 22px;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .responsive-toolbar-enhanced {
+        padding: 8px 10px;
+        gap: 8px;
+        flex-direction: column;
+    }
+
+    .toolbar-section {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .view-mode-group {
+        width: 100%;
+    }
+
+    .view-mode-btn {
+        padding: 14px 10px;
+        font-size: 14px;
+        min-height: 52px;
+    }
+
+    .sync-indicator {
+        padding: 10px 14px;
+        font-size: 12.5px;
+    }
+
+    .sync-indicator span {
+        display: none; /* Ẩn text, chỉ giữ icon */
+    }
+
+    .mobile-tips {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+
+    .mobile-tips .tip-icon {
+        font-size: 18px;
+    }
+
+    .toolbar-action-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 14px;
+        min-height: 52px;
+        justify-content: center;
+    }
+
+    .toolbar-action-btn span {
+        display: inline;
+    }
+
+    .zoom-text {
+        font-size: 14px;
+    }
+
+    .device-info-panel {
+        right: 4px;
+        left: 4px;
+        padding: 16px;
+    }
+
+    .info-value {
+        font-size: 20px;
+    }
+
+    .mobile-warnings {
+        padding: 16px;
+    }
+
+    .mobile-warnings h4 {
+        font-size: 14px;
+    }
+
+    .mobile-warnings li {
+        font-size: 13px;
+    }
+
+    /* Animation nhẹ hơn để tiết kiệm pin */
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .sync-indicator svg {
+        animation-duration: 3s;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.9; }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+
+    /* Tắt hover transform */
+    .view-mode-btn:hover,
+    .toolbar-action-btn:hover {
+        transform: none;
+    }
+
+    .view-mode-btn:active,
+    .toolbar-action-btn:active {
+        transform: scale(0.98);
+    }
+}

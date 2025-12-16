@@ -266,3 +266,235 @@
     min-width: 40px;
     text-align: center;
 }
+/* ============================================ ADMIN USER MANAGEMENT - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ để hoàn hảo hơn trên mobile */
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .admin-user-content {
+        margin-left: 80px;
+        padding: 2rem;
+    }
+
+    .admin-header {
+        padding: 1.75rem;
+    }
+
+    .header-title h1 {
+        font-size: 1.65rem;
+    }
+
+    .icon-wrapper {
+        width: 55px;
+        height: 55px;
+        font-size: 1.6rem;
+    }
+
+    .admin-user-form {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.25rem;
+        padding: 1.75rem;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .admin-user-container {
+        flex-direction: column;
+    }
+
+    .admin-user-main {
+        width: 100%;
+    }
+
+    .admin-user-content {
+        margin-left: 0;
+        margin-top: 0;
+        padding: 1.5rem;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .header-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .header-title h1 {
+        font-size: 1.6rem;
+    }
+
+    .header-title p {
+        font-size: 0.95rem;
+    }
+
+    .icon-wrapper {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+        align-self: flex-start;
+    }
+
+    .admin-user-form {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        padding: 1.5rem;
+    }
+
+    .admin-user-form input,
+    .admin-user-form select {
+        padding: 0.9rem 1rem;
+        font-size: 16px; /* Tránh zoom trên iOS */
+    }
+
+    .admin-user-form button {
+        width: 100%;
+        justify-self: stretch;
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+
+    .user-table-container {
+        padding: 1.5rem;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .user-table th {
+        font-size: 0.75rem;
+    }
+
+    .action-cell {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn-edit,
+    .btn-delete {
+        width: 100%;
+        justify-content: center;
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .role-badge,
+    .sub-badge,
+    .login-count-badge {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    /* Table cuộn ngang mượt */
+    .user-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .user-table {
+        min-width: 800px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .admin-user-content {
+        padding: 1rem;
+    }
+
+    .admin-header {
+        padding: 1.25rem;
+        border-radius: 14px;
+    }
+
+    .header-title h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-title p {
+        font-size: 0.9rem;
+    }
+
+    .icon-wrapper {
+        width: 55px;
+        height: 55px;
+        font-size: 1.6rem;
+    }
+
+    .admin-user-form {
+        padding: 1.25rem;
+        gap: 1rem;
+    }
+
+    .user-table-container {
+        padding: 1rem;
+        border-radius: 14px;
+    }
+
+    .user-table {
+        min-width: 700px;
+    }
+
+    .user-table th,
+    .user-table td {
+        padding: 0.75rem 0.85rem;
+        font-size: 0.85rem;
+    }
+
+    .user-table th {
+        font-size: 0.7rem;
+    }
+
+    .role-badge,
+    .sub-badge,
+    .login-count-badge {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.55rem;
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .admin-header,
+    .admin-user-form,
+    .user-table-container,
+    .btn-primary,
+    .btn-edit,
+    .btn-delete,
+    .user-table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .admin-header:active,
+    .admin-user-form:active,
+    .user-table-container:active,
+    .btn-primary:active,
+    .btn-edit:active,
+    .btn-delete:active,
+    .user-table tbody tr:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Cải thiện scroll mượt cho table trên mobile */
+.user-table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.user-table-container::-webkit-scrollbar-thumb {
+    background: rgba(108, 92, 231, 0.3);
+    border-radius: 4px;
+}

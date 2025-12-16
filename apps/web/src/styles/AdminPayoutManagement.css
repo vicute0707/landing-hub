@@ -425,3 +425,274 @@
         width: 100%;
     }
 }
+/* ============================================ RESPONSIVE DESIGN - CẢI TIẾN CHO MOBILE ============================================ */
+
+/* Tablet lớn (≤1024px) */
+@media (max-width: 1024px) {
+    .admin-payout-main {
+        margin-left: 80px; /* Đã có, giữ nguyên nếu sidebar thu gọn */
+    }
+
+    .admin-payout-content {
+        padding: 1.5rem;
+    }
+
+    .payout-header h1 {
+        font-size: 2.4rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .admin-payout-main {
+        margin-left: 0; /* Sidebar ẩn hoàn toàn trên mobile */
+    }
+
+    .admin-payout-content {
+        padding: 1.25rem;
+        max-width: 100%;
+    }
+
+    .payout-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .payout-header h1 {
+        font-size: 2.1rem;
+        letter-spacing: -0.5px;
+    }
+
+    .payout-header p {
+        font-size: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+    .stat-icon svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .payout-filters {
+        padding: 1rem;
+    }
+
+    .filter-select {
+        min-width: 100%;
+        margin-bottom: 0.75rem;
+    }
+
+    /* Table responsive - cuộn ngang mượt */
+    .payouts-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 1rem;
+    }
+
+    .payouts-table table {
+        min-width: 700px;
+    }
+
+    .payouts-table th,
+    .payouts-table td {
+        padding: 0.875rem;
+        font-size: 0.825rem;
+    }
+
+    .user-info {
+        gap: 0.75rem;
+    }
+
+    .user-info small {
+        font-size: 0.7rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        width: 100%;
+        padding: 0.625rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .modal-content1 {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .modal-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-cancel,
+    .btn-confirm,
+    .btn-danger {
+        width: 100%;
+        padding: 0.875rem;
+    }
+}
+
+/* Mobile nhỏ (≤480px) - Tối ưu trải nghiệm điện thoại */
+@media (max-width: 480px) {
+    .admin-payout-content {
+        padding: 1rem;
+    }
+
+    .payout-header h1 {
+        font-size: 1.85rem;
+        line-height: 1.2;
+    }
+
+    .payout-header p {
+        font-size: 0.95rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+    }
+
+    .stat-value {
+        font-size: 1.35rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .payout-filters {
+        padding: 0.875rem;
+    }
+
+    .filter-select {
+        font-size: 0.95rem; /* Tránh zoom trên iOS */
+    }
+
+    .payouts-table table {
+        min-width: 600px;
+    }
+
+    .payouts-table th,
+    .payouts-table td {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .status-badge-a {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.7rem;
+    }
+
+    .empty-state {
+        padding: 2rem;
+        font-size: 0.95rem;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .pagination button {
+        width: 100%;
+        padding: 0.625rem;
+    }
+
+    .modal-content1 {
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    .modal-content1 h2 {
+        font-size: 1.15rem;
+    }
+
+    .modal-info p {
+        font-size: 0.825rem;
+    }
+
+    .form-group label {
+        font-size: 0.825rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 0.625rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Thêm touch feedback cho tương tác tốt hơn trên mobile */
+@media (max-width: 768px) {
+    .stat-card,
+    .payouts-table tr,
+    .btn-approve,
+    .btn-reject,
+    .btn-cancel,
+    .btn-confirm,
+    .btn-danger,
+    .pagination button,
+    .filter-select {
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:active,
+    .payouts-table tr:active,
+    .btn-approve:active,
+    .btn-reject:active,
+    .btn-cancel:active,
+    .btn-confirm:active,
+    .btn-danger:active,
+    .pagination button:active,
+    .filter-select:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Animation cho header gradient */
+@keyframes payoutHeaderGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

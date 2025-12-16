@@ -219,3 +219,195 @@
         width: 100%;
     }
 }
+/* Mobile enhancements cho Payout Request Modal */
+@media (max-width: 640px) {
+    .payout-modal-overlay {
+        padding: 0;
+        align-items: flex-end; /* Đẩy modal từ dưới lên - bottom sheet style */
+        backdrop-filter: blur(8px); /* Tăng blur nhẹ để nổi bật hơn */
+    }
+
+    .payout-modal {
+        width: 100%;
+        max-width: none;
+        border-radius: 20px 20px 0 0; /* Chỉ bo góc trên */
+        max-height: 95vh;
+        height: auto;
+        min-height: 70vh;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .payout-modal-header {
+        padding: 1.25rem 1rem;
+        position: relative;
+    }
+
+    .payout-modal-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        padding: 0.75rem;
+        font-size: 1.5rem;
+    }
+
+    /* Thêm handle bar để kéo modal (visual cue) */
+    .payout-modal-header::before {
+        content: '';
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 5px;
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    .payout-amount-display {
+        padding: 1.75rem 1rem;
+    }
+
+    .amount-value {
+        font-size: 1.75rem;
+    }
+
+    .amount-label {
+        font-size: 0.9rem;
+    }
+
+    .amount-note {
+        font-size: 0.8rem;
+    }
+
+    .payout-form {
+        padding: 1.25rem 1rem;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.85rem;
+        font-size: 1rem; /* ≥16px để tránh zoom trên iOS */
+    }
+
+    .form-group small {
+        font-size: 0.8rem;
+    }
+
+    .payout-info-box {
+        padding: 1rem;
+    }
+
+    .payout-info-box h4 {
+        font-size: 0.9rem;
+    }
+
+    .payout-info-box li {
+        font-size: 0.8rem;
+    }
+
+    .payout-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        min-height: 52px; /* Touch target rất tốt */
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .payout-modal-overlay {
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .payout-modal {
+        border-radius: 24px 24px 0 0;
+        min-height: 80vh;
+    }
+
+    .payout-modal-header {
+        padding: 1rem;
+    }
+
+    .payout-modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .payout-amount-display {
+        padding: 1.5rem 1rem;
+    }
+
+    .amount-value {
+        font-size: 1.6rem;
+    }
+
+    .payout-form {
+        padding: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.8rem;
+        font-size: 1rem;
+    }
+
+    .payout-info-box {
+        padding: 0.9rem;
+    }
+
+    .payout-info-box ul {
+        padding-left: 1rem;
+    }
+
+    .payout-info-box li {
+        font-size: 0.78rem;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        padding: 0.95rem 1.4rem;
+        font-size: 0.95rem;
+        min-height: 50px;
+    }
+
+    /* Animation mượt hơn, nhẹ hơn */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Tắt hover transform trên mobile nhỏ */
+    .btn-submit:hover:not(:disabled) {
+        transform: none;
+    }
+
+    .btn-submit:active:not(:disabled) {
+        transform: scale(0.98);
+    }
+}

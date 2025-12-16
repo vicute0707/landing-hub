@@ -439,3 +439,263 @@
         flex-direction: column;
     }
 }
+/* ============================================ MY ORDERS & MARKETPLACE ORDERS - CẢI TIẾN & RESPONSIVE MOBILE ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ */
+
+/* Tối ưu chung */
+.my-orders-container {
+    min-height: 100vh;
+    padding-top: 70px; /* Đẩy nội dung xuống dưới toolbar cố định nếu có */
+}
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .my-orders-content {
+        margin-left: 200px;
+        padding: 2rem;
+    }
+
+    .orders-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .order-image {
+        width: 180px;
+        height: 130px;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .my-orders-content {
+        margin-left: 0;
+        margin-top: 60px;
+        padding: 1.5rem 1rem;
+    }
+
+    .my-orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+        margin-bottom: 1.75rem;
+    }
+
+    .my-orders-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .my-orders-header p {
+        font-size: 0.95rem;
+    }
+
+    .orders-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 0.5rem;
+        gap: 0.75rem;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-button {
+        min-width: 140px;
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .orders-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .stat-card1 {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-value {
+        font-size: 1.6rem;
+    }
+
+    .orders-filter {
+        margin-bottom: 1.5rem;
+    }
+
+    .status-filter {
+        width: 100%;
+        min-width: unset;
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+    }
+
+    .orders-list {
+        gap: 1.25rem;
+    }
+
+    .order-card {
+        border-radius: 14px;
+    }
+
+    .order-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .order-body {
+        flex-direction: column;
+        padding: 1.25rem;
+        gap: 1.25rem;
+    }
+
+    .order-image {
+        width: 100%;
+        height: 220px;
+        border-radius: 10px;
+    }
+
+    .order-details h3 {
+        font-size: 1.15rem;
+    }
+
+    .order-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+
+    .btn-download,
+    .btn-view-detail,
+    .btn-primary {
+        flex: 1;
+        padding: 0.875rem;
+        font-size: 0.95rem;
+        justify-content: center;
+    }
+
+    .price-value,
+    .revenue-value {
+        font-size: 1.4rem;
+    }
+
+    .empty-state,
+    .loading-spinner {
+        padding: 3rem 1.5rem;
+    }
+
+    .pagination {
+        margin-top: 1.75rem;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .pagination-btn {
+        padding: 0.75rem 1.25rem;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .my-orders-content {
+        padding: 1rem;
+    }
+
+    .my-orders-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .orders-tabs {
+        padding: 0.5rem 0.25rem;
+    }
+
+    .tab-button {
+        min-width: 120px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .stat-card1 {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .order-header {
+        padding: 0.875rem;
+    }
+
+    .order-body {
+        padding: 1rem;
+    }
+
+    .order-image {
+        height: 180px;
+    }
+
+    .order-actions {
+        flex-direction: column;
+    }
+
+    .btn-download,
+    .btn-view-detail,
+    .btn-primary {
+        padding: 0.875rem;
+    }
+
+    .price-value,
+    .revenue-value {
+        font-size: 1.3rem;
+    }
+
+    .empty-state,
+    .loading-spinner {
+        padding: 2.5rem 1rem;
+    }
+}
+
+/* Thêm touch feedback cho mobile */
+@media (max-width: 768px) {
+    .tab-button,
+    .stat-card1,
+    .order-card,
+    .btn-download,
+    .btn-view-detail,
+    .btn-primary,
+    .pagination-btn {
+        transition: all 0.2s ease;
+    }
+
+    .tab-button:active,
+    .stat-card1:active,
+    .order-card:active,
+    .btn-download:active,
+    .btn-view-detail:active,
+    .btn-primary:active,
+    .pagination-btn:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
+
+/* Scroll mượt cho tabs & table nếu cần */
+.orders-tabs,
+.orders-list {
+    -webkit-overflow-scrolling: touch;
+}

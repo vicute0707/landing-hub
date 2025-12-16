@@ -686,3 +686,217 @@
         background-position: 0% 50%;
     }
 }
+/* Mobile enhancements cho My Sales Page */
+@media (max-width: 768px) {
+    .my-sales-container {
+        margin-top: 60px; /* Giảm nếu header mobile nhỏ hơn */
+    }
+
+    .my-sales-content {
+        margin-left: 0; /* Bỏ sidebar margin trên mobile */
+        padding: 0 12px;
+    }
+
+    /* Header */
+    .my-sales-header {
+        padding: 16px 0;
+        margin-bottom: 20px;
+    }
+
+    .my-sales-header h1 {
+        font-size: 2rem; /* Giảm kích thước title */
+        letter-spacing: -0.5px;
+    }
+
+    .my-sales-header p {
+        font-size: 0.9rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0 12px;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-icon-wrapper {
+        width: 48px;
+        height: 48px;
+    }
+
+    .stat-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .stat-label {
+        font-size: 0.78rem;
+    }
+
+    /* Filter */
+    .filter-section {
+        padding: 0 12px;
+    }
+
+    .status-filter {
+        width: 100%;
+        min-width: auto;
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+
+    /* Page List Grid */
+    .pages-list1 {
+        gap: 16px;
+        padding: 12px;
+    }
+
+    .page-image {
+        height: 200px; /* Giữ tỷ lệ đẹp trên mobile */
+    }
+
+    .page-info {
+        padding: 14px;
+    }
+
+    .page-info h3 {
+        font-size: 1.05rem;
+    }
+
+    .page-description {
+        font-size: 0.85rem;
+        -webkit-line-clamp: 3; /* Cho phép hiển thị nhiều dòng hơn trên mobile */
+    }
+
+    /* Actions */
+    .page-actions {
+        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .page-price {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .action-buttons1 {
+        justify-content: center;
+    }
+
+    .btn-view1,
+    .btn-delete {
+        width: 48px;
+        height: 48px;
+        transform: scale(0.85); /* Vẫn giữ hiệu ứng hover nhưng dễ chạm hơn */
+    }
+
+    .page-item:hover .btn-view1,
+    .page-item:hover .btn-delete {
+        transform: scale(1);
+    }
+
+    /* Status badge */
+    .status-badge {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        top: 10px;
+        right: 10px;
+    }
+
+    /* Rejection reason */
+    .rejection-reason {
+        font-size: 0.78rem;
+        -webkit-line-clamp: 2;
+    }
+}
+
+/* Extra small devices (≤480px - smartphone nhỏ) */
+@media (max-width: 480px) {
+    .my-sales-content {
+        padding: 0 8px;
+    }
+
+    .my-sales-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .my-sales-header p {
+        font-size: 0.85rem;
+    }
+
+    .stats-grid {
+        padding: 0 8px;
+    }
+
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+    }
+
+    .stat-icon-wrapper {
+        margin-right: 0;
+        margin-bottom: 8px;
+    }
+
+    .pages-list1 {
+        gap: 14px;
+        padding: 8px;
+    }
+
+    .page-image {
+        height: 180px;
+    }
+
+    .page-info h3 {
+        font-size: 1rem;
+    }
+
+    .page-category {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+    }
+
+    .page-meta1 {
+        font-size: 0.7rem;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    /* Button add full width & lớn hơn để dễ chạm */
+    .btn-add {
+        padding: 14px 20px;
+        font-size: 0.95rem;
+        min-height: 48px; /* Touch target tốt */
+    }
+
+    /* Đảm bảo touch target đủ lớn cho các phần tử tương tác */
+    .status-filter,
+    .btn-view1,
+    .btn-delete,
+    .page-item {
+        min-height: 44px; /* iOS/Android recommendation */
+    }
+
+    /* Tối ưu hiệu năng animation trên mobile nhỏ */
+    .page-item:hover .page-image img {
+        animation-duration: 12s; /* Chậm hơn một chút để tiết kiệm pin */
+    }
+
+    /* Gradient title nhẹ hơn */
+    @keyframes flowGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+}

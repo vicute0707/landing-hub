@@ -461,3 +461,293 @@
         font-size: 28px;
     }
 }
+/* ============================================ ADMIN SYSTEM REPORT - CẢI TIẾN & RESPONSIVE MOBILE 2025 ============================================ */
+
+/* Giữ nguyên toàn bộ CSS gốc của bạn, chỉ bổ sung/tối ưu phần responsive & một số tinh chỉnh nhỏ để hoàn hảo hơn trên mobile */
+
+/* Tối ưu chung */
+.admin-report {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    min-height: 100vh;
+}
+
+/* Loading & Error state đẹp hơn trên mobile */
+.admin-report.loading,
+.admin-report.error {
+    min-height: 60vh;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* ================== RESPONSIVE CẢI TIẾN ================== */
+
+/* Tablet lớn (≤1200px) */
+@media (max-width: 1200px) {
+    .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .report-header {
+        padding-bottom: 16px;
+    }
+
+    .report-title h1 {
+        font-size: 28px;
+    }
+
+    .date-range-filter {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-range-filter input {
+        width: 100%;
+    }
+}
+
+/* Tablet nhỏ & Mobile lớn (≤768px) */
+@media (max-width: 768px) {
+    .admin-report {
+        padding: 24px 16px;
+    }
+
+    .report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+    }
+
+    .report-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .report-title h1 {
+        font-size: 26px;
+        line-height: 1.2;
+    }
+
+    .report-title p {
+        font-size: 15px;
+    }
+
+    .report-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .btn-refresh,
+    .btn-download,
+    .btn-filter {
+        flex: 1;
+        min-width: 120px;
+        justify-content: center;
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+
+    .date-range-filter {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .date-range-filter input {
+        padding: 12px 14px;
+        font-size: 16px; /* Tránh zoom trên iOS */
+    }
+
+    .overview-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .overview-card {
+        padding: 20px;
+    }
+
+    .card-value {
+        font-size: 28px;
+    }
+
+    .section {
+        padding: 24px;
+    }
+
+    .section h2 {
+        font-size: 19px;
+    }
+
+    .transaction-grid,
+    .payment-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .transaction-card,
+    .payment-card {
+        padding: 20px;
+    }
+
+    .transaction-card .count {
+        font-size: 26px;
+    }
+
+    .payment-card .amount {
+        font-size: 20px;
+    }
+
+    .daily-chart {
+        height: 240px;
+        gap: 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px 8px;
+    }
+
+    .chart-bar-wrapper {
+        min-width: 32px;
+    }
+
+    .chart-bar {
+        max-width: 32px;
+    }
+
+    .bar-label {
+        font-size: 8.5px;
+        transform: rotate(-45deg);
+        white-space: nowrap;
+    }
+
+    .bar-info .value {
+        font-size: 9px;
+    }
+
+    .leaderboard-table table {
+        min-width: 700px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+
+    .report-footer {
+        padding: 20px;
+        font-size: 13.5px;
+    }
+}
+
+/* Mobile nhỏ (≤480px) */
+@media (max-width: 480px) {
+    .admin-report {
+        padding: 20px 12px;
+    }
+
+    .report-title h1 {
+        font-size: 24px;
+    }
+
+    .report-actions {
+        flex-direction: column;
+    }
+
+    .btn-refresh,
+    .btn-download,
+    .btn-filter {
+        width: 100%;
+    }
+
+    .overview-card {
+        padding: 18px;
+    }
+
+    .card-value {
+        font-size: 26px;
+    }
+
+    .section {
+        padding: 20px;
+    }
+
+    .section h2 {
+        font-size: 18px;
+    }
+
+    .transaction-card .count {
+        font-size: 24px;
+    }
+
+    .payment-card {
+        padding: 18px;
+    }
+
+    .payment-card .amount {
+        font-size: 18px;
+    }
+
+    .daily-chart {
+        height: 200px;
+    }
+
+    .chart-bar-wrapper {
+        min-width: 28px;
+    }
+
+    .chart-bar {
+        max-width: 28px;
+    }
+
+    .bar-label {
+        font-size: 8px;
+    }
+
+    .leaderboard-table table {
+        min-width: 600px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+        padding: 10px 12px;
+        font-size: 13.5px;
+    }
+
+    .report-footer {
+        padding: 18px;
+        font-size: 13px;
+    }
+
+    .report-footer .report-year {
+        font-size: 13.5px;
+    }
+}
+
+/* Thêm touch feedback cho tương tác tốt hơn trên mobile */
+@media (max-width: 768px) {
+    .overview-card,
+    .transaction-card,
+    .payment-card,
+    .btn-refresh,
+    .btn-download,
+    .btn-filter,
+    .leaderboard-table tr {
+        transition: all 0.2s ease;
+    }
+
+    .overview-card:active,
+    .transaction-card:active,
+    .payment-card:active,
+    .btn-refresh:active,
+    .btn-download:active,
+    .btn-filter:active,
+    .leaderboard-table tr:active {
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+}
