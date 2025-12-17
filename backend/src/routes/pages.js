@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pagesController = require('../controllers/pages');
-const authenticate = require('../middleware/auth');
+const authenticate = require('../middleware/authMiddleware');
 
 // Routes
 router.get('/', authenticate, pagesController.getPages);
