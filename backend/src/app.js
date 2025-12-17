@@ -13,7 +13,7 @@ mongoose.connect(process.env.MONGO_URI)
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:5000',
-
+    'https://api.landinghub.shop',
     // Frontend CloudFront + domain
     'https://landinghub.shop',
     'https://www.landinghub.shop',
@@ -23,22 +23,30 @@ const allowedOrigins = [
 // CORS Configuration
 const corsOptions = {
     origin: function (origin, callback) {
+        // Allow non-browser requests (Postman, server-to-server)
         if (!origin) return callback(null, true);
+
+        // Log để debug
+        console.log('🔍 CORS Request from origin:', origin);
 
         if (
             allowedOrigins.includes(origin) ||
             origin.endsWith('.landinghub.shop') ||
             origin.endsWith('.cloudfront.net')
         ) {
+            console.log('✅ CORS ALLOWED:', origin);
             callback(null, true);
         } else {
             console.warn('❌ CORS BLOCKED:', origin);
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false); // Quan trọng: trả false thay vì throw error
         }
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 };
 
 app.use(cors(corsOptions));
