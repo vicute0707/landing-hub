@@ -64,6 +64,8 @@ jobs:
           MOMO_ENDPOINT=${{ secrets.MOMO_ENDPOINT }}
           MOMO_PARTNER_CODE=${{ secrets.MOMO_PARTNER_CODE }}
           MOMO_ACCESS_KEY=${{ secrets.MOMO_ACCESS_KEY }}
+          MOMO_IPN_URL=${{ secrets.MOMO_IPN_URL }}
+          MOMO_RETURN_URL=${{ secrets.MOMO_RETURN_URL }}
           MOMO_SECRET_KEY=${{ secrets.MOMO_SECRET_KEY }}
           VNPAY_TMN_CODE=${{ secrets.VNPAY_TMN_CODE }}
           VNPAY_SECRET_KEY=${{ secrets.VNPAY_SECRET_KEY }}
