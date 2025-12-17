@@ -1420,13 +1420,51 @@ const renderGalleryHTML = (element, isChild) => {
 /**
  * Render section với children
  */
+/**
+ * Render section với children – Phiên bản đã sửa lỗi background-image
+ */
 const renderSectionHTML = (section) => {
-    const { id, componentData = {}, styles = {}, size = {}, position = {}, children = [] } = section;
+    const {
+        id,
+        componentData = {},
+        styles = {},
+        size = {},
+        position = {},
+        children = []
+    } = section;
 
     // Render children
-    const childrenHTML = children.map(child =>
-        renderElementHTML(child, true)
-    ).join('\n');
+    const childrenHTML = children
+        .map(child => renderElementHTML(child, true))
+        .join('\n');
+
+    // === XỬ LÝ BACKGROUND IMAGE AN TOÀN ===
+    let backgroundImageStyle = 'none';
+    let backgroundSize = componentData.backgroundSize || 'cover';
+    let backgroundPosition = componentData.backgroundPosition || 'center';
+
+    if (componentData.backgroundImage) {
+        let cleanUrl = componentData.backgroundImage.trim();
+
+        // Loại bỏ wrapper url(...) nếu đã có (tránh double url())
+        const urlMatch = cleanUrl.match(/url\(['"]?([^'"]+)['"]?\)/i);
+        if (urlMatch) {
+            cleanUrl = urlMatch[1];
+        }
+
+        // Escape dấu ngoặc kép trong URL nếu cần (an toàn cho inline style)
+        backgroundImageStyle = `url("${cleanUrl}")`;
+    }
+
+    // Nếu có backgroundColor riêng (không bắt buộc phải có backgroundImage)
+    const backgroundColor = componentData.backgroundColor || styles.backgroundColor || 'transparent';
+
+    // Overlay
+    const overlayColor = componentData.overlayColor || 'transparent';
+    const overlayOpacity = componentData.overlayOpacity ?? 0;
+
+    // Padding cho container
+    const containerPadding = componentData.padding || styles.padding || '20px';
 
     return `
         <section
@@ -1443,6 +1481,7 @@ const renderSectionHTML = (section) => {
                 transform: translateX(-50%);
                 width: 1200px;
                 height: ${size.height || 400}px;
+                overflow: hidden;
             "
         >
             <!-- Background -->
@@ -1450,28 +1489,31 @@ const renderSectionHTML = (section) => {
                 position: absolute;
                 inset: 0;
                 z-index: 0;
-                background-color: ${componentData.backgroundColor || styles.backgroundColor || 'transparent'};
-                background-image: ${componentData.backgroundImage ? `url(${componentData.backgroundImage})` : 'none'};
-                background-size: cover;
-                background-position: center;
+                background-color: ${backgroundColor};
+                background-image: ${backgroundImageStyle};
+                background-size: ${backgroundSize};
+                background-position: ${backgroundPosition};
+                background-repeat: no-repeat;
             "></div>
 
             <!-- Overlay -->
             <div class="ladi-overlay" style="
                 position: absolute;
                 inset: 0;
-                z-index: 0;
-                background-color: ${componentData.overlayColor || 'transparent'};
-                opacity: ${componentData.overlayOpacity || 0};
+                z-index: 1;
+                background-color: ${overlayColor};
+                opacity: ${overlayOpacity};
+                pointer-events: none;
             "></div>
 
             <!-- Container -->
             <div class="ladi-container" style="
                 position: relative;
-                z-index: 1;
-                padding: ${componentData.padding || styles.padding || '20px'};
+                z-index: 2;
+                padding: ${containerPadding};
                 width: 100%;
                 height: 100%;
+                box-sizing: border-box;
             ">
                 ${childrenHTML}
             </div>
