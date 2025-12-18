@@ -7,8 +7,8 @@ class MomoService {
         this.accessKey = process.env.MOMO_ACCESS_KEY || '';
         this.secretKey = process.env.MOMO_SECRET_KEY || '';
         this.endpoint = process.env.MOMO_ENDPOINT || 'https://test-payment.momo.vn/v2/gateway/api/create';
-        this.redirectUrl = process.env.MOMO_REDIRECT_URL || 'http://localhost:3000/payment/momo/callback';
-        this.ipnUrl = process.env.MOMO_IPN_URL || 'http://localhost:5000/api/payment/momo/ipn';
+        this.redirectUrl = process.env.MOMO_REDIRECT_URL || 'https://landinghub.shop/payment/momo/callback';
+        this.ipnUrl = process.env.MOMO_IPN_URL || 'https://api.landinghub.shop/api/payment/momo/ipn';
         this.requestType = 'captureWallet';
     }
 
