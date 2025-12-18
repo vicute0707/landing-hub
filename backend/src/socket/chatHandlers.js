@@ -34,8 +34,7 @@ function initChatHandlers(io, socket) {
             // Verify user has access to this room
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userId }, { admin_id: userId }]
-            });
+                $or: [{ user_id: userId.toString() }, { admin_id: userId.toString() }]            });
 
             if (!room) {
                 console.log(`❌ [join_room] Room ${roomId} not found or user ${userId} has no access`);
@@ -85,7 +84,7 @@ function initChatHandlers(io, socket) {
             // Verify room access
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userId }, { admin_id: userId }]
+                $or: [{ user_id: userId.toString() }, { admin_id: userId.toString() }]
             });
 
             if (!room) {
@@ -175,11 +174,11 @@ function initChatHandlers(io, socket) {
             }
 
             // Verify room
+            // Verify room
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                user_id: userId
+                user_id: userId.toString()  // ← THÊM .toString() Ở ĐÂY!!!
             });
-
             if (!room) {
                 console.log(`❌ [send_message_with_ai] Room not found: ${roomId} for user ${userId}`);
                 return socket.emit('error', {

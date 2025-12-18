@@ -414,11 +414,9 @@ const SupportChatbox = () => {
                 {isConnected ? (
                     <>
                         <span className="status-dot online"></span>
-                        {roomInfo?.admin_id ? (
-                            <span style={{ color: '#10b981', fontWeight: '600' }}>👨‍💼 Admin đang hỗ trợ</span>
-                        ) : (
-                            <span style={{ color: '#3b82f6', fontWeight: '600' }}>🤖 AI đang hỗ trợ</span>
-                        )}
+                        <span style={{ color: '#6b7280', fontSize: '12px' }}>
+    {roomInfo?.admin_id ? '👨‍💼 Admin đang hỗ trợ' : '🤖 AI sẵn sàng'}
+  </span>
                     </>
                 ) : (
                     <>
@@ -556,17 +554,18 @@ const SupportChatbox = () => {
 
                     {/* Input */}
                     <div className="chat-input">
-            <textarea
-                value={inputMessage}
-                onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
-                placeholder={aiStreaming ? "⏳ AI đang trả lời..." : "Nhập tin nhắn..."}
-                rows="1"
-                disabled={!isConnected || aiStreaming}
-            />
+  <textarea
+      value={inputMessage}
+      onChange={handleInputChange}
+      onKeyPress={handleKeyPress}
+      placeholder={aiStreaming ? "⏳ AI đang trả lời..." : "Nhập tin nhắn..."}
+      rows="1"
+      disabled={aiStreaming} // ← CHỈ disable khi AI đang trả lời
+      style={{ resize: 'none' }} // Bonus: đẹp hơn
+  />
                         <button
                             onClick={handleSendMessage}
-                            disabled={!inputMessage.trim() || !isConnected || aiStreaming}
+                            disabled={!inputMessage.trim() || aiStreaming}
                             title={aiStreaming ? "Vui lòng đợi AI trả lời xong" : "Gửi tin nhắn"}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -114,8 +114,7 @@ exports.getRoomMessages = async (req, res) => {
         // Verify user has access to this room
         const room = await ChatRoom.findOne({
             _id: roomId,
-            $or: [{ user_id: userId }, { admin_id: userId }]
-        });
+            $or: [{ user_id: userId.toString() }, { admin_id: userId.toString() }]        });
 
         if (!room) {
             return res.status(404).json({
