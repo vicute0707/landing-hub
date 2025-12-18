@@ -206,7 +206,7 @@ exports.momoIPN = async (req, res) => {
         }
 
         // Response to MOMO (return 204 for success)
-        res.status(204).send();
+        return res.status(200).send('OK');
     } catch (error) {
         console.error('💥 MOMO IPN Error:', error);
         res.status(200).json({ message: 'Error processed' });
