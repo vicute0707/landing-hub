@@ -130,7 +130,7 @@ exports.getRoomMessages = async (req, res) => {
         }
 
         const messages = await ChatMessage.find(query)
-            .sort({ createdAt: -1 })
+            .sort({ createdAt: 1 })
             .limit(limit)
             .lean();
 
@@ -155,7 +155,7 @@ exports.getRoomMessages = async (req, res) => {
 
         res.json({
             success: true,
-            messages: transformedMessages.reverse(), // Oldest first
+            messages: transformedMessages, // Oldest first
             hasMore: messages.length === limit
         });
     } catch (error) {
@@ -323,6 +323,7 @@ exports.sendMessageWithAI = async (req, res) => {
                 const history = await ChatMessage.find({ room_id: roomId })
                     .sort({ createdAt: -1 })
                     .limit(10)
+                    .populate('sender_id', 'name email')   // ← thêm dòng này
                     .lean();
 
                 // Build messages array for AI
