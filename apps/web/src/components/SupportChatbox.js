@@ -105,26 +105,18 @@ const SupportChatbox = () => {
 
             cleanups.push(on('new_message', (data) => {
                 console.log('📨 New message received:', data);
-
                 setMessages(prev => {
-                    // Deduplication
+                    // Check if message already exists (deduplication)
                     const exists = prev.some(msg => msg.id === data.id);
                     if (exists) {
-                        console.log('⚠️ Message already exists, skipping:', data.id);
+                        console.log('⚠️  Message already exists, skipping:', data.id);
                         return prev;
                     }
-
-                    // Chuẩn hóa sender_type: nếu là admin thì set rõ 'admin'
-                    const normalizedSenderType = data.sender_type === 'admin'
-                        ? 'admin'
-                        : data.sender_type || 'bot'; // fallback
-
                     return [...prev, {
                         id: data.id,
-                        sender_type: normalizedSenderType,
+                        sender_type: data.sender_type,
                         message: data.message,
-                        created_at: data.created_at,
-                        message_type: data.message_type || 'text' // nếu có system message
+                        created_at: data.created_at
                     }];
                 });
             }));
@@ -168,23 +160,13 @@ const SupportChatbox = () => {
             }));
 
             cleanups.push(on('admin_joined', (data) => {
-                console.log('👨‍💼 Admin đã tham gia chat:', data);
-
-                // Cập nhật trạng thái để biết đang chat với admin
+                console.log('👨‍💼 Admin joined:', data);
                 setRoomInfo(prev => ({
                     ...prev,
                     admin_id: data.admin_id || 'admin',
-                    status: data.status || 'assigned',
-                    ai_enabled: false
+                    ai_enabled: false,
+                    status: 'assigned'
                 }));
-
-                // Thêm tin nhắn thông báo để người dùng biết
-                setMessages(prev => [...prev, {
-                    id: `system-admin-joined-${Date.now()}`,
-                    sender_type: 'system',
-                    message: 'Admin đã tham gia cuộc trò chuyện. Bạn đang được hỗ trợ trực tiếp! 👨‍💼',
-                    created_at: new Date().toISOString()
-                }]);
             }));
 
             cleanups.push(on('escalated_to_admin', () => {
@@ -432,9 +414,11 @@ const SupportChatbox = () => {
                 {isConnected ? (
                     <>
                         <span className="status-dot online"></span>
-                        <span style={{ color: '#6b7280', fontSize: '12px' }}>
-    {roomInfo?.admin_id ? '👨‍💼 Admin đang hỗ trợ' : '🤖 AI sẵn sàng'}
-  </span>
+                        {roomInfo?.admin_id ? (
+                            <span style={{ color: '#10b981', fontWeight: '600' }}>👨‍💼 Admin đang hỗ trợ</span>
+                        ) : (
+                            <span style={{ color: '#3b82f6', fontWeight: '600' }}>🤖 AI đang hỗ trợ</span>
+                        )}
                     </>
                 ) : (
                     <>
@@ -512,17 +496,16 @@ const SupportChatbox = () => {
                         {messages.map((msg, index) => (
                             <div
                                 key={msg.id ?? `msg-${msg.sender_type}-${index}-${msg.created_at || Date.now()}`}
-                                className={`message ${
-                                    msg.sender_type === 'user' ? 'user'
-                                        : msg.sender_type === 'admin' ? 'bot'  // dùng class bot để bên phải, hoặc tạo class riêng 'admin'
-                                            : 'bot'
-                                }`}
+                                className={`message ${msg.sender_type === 'user' ? 'user' : 'bot'}`}
                             >
                                 {msg.sender_type !== 'user' && (
-                                    <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px', fontWeight: '600' }}>
-                                        {msg.sender_type === 'bot' ? '🤖 AI Assistant'
-                                            : msg.sender_type === 'admin' ? '👨‍💼 Admin'
-                                                : 'Hệ thống'}
+                                    <div style={{
+                                        fontSize: '10px',
+                                        color: '#6b7280',
+                                        marginBottom: '4px',
+                                        fontWeight: '600'
+                                    }}>
+                                        {msg.sender_type === 'bot' ? '🤖 AI Assistant' : '👨‍💼 Admin'}
                                     </div>
                                 )}
                                 <div className="message-content">
@@ -573,18 +556,17 @@ const SupportChatbox = () => {
 
                     {/* Input */}
                     <div className="chat-input">
-  <textarea
-      value={inputMessage}
-      onChange={handleInputChange}
-      onKeyPress={handleKeyPress}
-      placeholder={aiStreaming ? "⏳ AI đang trả lời..." : "Nhập tin nhắn..."}
-      rows="1"
-      disabled={aiStreaming} // ← CHỈ disable khi AI đang trả lời
-      style={{ resize: 'none' }} // Bonus: đẹp hơn
-  />
+            <textarea
+                value={inputMessage}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder={aiStreaming ? "⏳ AI đang trả lời..." : "Nhập tin nhắn..."}
+                rows="1"
+                disabled={!isConnected || aiStreaming}
+            />
                         <button
                             onClick={handleSendMessage}
-                            disabled={!inputMessage.trim() || aiStreaming}
+                            disabled={!inputMessage.trim() || !isConnected || aiStreaming}
                             title={aiStreaming ? "Vui lòng đợi AI trả lời xong" : "Gửi tin nhắn"}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

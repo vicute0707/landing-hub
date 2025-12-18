@@ -1,392 +1,5 @@
 const ChatRoom = require('../models/ChatRoom');
 const ChatMessage = require('../models/ChatMessage');
-const { createNotification } = require('../controllers/notificationController');
-
-/**
- * Initialize admin chat handlers
- * These handlers are only for admin users
- */
-function initAdminHandlers(io, socket) {
-    const userId = socket.userId;
-
-    // Verify user is admin (you should have an isAdmin check in your User model)
-    // For now, we'll assume if they connect to admin namespace, they're authorized
-
-    console.log(`👨‍💼 Admin ${userId} connected`);
-
-    // Join admin room for notifications
-    socket.join('admin_room');
-
-    /**
-     * Get all pending support requests
-     */
-    socket.on('get_pending_rooms', async () => {
-        try {
-            const rooms = await ChatRoom.find({
-                status: 'open'
-            })
-                .populate('user_id', 'name email')
-                .sort({ priority: -1, last_message_at: -1 })
-                .limit(50)
-                .lean();
-
-            socket.emit('pending_rooms', {
-                rooms
-            });
-        } catch (error) {
-            console.error('Error fetching pending rooms:', error);
-            socket.emit('error', {
-                message: 'Không thể tải danh sách hỗ trợ'
-            });
-        }
-    });
-
-    /**
-     * Get all active rooms assigned to this admin
-     */
-    socket.on('get_my_rooms', async () => {
-        try {
-            const rooms = await ChatRoom.find({
-                admin_id: userId,
-                status: { $in: ['assigned', 'open'] }
-            })
-                .populate('user_id', 'name email')
-                .sort({ last_message_at: -1 })
-                .lean();
-
-            socket.emit('my_rooms', {
-                rooms
-            });
-        } catch (error) {
-            console.error('Error fetching admin rooms:', error);
-            socket.emit('error', {
-                message: 'Không thể tải danh sách chat'
-            });
-        }
-    });
-
-    /**
-     * Assign a room to this admin
-     */
-    socket.on('assign_room', async (data) => {
-        try {
-            const { roomId } = data;
-
-            const room = await ChatRoom.findByIdAndUpdate(
-                roomId,
-                {
-                    admin_id: userId,
-                    status: 'assigned',
-                    ai_enabled: false // Disable AI when admin takes over
-                },
-                { new: true }
-            ).populate('user_id', 'name email');
-
-            if (!room) {
-                return socket.emit('error', {
-                    message: 'Không tìm thấy phòng chat'
-                });
-            }
-
-            // Join the chat room
-            socket.join(`chat_${roomId}`);
-
-            // Send system message
-            const systemMsg = new ChatMessage({
-                room_id: roomId,
-                sender_type: 'bot',
-                message_type: 'system',
-                message: `Admin đã tham gia chat. Bạn sẽ được hỗ trợ trực tiếp! 👨‍💼`
-            });
-            await systemMsg.save();
-
-            // Send notification to user
-            await createNotification(
-                room.user_id._id,
-                'admin_joined_chat',
-                'Admin đã tham gia chat',
-                'Bạn sẽ được hỗ trợ trực tiếp bởi admin',
-                { roomId, adminId: userId }
-            );
-
-            // Notify user via Socket.IO
-            io.to(`user_${room.user_id._id}`).emit('admin_joined', {
-                room_id: roomId,
-                admin_id: userId,
-                admin_name: 'Admin',
-                status: 'assigned'
-            });
-
-            // Also notify the chat room
-            io.to(`chat_${roomId}`).emit('admin_joined', {
-                room_id: roomId,
-                admin_id: userId,
-                admin_name: 'Admin',
-                status: 'assigned'
-            });
-
-            // Broadcast system message
-            io.to(`chat_${roomId}`).emit('new_message', {
-                id: systemMsg._id,
-                room_id: roomId, // ✅ Added
-                sender_type: 'bot',
-                sender_name: 'System', // ✅ Added
-                message_type: 'system',
-                message: systemMsg.message,
-                created_at: systemMsg.createdAt
-            });
-
-            // Confirm to admin
-            socket.emit('room_assigned', {
-                room
-            });
-
-            // Notify other admins
-            socket.to('admin_room').emit('room_taken', {
-                roomId,
-                takenBy: userId
-            });
-
-            console.log(`✅ Admin ${userId} assigned to room ${roomId}`);
-        } catch (error) {
-            console.error('Error assigning room:', error);
-            socket.emit('error', {
-                message: 'Không thể nhận phòng chat'
-            });
-        }
-    });
-
-    /**
-     * Close/resolve a room
-     */
-    socket.on('resolve_room', async (data) => {
-        try {
-            const { roomId, notes } = data;
-
-            const room = await ChatRoom.findOne({
-                _id: roomId,
-                admin_id: userId
-            });
-
-            if (!room) {
-                return socket.emit('error', {
-                    message: 'Không tìm thấy phòng chat'
-                });
-            }
-
-            room.status = 'resolved';
-            room.resolved_at = new Date();
-            if (notes) {
-                room.context = { ...room.context, admin_notes: notes };
-            }
-            await room.save();
-
-            // Send closing message
-            const closeMsg = new ChatMessage({
-                room_id: roomId,
-                sender_type: 'bot',
-                message_type: 'system',
-                message: 'Chat đã được giải quyết. Cảm ơn bạn đã liên hệ! 🙏'
-            });
-            await closeMsg.save();
-
-            // Notify user
-            io.to(`chat_${roomId}`).emit('chat_resolved', {
-                room_id: roomId,
-                message: closeMsg.message
-            });
-
-            // Broadcast system message
-            io.to(`chat_${roomId}`).emit('new_message', {
-                id: closeMsg._id,
-                sender_type: 'bot',
-                message_type: 'system',
-                message: closeMsg.message,
-                created_at: closeMsg.createdAt
-            });
-
-            socket.emit('room_resolved', {
-                roomId
-            });
-
-            console.log(`✅ Room ${roomId} resolved by admin ${userId}`);
-        } catch (error) {
-            console.error('Error resolving room:', error);
-            socket.emit('error', {
-                message: 'Không thể đóng chat'
-            });
-        }
-    });
-
-    /**
-     * Transfer room to another admin
-     */
-    socket.on('transfer_room', async (data) => {
-        try {
-            const { roomId, targetAdminId } = data;
-
-            const room = await ChatRoom.findOne({
-                _id: roomId,
-                admin_id: userId
-            });
-
-            if (!room) {
-                return socket.emit('error', {
-                    message: 'Không tìm thấy phòng chat'
-                });
-            }
-
-            room.admin_id = targetAdminId;
-            await room.save();
-
-            // Send system message
-            const transferMsg = new ChatMessage({
-                room_id: roomId,
-                sender_type: 'bot',
-                message_type: 'system',
-                message: `Chat đã được chuyển cho admin khác.`
-            });
-            await transferMsg.save();
-
-            // Notify all parties
-            io.to(`chat_${roomId}`).emit('new_message', {
-                id: transferMsg._id,
-                sender_type: 'bot',
-                message_type: 'system',
-                message: transferMsg.message,
-                created_at: transferMsg.createdAt
-            });
-
-            io.to(`user_${targetAdminId}`).emit('room_transferred_to_you', {
-                roomId
-            });
-
-            socket.emit('room_transferred', {
-                roomId,
-                to: targetAdminId
-            });
-
-            console.log(`✅ Room ${roomId} transferred from ${userId} to ${targetAdminId}`);
-        } catch (error) {
-            console.error('Error transferring room:', error);
-            socket.emit('error', {
-                message: 'Không thể chuyển chat'
-            });
-        }
-    });
-
-    /**
-     * Get room statistics
-     */
-    socket.on('get_stats', async () => {
-        try {
-            const stats = await ChatRoom.aggregate([
-                {
-                    $group: {
-                        _id: '$status',
-                        count: { $sum: 1 }
-                    }
-                }
-            ]);
-
-            const myActiveRooms = await ChatRoom.countDocuments({
-                admin_id: userId,
-                status: 'assigned'
-            });
-
-            const avgResponseTime = await ChatMessage.aggregate([
-                {
-                    $match: {
-                        sender_type: 'admin',
-                        createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24h
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        avgTime: { $avg: '$ai_metadata.response_time' }
-                    }
-                }
-            ]);
-
-            socket.emit('admin_stats', {
-                roomsByStatus: stats.reduce((acc, s) => {
-                    acc[s._id] = s.count;
-                    return acc;
-                }, {}),
-                myActiveRooms,
-                avgResponseTime: avgResponseTime[0]?.avgTime || 0
-            });
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-            socket.emit('error', {
-                message: 'Không thể tải thống kê'
-            });
-        }
-    });
-
-    /**
-     * Admin gửi tin nhắn realtime (QUAN TRỌNG NHẤT - SỬA CHỖ NÀY ĐỂ USER THẤY TIN NHẮN ADMIN)
-     */
-    socket.on('send_message', async (data) => {
-        try {
-            const { roomId, message } = data;
-
-            if (!message || !message.trim()) {
-                return socket.emit('error', { message: 'Tin nhắn không được để trống' });
-            }
-
-            // Kiểm tra admin có quyền gửi trong room này không
-            const room = await ChatRoom.findOne({
-                _id: roomId,
-                admin_id: userId
-            });
-
-            if (!room) {
-                return socket.emit('error', { message: 'Bạn chưa nhận hỗ trợ room này' });
-            }
-
-            // Tạo tin nhắn admin
-            const newMessage = new ChatMessage({
-                room_id: roomId,
-                sender_id: userId,
-                sender_type: 'admin',
-                message: message.trim()
-            });
-            await newMessage.save();
-
-            // Cập nhật thời gian room
-            room.last_message_at = new Date();
-            await room.save();
-
-            // Gửi realtime cho tất cả trong room (bao gồm user)
-            io.to(`chat_${roomId}`).emit('new_message', {
-                id: newMessage._id,
-                room_id: roomId,
-                sender_type: 'admin',
-                sender_id: userId,
-                sender_name: 'Admin',
-                message: newMessage.message,
-                created_at: newMessage.createdAt
-            });
-
-            console.log(`📨 Admin ${userId} gửi tin nhắn thành công đến room ${roomId}`);
-        } catch (error) {
-            console.error('Lỗi khi admin gửi tin nhắn:', error);
-            socket.emit('error', { message: 'Không thể gửi tin nhắn' });
-        }
-    });
-
-    /**
-     * Disconnect
-     */
-    socket.on('disconnect', () => {
-        console.log(`Admin ${userId} disconnected`);
-    });
-}
-
-module.exports = initAdminHandlers;const ChatRoom = require('../models/ChatRoom');
-const ChatMessage = require('../models/ChatMessage');
 const { buildAIContext, detectAdminNeed } = require('../services/ai/chatContextService');
 const { generateStreamingResponse } = require('../services/ai/multiAIProvider');
 const { createNotification } = require('../controllers/notificationController');
@@ -396,7 +9,6 @@ const { createNotification } = require('../controllers/notificationController');
  */
 function initChatHandlers(io, socket) {
     const userId = socket.userId;
-    const userIdStr = userId.toString(); // ← Thêm biến string để dùng chung, tránh lặp .toString()
 
     console.log(`💬 User ${userId} connected to chat`);
 
@@ -419,10 +31,10 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // ✅ SỬA: thêm .toString() để so sánh đúng trên production
+            // Verify user has access to this room
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
+                $or: [{ user_id: userId }, { admin_id: userId }]
             });
 
             if (!room) {
@@ -470,10 +82,10 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // ✅ SỬA: thêm .toString()
+            // Verify room access
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
+                $or: [{ user_id: userId }, { admin_id: userId }]
             });
 
             if (!room) {
@@ -483,7 +95,7 @@ function initChatHandlers(io, socket) {
             }
 
             // Determine sender type
-            const isUser = room.user_id.toString() === userIdStr;
+            const isUser = room.user_id.toString() === userId.toString();
             const senderType = isUser ? 'user' : 'admin';
 
             // Create message
@@ -509,10 +121,10 @@ function initChatHandlers(io, socket) {
             // Broadcast to room with full info
             io.to(`chat_${roomId}`).emit('new_message', {
                 id: newMessage._id,
-                room_id: roomId,
+                room_id: roomId, // ✅ Added
                 sender_type: senderType,
                 sender_id: newMessage.sender_id?._id || userId,
-                sender_name: newMessage.sender_id?.name || (senderType === 'admin' ? 'Admin' : 'User'),
+                sender_name: newMessage.sender_id?.name || (senderType === 'admin' ? 'Admin' : 'User'), // ✅ Added
                 message: newMessage.message,
                 created_at: newMessage.createdAt
             });
@@ -562,10 +174,10 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // ✅ SỬA QUAN TRỌNG NHẤT: thêm .toString() ở đây
+            // Verify room
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                user_id: userIdStr
+                user_id: userId
             });
 
             if (!room) {
@@ -613,10 +225,10 @@ function initChatHandlers(io, socket) {
             try {
                 const messageData = {
                     id: userMessage._id,
-                    room_id: roomId,
+                    room_id: roomId, // ✅ Added room_id!
                     sender_type: 'user',
                     sender_id: userMessage.sender_id?._id || userId,
-                    sender_name: userMessage.sender_id?.name || 'Người dùng',
+                    sender_name: userMessage.sender_id?.name || 'Người dùng', // ✅ Added sender_name!
                     message: userMessage.message,
                     created_at: userMessage.createdAt
                 };
@@ -628,7 +240,7 @@ function initChatHandlers(io, socket) {
                     preview: messageData.message.substring(0, 30)
                 });
             } catch (broadcastError) {
-                console.error(`⚠️ [send_message_with_ai] Failed to broadcast user message:`, broadcastError.message);
+                console.error(`⚠️  [send_message_with_ai] Failed to broadcast user message:`, broadcastError.message);
                 // Don't fail the operation, message is saved
             }
 
@@ -652,9 +264,9 @@ function initChatHandlers(io, socket) {
 
                     io.to(`chat_${roomId}`).emit('new_message', {
                         id: escalateMsg._id,
-                        room_id: roomId,
+                        room_id: roomId, // ✅ Added
                         sender_type: 'bot',
-                        sender_name: 'AI Assistant',
+                        sender_name: 'AI Assistant', // ✅ Added
                         message: escalateMsg.message,
                         created_at: escalateMsg.createdAt
                     });
@@ -679,7 +291,8 @@ function initChatHandlers(io, socket) {
                         );
                         console.log(`✅ [send_message_with_ai] Escalation notification created`);
                     } catch (notifError) {
-                        console.warn('⚠️ [send_message_with_ai] Failed to create notification:', notifError.message);
+                        console.warn('⚠️  [send_message_with_ai] Failed to create notification:', notifError.message);
+                        // Don't fail the whole operation if notification fails
                     }
 
                     console.log(`✅ [send_message_with_ai] Escalation complete, emitting escalated_to_admin event`);
@@ -694,6 +307,7 @@ function initChatHandlers(io, socket) {
             }
 
             // Generate AI response if enabled and no admin
+            // Default to true if ai_enabled is undefined (for old rooms)
             const aiEnabled = room.ai_enabled !== false;
             if (aiEnabled && !room.admin_id) {
                 console.log(`🤖 [send_message_with_ai] Starting AI response for room ${roomId}`);
@@ -793,9 +407,9 @@ function initChatHandlers(io, socket) {
                     // Also emit as new_message so admin can see it
                     io.to(`chat_${roomId}`).emit('new_message', {
                         id: aiMessage._id,
-                        room_id: roomId,
+                        room_id: roomId, // ✅ Added
                         sender_type: 'bot',
-                        sender_name: 'AI Assistant',
+                        sender_name: 'AI Assistant', // ✅ Added
                         message: fullResponse,
                         created_at: aiMessage.createdAt,
                         ai_metadata: aiMessage.ai_metadata
@@ -823,7 +437,7 @@ function initChatHandlers(io, socket) {
                     });
                 }
             } else {
-                console.log(`ℹ️ [send_message_with_ai] AI not triggered - AI enabled: ${aiEnabled} (value: ${room.ai_enabled}), Admin: ${room.admin_id || 'none'}`);
+                console.log(`ℹ️  [send_message_with_ai] AI not triggered - AI enabled: ${aiEnabled} (value: ${room.ai_enabled}), Admin: ${room.admin_id || 'none'}`);
             }
 
             // Update room timestamp
@@ -832,7 +446,8 @@ function initChatHandlers(io, socket) {
                 await room.save();
                 console.log(`✅ [send_message_with_ai] Handler completed for room ${roomId}`);
             } catch (saveError) {
-                console.error(`⚠️ [send_message_with_ai] Failed to update room timestamp:`, saveError.message);
+                console.error(`⚠️  [send_message_with_ai] Failed to update room timestamp:`, saveError.message);
+                // Don't fail the whole operation if room save fails
             }
 
         } catch (error) {
@@ -852,15 +467,15 @@ function initChatHandlers(io, socket) {
         try {
             const { roomId } = data;
 
-            // ✅ SỬA: thêm .toString()
+            // Verify room access
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
+                $or: [{ user_id: userId }, { admin_id: userId }]
             });
 
             if (!room) return;
 
-            const isUser = room.user_id.toString() === userIdStr;
+            const isUser = room.user_id.toString() === userId.toString();
             await ChatMessage.updateMany(
                 { room_id: roomId, [isUser ? 'read_by_user' : 'read_by_admin']: false },
                 { [isUser ? 'read_by_user' : 'read_by_admin']: true }

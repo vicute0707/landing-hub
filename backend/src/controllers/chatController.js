@@ -104,31 +104,18 @@ exports.getUserRooms = async (req, res) => {
 /**
  * Get messages for a specific room
  */
-/**
- * Get messages for a specific room
- */
-/**
- * Get messages for a specific room - FIX CHO ADMIN XEM ĐƯỢC TẤT CẢ ROOM
- */
 exports.getRoomMessages = async (req, res) => {
     try {
         const { roomId } = req.params;
         const userId = req.user.id;
-        const limit = parseInt(req.query.limit) || 100;
-        const before = req.query.before;
+        const limit = parseInt(req.query.limit) || 50;
+        const before = req.query.before; // For pagination
 
-        let room;
-
-        // ADMIN ĐƯỢC XEM TẤT CẢ ROOM
-        if (req.user.role === 'admin') {
-            room = await ChatRoom.findById(roomId);
-        } else {
-            // USER CHỈ XEM ROOM CỦA MÌNH
-            room = await ChatRoom.findOne({
-                _id: roomId,
-                user_id: userId
-            });
-        }
+        // Verify user has access to this room
+        const room = await ChatRoom.findOne({
+            _id: roomId,
+            $or: [{ user_id: userId }, { admin_id: userId }]
+        });
 
         if (!room) {
             return res.status(404).json({
@@ -137,43 +124,47 @@ exports.getRoomMessages = async (req, res) => {
             });
         }
 
+        // Build query
         const query = { room_id: roomId };
         if (before) {
             query.createdAt = { $lt: new Date(before) };
         }
 
         const messages = await ChatMessage.find(query)
-            .sort({ createdAt: 1 }) // Từ cũ đến mới
+            .sort({ createdAt: -1 })
             .limit(limit)
-            .populate('sender_id', 'name email')
             .lean();
 
-        // Đánh dấu đã đọc
+        // Mark messages as read
         const isUser = room.user_id.toString() === userId.toString();
         await ChatMessage.updateMany(
             { room_id: roomId, [isUser ? 'read_by_user' : 'read_by_admin']: false },
-            { $set: { [isUser ? 'read_by_user' : 'read_by_admin']: true } }
+            { [isUser ? 'read_by_user' : 'read_by_admin']: true }
         );
 
+        // Transform messages to match frontend format (created_at instead of createdAt)
         const transformedMessages = messages.map(msg => ({
             id: msg._id,
-            sender_id: msg.sender_id?._id || null,
-            sender_name: msg.sender_id?.name || null,
+            sender_id: msg.sender_id,
             sender_type: msg.sender_type,
             message: msg.message,
-            message_type: msg.message_type || 'text',
-            created_at: msg.createdAt,
-            ai_metadata: msg.ai_metadata || null
+            message_type: msg.message_type,
+            created_at: msg.createdAt,  // Transform createdAt → created_at
+            is_read: msg.is_read,
+            ai_metadata: msg.ai_metadata
         }));
 
         res.json({
             success: true,
-            messages: transformedMessages,
+            messages: transformedMessages.reverse(), // Oldest first
             hasMore: messages.length === limit
         });
     } catch (error) {
         console.error('Error fetching messages:', error);
-        res.status(500).json({ success: false, message: 'Không thể tải tin nhắn' });
+        res.status(500).json({
+            success: false,
+            message: 'Không thể tải tin nhắn'
+        });
     }
 };
 
@@ -333,7 +324,6 @@ exports.sendMessageWithAI = async (req, res) => {
                 const history = await ChatMessage.find({ room_id: roomId })
                     .sort({ createdAt: -1 })
                     .limit(10)
-                    .populate('sender_id', 'name email')   // ← thêm dòng này
                     .lean();
 
                 // Build messages array for AI
