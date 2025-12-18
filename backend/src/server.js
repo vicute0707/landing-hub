@@ -26,6 +26,12 @@ const io = new Server(server, {
                 "https://landinghub.shop",
                 'http://localhost:3000',
                 'http://localhost:5000',
+                'http://localhost:5000',
+                'https://api.landinghub.shop',
+                'https://landinghub.shop',
+                'https://www.landinghub.shop',
+                'https://app.landinghub.shop',
+                'https://d197hx8bwkos4.cloudfront.net',
                 process.env.REACT_APP_API_URL
             ].filter(Boolean);
 
