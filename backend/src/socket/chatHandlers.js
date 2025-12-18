@@ -507,7 +507,7 @@ function initChatHandlers(io, socket) {
         });
     });
     /**
-     * Admin gửi tin nhắn realtime (QUAN TRỌNG NHẤT - SỬA CHỖ NÀY ĐỂ USER THẤY TIN NHẮN ADMIN)
+     * Admin gửi tin nhắn realtime - FIX CHÍNH ĐỂ USER THẤY TIN NHẮN ADMIN
      */
     socket.on('send_message', async (data) => {
         try {
@@ -517,17 +517,17 @@ function initChatHandlers(io, socket) {
                 return socket.emit('error', { message: 'Tin nhắn không được để trống' });
             }
 
-            // Kiểm tra admin có quyền gửi trong room này không
+            // Kiểm tra admin có assign room này không
             const room = await ChatRoom.findOne({
                 _id: roomId,
                 admin_id: userId
             });
 
             if (!room) {
-                return socket.emit('error', { message: 'Bạn chưa nhận hỗ trợ room này' });
+                return socket.emit('error', { message: 'Room không tồn tại hoặc bạn chưa nhận hỗ trợ' });
             }
 
-            // Tạo tin nhắn admin
+            // Tạo tin nhắn
             const newMessage = new ChatMessage({
                 room_id: roomId,
                 sender_id: userId,
@@ -536,11 +536,11 @@ function initChatHandlers(io, socket) {
             });
             await newMessage.save();
 
-            // Cập nhật thời gian room
+            // Cập nhật room
             room.last_message_at = new Date();
             await room.save();
 
-            // Gửi realtime cho tất cả trong room (bao gồm user)
+            // Emit realtime cho TOÀN BỘ room chat (user sẽ nhận được)
             io.to(`chat_${roomId}`).emit('new_message', {
                 id: newMessage._id,
                 room_id: roomId,
@@ -551,9 +551,9 @@ function initChatHandlers(io, socket) {
                 created_at: newMessage.createdAt
             });
 
-            console.log(`📨 Admin ${userId} gửi tin nhắn thành công đến room ${roomId}`);
+            console.log(`📨 [ADMIN] ${userId} gửi tin nhắn đến room ${roomId}`);
         } catch (error) {
-            console.error('Lỗi khi admin gửi tin nhắn:', error);
+            console.error('Lỗi admin gửi tin nhắn:', error);
             socket.emit('error', { message: 'Không thể gửi tin nhắn' });
         }
     });

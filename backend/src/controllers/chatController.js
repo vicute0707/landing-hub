@@ -107,61 +107,59 @@ exports.getUserRooms = async (req, res) => {
 /**
  * Get messages for a specific room
  */
+/**
+ * Get messages for a specific room - FIX CHO ADMIN XEM ĐƯỢC TẤT CẢ ROOM
+ */
 exports.getRoomMessages = async (req, res) => {
     try {
         const { roomId } = req.params;
         const userId = req.user.id;
-        const limit = parseInt(req.query.limit) || 100; // Tăng lên 100 cho chắc
+        const limit = parseInt(req.query.limit) || 100;
         const before = req.query.before;
 
-        // === QUAN TRỌNG: Phân quyền truy cập ===
         let room;
 
-        // Nếu là admin → được xem TẤT CẢ các room (không cần kiểm tra admin_id)
+        // ADMIN ĐƯỢC XEM TẤT CẢ ROOM
         if (req.user.role === 'admin') {
-            room = await ChatRoom.findById(roomId).populate('user_id', 'name email');
+            room = await ChatRoom.findById(roomId);
         } else {
-            // Nếu là user thường → chỉ được xem room của chính mình
+            // USER CHỈ XEM ROOM CỦA MÌNH
             room = await ChatRoom.findOne({
                 _id: roomId,
                 user_id: userId
-            }).populate('user_id', 'name email');
+            });
         }
 
         if (!room) {
             return res.status(404).json({
                 success: false,
-                message: 'Không tìm thấy phòng chat hoặc bạn không có quyền truy cập'
+                message: 'Không tìm thấy phòng chat'
             });
         }
 
-        // Build query lấy tin nhắn
         const query = { room_id: roomId };
         if (before) {
             query.createdAt = { $lt: new Date(before) };
         }
 
         const messages = await ChatMessage.find(query)
-            .sort({ createdAt: 1 }) // Lấy từ cũ đến mới → admin thấy từ đầu cuộc trò chuyện
+            .sort({ createdAt: 1 }) // Từ cũ đến mới
             .limit(limit)
-            .populate('sender_id', 'name email') // Để hiển thị tên thật của user/admin
+            .populate('sender_id', 'name email')
             .lean();
 
         // Đánh dấu đã đọc
         const isUser = room.user_id.toString() === userId.toString();
-        const readField = isUser ? 'read_by_user' : 'read_by_admin';
-
         await ChatMessage.updateMany(
-            { room_id: roomId, [readField]: false },
-            { $set: { [readField]: true } }
+            { room_id: roomId, [isUser ? 'read_by_user' : 'read_by_admin']: false },
+            { $set: { [isUser ? 'read_by_user' : 'read_by_admin']: true } }
         );
 
-        // Transform để frontend dùng dễ (giống format cũ)
         const transformedMessages = messages.map(msg => ({
             id: msg._id,
             sender_id: msg.sender_id?._id || null,
             sender_name: msg.sender_id?.name || null,
-            sender_type: msg.sender_type, // 'user', 'admin', 'bot', 'system'
+            sender_type: msg.sender_type,
             message: msg.message,
             message_type: msg.message_type || 'text',
             created_at: msg.createdAt,
@@ -170,16 +168,12 @@ exports.getRoomMessages = async (req, res) => {
 
         res.json({
             success: true,
-            messages: transformedMessages, // Đã oldest first, không cần reverse
+            messages: transformedMessages,
             hasMore: messages.length === limit
         });
-
     } catch (error) {
         console.error('Error fetching messages:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Không thể tải tin nhắn'
-        });
+        res.status(500).json({ success: false, message: 'Không thể tải tin nhắn' });
     }
 };
 
