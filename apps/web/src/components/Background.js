@@ -141,24 +141,24 @@ const Background = ({ children, fullWidth = false, onQuickLogin }) => {
                             </div>
 
                             {/* Admin */}
-                            <div style={{ marginBottom: '16px', padding: '14px', background: '#fff0f0', borderRadius: '10px' }}>
-                                <strong>Admin</strong><br />
-                                Email: <code>admin@gmail.com</code><br />
-                                Pass: <span>{showPassAdmin ? '123456' : '••••••••'}</span>
-                                <button onClick={() => setShowPassAdmin(!showPassAdmin)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                    {showPassAdmin ? '🙈' : '👁'}
-                                </button>
-                                <button onClick={() => copyToClipboard('123456')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>
-                                    Copy
-                                </button>
-                                <br />
-                                <button
-                                    onClick={() => handleQuickLogin('admin@gmail.com', '123456')}
-                                    style={{ marginTop: '10px', width: '100%', padding: '10px', background: '#e91e63', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
-                                >
-                                    Đăng nhập nhanh (Admin)
-                                </button>
-                            </div>
+                            {/*<div style={{ marginBottom: '16px', padding: '14px', background: '#fff0f0', borderRadius: '10px' }}>*/}
+                            {/*    <strong>Admin</strong><br />*/}
+                            {/*    Email: <code>admin@gmail.com</code><br />*/}
+                            {/*    Pass: <span>{showPassAdmin ? '123456' : '••••••••'}</span>*/}
+                            {/*    <button onClick={() => setShowPassAdmin(!showPassAdmin)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>*/}
+                            {/*        {showPassAdmin ? '🙈' : '👁'}*/}
+                            {/*    </button>*/}
+                            {/*    <button onClick={() => copyToClipboard('123456')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>*/}
+                            {/*        Copy*/}
+                            {/*    </button>*/}
+                            {/*    <br />*/}
+                            {/*    <button*/}
+                            {/*        onClick={() => handleQuickLogin('admin@gmail.com', '123456')}*/}
+                            {/*        style={{ marginTop: '10px', width: '100%', padding: '10px', background: '#e91e63', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}*/}
+                            {/*    >*/}
+                            {/*        Đăng nhập nhanh (Admin)*/}
+                            {/*    </button>*/}
+                            {/*</div>*/}
 
                             {/* User thường */}
                             <div style={{ padding: '14px', background: '#f0fff0', borderRadius: '10px' }}>

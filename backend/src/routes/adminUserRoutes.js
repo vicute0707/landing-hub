@@ -62,4 +62,30 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
+// 🔒 Toggle khóa / mở khóa tài khoản (chỉ admin)
+router.patch("/:id/toggle-disable", async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "Không tìm thấy user" });
+        }
+
+        // Không cho tự khóa chính mình (nếu có req.user từ middleware)
+        if (req.user && user._id.toString() === req.user.userId) {
+            return res.status(400).json({ message: "Không thể khóa tài khoản của chính mình" });
+        }
+
+        user.isDisabled = !user.isDisabled;
+        await user.save();
+
+        res.json({
+            message: user.isDisabled ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản",
+            isDisabled: user.isDisabled
+        });
+    } catch (err) {
+        console.error("Toggle disable error:", err);
+        res.status(500).json({ message: "Lỗi server", error: err.message });
+    }
+});
+
 module.exports = router;
