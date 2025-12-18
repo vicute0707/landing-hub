@@ -9,6 +9,7 @@ const { createNotification } = require('../controllers/notificationController');
  */
 function initChatHandlers(io, socket) {
     const userId = socket.userId;
+    const userIdStr = userId.toString(); // ← Thêm biến string để dùng chung, tránh lặp .toString()
 
     console.log(`💬 User ${userId} connected to chat`);
 
@@ -31,10 +32,11 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // Verify user has access to this room
+            // ✅ SỬA: thêm .toString() để so sánh đúng trên production
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userId.toString() }, { admin_id: userId.toString() }]            });
+                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
+            });
 
             if (!room) {
                 console.log(`❌ [join_room] Room ${roomId} not found or user ${userId} has no access`);
@@ -81,10 +83,10 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // Verify room access
+            // ✅ SỬA: thêm .toString()
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userId.toString() }, { admin_id: userId.toString() }]
+                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
             });
 
             if (!room) {
@@ -94,7 +96,7 @@ function initChatHandlers(io, socket) {
             }
 
             // Determine sender type
-            const isUser = room.user_id.toString() === userId.toString();
+            const isUser = room.user_id.toString() === userIdStr;
             const senderType = isUser ? 'user' : 'admin';
 
             // Create message
@@ -120,10 +122,10 @@ function initChatHandlers(io, socket) {
             // Broadcast to room with full info
             io.to(`chat_${roomId}`).emit('new_message', {
                 id: newMessage._id,
-                room_id: roomId, // ✅ Added
+                room_id: roomId,
                 sender_type: senderType,
                 sender_id: newMessage.sender_id?._id || userId,
-                sender_name: newMessage.sender_id?.name || (senderType === 'admin' ? 'Admin' : 'User'), // ✅ Added
+                sender_name: newMessage.sender_id?.name || (senderType === 'admin' ? 'Admin' : 'User'),
                 message: newMessage.message,
                 created_at: newMessage.createdAt
             });
@@ -173,12 +175,12 @@ function initChatHandlers(io, socket) {
                 });
             }
 
-            // Verify room
-            // Verify room
+            // ✅ SỬA QUAN TRỌNG NHẤT: thêm .toString() ở đây
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                user_id: userId.toString()  // ← THÊM .toString() Ở ĐÂY!!!
+                user_id: userIdStr
             });
+
             if (!room) {
                 console.log(`❌ [send_message_with_ai] Room not found: ${roomId} for user ${userId}`);
                 return socket.emit('error', {
@@ -224,10 +226,10 @@ function initChatHandlers(io, socket) {
             try {
                 const messageData = {
                     id: userMessage._id,
-                    room_id: roomId, // ✅ Added room_id!
+                    room_id: roomId,
                     sender_type: 'user',
                     sender_id: userMessage.sender_id?._id || userId,
-                    sender_name: userMessage.sender_id?.name || 'Người dùng', // ✅ Added sender_name!
+                    sender_name: userMessage.sender_id?.name || 'Người dùng',
                     message: userMessage.message,
                     created_at: userMessage.createdAt
                 };
@@ -239,7 +241,7 @@ function initChatHandlers(io, socket) {
                     preview: messageData.message.substring(0, 30)
                 });
             } catch (broadcastError) {
-                console.error(`⚠️  [send_message_with_ai] Failed to broadcast user message:`, broadcastError.message);
+                console.error(`⚠️ [send_message_with_ai] Failed to broadcast user message:`, broadcastError.message);
                 // Don't fail the operation, message is saved
             }
 
@@ -263,9 +265,9 @@ function initChatHandlers(io, socket) {
 
                     io.to(`chat_${roomId}`).emit('new_message', {
                         id: escalateMsg._id,
-                        room_id: roomId, // ✅ Added
+                        room_id: roomId,
                         sender_type: 'bot',
-                        sender_name: 'AI Assistant', // ✅ Added
+                        sender_name: 'AI Assistant',
                         message: escalateMsg.message,
                         created_at: escalateMsg.createdAt
                     });
@@ -290,8 +292,7 @@ function initChatHandlers(io, socket) {
                         );
                         console.log(`✅ [send_message_with_ai] Escalation notification created`);
                     } catch (notifError) {
-                        console.warn('⚠️  [send_message_with_ai] Failed to create notification:', notifError.message);
-                        // Don't fail the whole operation if notification fails
+                        console.warn('⚠️ [send_message_with_ai] Failed to create notification:', notifError.message);
                     }
 
                     console.log(`✅ [send_message_with_ai] Escalation complete, emitting escalated_to_admin event`);
@@ -306,7 +307,6 @@ function initChatHandlers(io, socket) {
             }
 
             // Generate AI response if enabled and no admin
-            // Default to true if ai_enabled is undefined (for old rooms)
             const aiEnabled = room.ai_enabled !== false;
             if (aiEnabled && !room.admin_id) {
                 console.log(`🤖 [send_message_with_ai] Starting AI response for room ${roomId}`);
@@ -406,9 +406,9 @@ function initChatHandlers(io, socket) {
                     // Also emit as new_message so admin can see it
                     io.to(`chat_${roomId}`).emit('new_message', {
                         id: aiMessage._id,
-                        room_id: roomId, // ✅ Added
+                        room_id: roomId,
                         sender_type: 'bot',
-                        sender_name: 'AI Assistant', // ✅ Added
+                        sender_name: 'AI Assistant',
                         message: fullResponse,
                         created_at: aiMessage.createdAt,
                         ai_metadata: aiMessage.ai_metadata
@@ -436,7 +436,7 @@ function initChatHandlers(io, socket) {
                     });
                 }
             } else {
-                console.log(`ℹ️  [send_message_with_ai] AI not triggered - AI enabled: ${aiEnabled} (value: ${room.ai_enabled}), Admin: ${room.admin_id || 'none'}`);
+                console.log(`ℹ️ [send_message_with_ai] AI not triggered - AI enabled: ${aiEnabled} (value: ${room.ai_enabled}), Admin: ${room.admin_id || 'none'}`);
             }
 
             // Update room timestamp
@@ -445,8 +445,7 @@ function initChatHandlers(io, socket) {
                 await room.save();
                 console.log(`✅ [send_message_with_ai] Handler completed for room ${roomId}`);
             } catch (saveError) {
-                console.error(`⚠️  [send_message_with_ai] Failed to update room timestamp:`, saveError.message);
-                // Don't fail the whole operation if room save fails
+                console.error(`⚠️ [send_message_with_ai] Failed to update room timestamp:`, saveError.message);
             }
 
         } catch (error) {
@@ -466,15 +465,15 @@ function initChatHandlers(io, socket) {
         try {
             const { roomId } = data;
 
-            // Verify room access
+            // ✅ SỬA: thêm .toString()
             const room = await ChatRoom.findOne({
                 _id: roomId,
-                $or: [{ user_id: userId }, { admin_id: userId }]
+                $or: [{ user_id: userIdStr }, { admin_id: userIdStr }]
             });
 
             if (!room) return;
 
-            const isUser = room.user_id.toString() === userId.toString();
+            const isUser = room.user_id.toString() === userIdStr;
             await ChatMessage.updateMany(
                 { room_id: roomId, [isUser ? 'read_by_user' : 'read_by_admin']: false },
                 { [isUser ? 'read_by_user' : 'read_by_admin']: true }
