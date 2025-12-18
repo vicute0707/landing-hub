@@ -105,18 +105,26 @@ const SupportChatbox = () => {
 
             cleanups.push(on('new_message', (data) => {
                 console.log('📨 New message received:', data);
+
                 setMessages(prev => {
-                    // Check if message already exists (deduplication)
+                    // Deduplication
                     const exists = prev.some(msg => msg.id === data.id);
                     if (exists) {
-                        console.log('⚠️  Message already exists, skipping:', data.id);
+                        console.log('⚠️ Message already exists, skipping:', data.id);
                         return prev;
                     }
+
+                    // Chuẩn hóa sender_type: nếu là admin thì set rõ 'admin'
+                    const normalizedSenderType = data.sender_type === 'admin'
+                        ? 'admin'
+                        : data.sender_type || 'bot'; // fallback
+
                     return [...prev, {
                         id: data.id,
-                        sender_type: data.sender_type,
+                        sender_type: normalizedSenderType,
                         message: data.message,
-                        created_at: data.created_at
+                        created_at: data.created_at,
+                        message_type: data.message_type || 'text' // nếu có system message
                     }];
                 });
             }));
@@ -160,13 +168,23 @@ const SupportChatbox = () => {
             }));
 
             cleanups.push(on('admin_joined', (data) => {
-                console.log('👨‍💼 Admin joined:', data);
+                console.log('👨‍💼 Admin đã tham gia chat:', data);
+
+                // Cập nhật trạng thái để biết đang chat với admin
                 setRoomInfo(prev => ({
                     ...prev,
                     admin_id: data.admin_id || 'admin',
-                    ai_enabled: false,
-                    status: 'assigned'
+                    status: data.status || 'assigned',
+                    ai_enabled: false
                 }));
+
+                // Thêm tin nhắn thông báo để người dùng biết
+                setMessages(prev => [...prev, {
+                    id: `system-admin-joined-${Date.now()}`,
+                    sender_type: 'system',
+                    message: 'Admin đã tham gia cuộc trò chuyện. Bạn đang được hỗ trợ trực tiếp! 👨‍💼',
+                    created_at: new Date().toISOString()
+                }]);
             }));
 
             cleanups.push(on('escalated_to_admin', () => {
@@ -494,16 +512,17 @@ const SupportChatbox = () => {
                         {messages.map((msg, index) => (
                             <div
                                 key={msg.id ?? `msg-${msg.sender_type}-${index}-${msg.created_at || Date.now()}`}
-                                className={`message ${msg.sender_type === 'user' ? 'user' : 'bot'}`}
+                                className={`message ${
+                                    msg.sender_type === 'user' ? 'user'
+                                        : msg.sender_type === 'admin' ? 'bot'  // dùng class bot để bên phải, hoặc tạo class riêng 'admin'
+                                            : 'bot'
+                                }`}
                             >
                                 {msg.sender_type !== 'user' && (
-                                    <div style={{
-                                        fontSize: '10px',
-                                        color: '#6b7280',
-                                        marginBottom: '4px',
-                                        fontWeight: '600'
-                                    }}>
-                                        {msg.sender_type === 'bot' ? '🤖 AI Assistant' : '👨‍💼 Admin'}
+                                    <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px', fontWeight: '600' }}>
+                                        {msg.sender_type === 'bot' ? '🤖 AI Assistant'
+                                            : msg.sender_type === 'admin' ? '👨‍💼 Admin'
+                                                : 'Hệ thống'}
                                     </div>
                                 )}
                                 <div className="message-content">

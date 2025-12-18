@@ -356,3 +356,7 @@
         height: 56px;
     }
 }
+.message.bot.admin {
+    background-color: #e0f2fe; /* Xanh nhạt */
+    border-left: 4px solid #0ea5e9;
+}
