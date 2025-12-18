@@ -1,5 +1,4 @@
-import api from '@landinghub/api'; // Base URL đã được config trong @landinghub/api
-
+import api from './api'; // Base URL đã được config trong @landinghub/api
 export const userApi = {
     // Lấy danh sách tất cả user (dành cho admin)
     getAll: async () => {

@@ -9,5 +9,4 @@ router.get('/info', authMiddleware, userController.getUserInfo);
 
 // Cập nhật thông tin user
 router.put('/update', authMiddleware, userController.updateUserInfo); // Sửa lại callback
-router.patch('/:id/toggle-disable', authMiddleware, isAdmin, userController.toggleUserDisable);
 module.exports = router;

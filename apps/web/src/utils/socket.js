@@ -7,55 +7,67 @@ let isConfigured = false;
  * Initialize Socket.IO connection
  */
 export const initSocket = () => {
+    // Nếu đã connect rồi thì return luôn
     if (socket && socket.connected) {
         return socket;
     }
 
+    // Lấy token từ localStorage
     const token = localStorage.getItem('token');
     if (!token) {
         console.warn('No token found for socket connection');
         isConfigured = false;
-        // Emit not_configured event
-        setTimeout(() => {
-            if (socket) {
-                socket.emit('not_configured');
-            }
-        }, 100);
         return null;
     }
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    // 🔧 FIX CHÍNH: Đúng URL production, KHÔNG dùng localhost:5000 nữa!
+    const apiUrl = process.env.REACT_APP_API_URL
+        ? `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}`  // Xóa trailing slash nếu có
+        : 'https://api.landinghub.shop';  // Hardcode fallback production URL
+
+    // In ra để debug (sau này có thể xóa)
+    console.log('🔌 Initializing socket to:', apiUrl);
 
     socket = io(apiUrl, {
         auth: {
-            token: token
+            token: token  // Gửi token trong auth để backend verify
         },
-        transports: ['websocket', 'polling'],
+        transports: ['websocket', 'polling'], // polling fallback nếu websocket bị chặn
         reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000
+        reconnectionAttempts: 10,      // Tăng lên để kiên nhẫn hơn
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
     });
 
+    // Các event listener
     socket.on('connect', () => {
-        console.log('✅ Socket connected:', socket.id);
+        console.log('✅ Socket connected successfully:', socket.id);
         isConfigured = true;
     });
 
-    socket.on('disconnect', () => {
-        console.log('❌ Socket disconnected');
+    socket.on('disconnect', (reason) => {
+        console.log('❌ Socket disconnected:', reason);
         isConfigured = false;
     });
 
     socket.on('connect_error', (error) => {
-        console.error('Socket connection error:', error);
+        console.error('Socket connection error:', error.message);
         isConfigured = false;
     });
 
     socket.on('reconnect_failed', () => {
-        console.error('Socket reconnection failed');
+        console.error('Socket reconnection failed after multiple attempts');
         isConfigured = false;
-        // Emit custom 'reconnect_failed' event for listeners
-        socket.emit('reconnect_failed');
+    });
+
+    // Backend có thể từ chối nếu token sai/hết hạn
+    socket.on('authentication_error', (err) => {
+        console.error('Socket authentication failed:', err);
+        disconnectSocket(true);
+        // Có thể trigger logout ở đây
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
     });
 
     return socket;
@@ -74,7 +86,6 @@ export const getSocket = () => {
 export const isSocketConfigured = () => {
     return isConfigured && socket && socket.connected;
 };
-
 /**
  * Disconnect socket
  * @param {boolean} force - Force disconnect even if not connected
@@ -86,6 +97,7 @@ export const disconnectSocket = (force = false) => {
         }
         socket = null;
         isConfigured = false;
+        console.log('🔌 Socket disconnected manually');
     }
 };
 

@@ -148,12 +148,12 @@ const Background = ({ children, fullWidth = false, onQuickLogin }) => {
                                 <button onClick={() => setShowPassAdmin(!showPassAdmin)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                                     {showPassAdmin ? '🙈' : '👁'}
                                 </button>
-                                <button onClick={() => copyToClipboard('admin123')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>
+                                <button onClick={() => copyToClipboard('123456')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>
                                     Copy
                                 </button>
                                 <br />
                                 <button
-                                    onClick={() => handleQuickLogin('admin@example.com', 'admin123')}
+                                    onClick={() => handleQuickLogin('admin@gmail.com', '123456')}
                                     style={{ marginTop: '10px', width: '100%', padding: '10px', background: '#e91e63', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
                                 >
                                     Đăng nhập nhanh (Admin)
@@ -168,12 +168,12 @@ const Background = ({ children, fullWidth = false, onQuickLogin }) => {
                                 <button onClick={() => setShowPassUser(!showPassUser)} style={{ marginLeft: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                                     {showPassUser ? '🙈' : '👁'}
                                 </button>
-                                <button onClick={() => copyToClipboard('user123')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>
+                                <button onClick={() => copyToClipboard('123456')} style={{ marginLeft: '8px', fontSize: '12px', padding: '2px 6px' }}>
                                     Copy
                                 </button>
                                 <br />
                                 <button
-                                    onClick={() => handleQuickLogin('user@example.com', 'user123')}
+                                    onClick={() => handleQuickLogin('vi123@gmail.com', '123456')}
                                     style={{ marginTop: '10px', width: '100%', padding: '10px', background: '#4caf50', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}
                                 >
                                     Đăng nhập nhanh (User)
