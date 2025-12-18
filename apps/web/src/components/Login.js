@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../utils/api';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
@@ -6,22 +6,29 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import '../styles/login.css';
 import Loader from '../components/Loader';
-const Login = () => {
+
+const Login = ({
+                   error: externalError,             // Error từ AuthPage (nếu có)
+                   onGoogleSuccess,                  // Không dùng ở đây nữa vì tự xử lý Google riêng
+                   onGoogleFailure,                  // Tương tự
+                   setQuickLoginRef,                  // Prop quan trọng: để AuthPage gọi quick login
+               }) => {
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
-    const [redirecting, setRedirecting] = useState(false); // 👈 loader khi chuyển trang
-    const [error, setError] = useState('');
+    const [redirecting, setRedirecting] = useState(false);
+    const [error, setError] = useState(''); // Error nội bộ
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    // Login bằng Email/Password
+    // Hàm đăng nhập chính (email/password)
     const handleLogin = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         setError('');
         setLoading(true);
+
         try {
             const res = await api.post('/api/auth/login', form);
             const token = res.data.token;
@@ -30,21 +37,56 @@ const Login = () => {
             const decodedToken = jwtDecode(token);
             const role = decodedToken.role;
 
-            setRedirecting(true); // 👈 bật loader trước khi redirect
-            setTimeout(() => redirectBasedOnRole(role), 1200); // delay nhẹ cho thấy animation
+            setRedirecting(true);
+            setTimeout(() => redirectBasedOnRole(role), 1200);
         } catch (err) {
-            setError(err.response?.data?.msg || 'Đăng nhập thất bại');
+            const msg = err.response?.data?.msg || 'Đăng nhập thất bại';
+            setError(msg);
             setLoading(false);
         }
     };
 
-    // Login bằng Google
+    // Hàm QUICK LOGIN - được gọi từ panel test ở Background
+    const quickLogin = async (email, password) => {
+        setForm({ email, password });
+        setError('');
+        setLoading(true);
+
+        // Delay nhẹ để người dùng thấy form được điền tự động (UX tốt hơn)
+        setTimeout(async () => {
+            try {
+                const res = await api.post('/api/auth/login', { email, password });
+                const token = res.data.token;
+                localStorage.setItem('token', token);
+
+                const decodedToken = jwtDecode(token);
+                const role = decodedToken.role;
+
+                setRedirecting(true);
+                setTimeout(() => redirectBasedOnRole(role), 1200);
+            } catch (err) {
+                const msg = err.response?.data?.msg || 'Đăng nhập thất bại';
+                setError(msg);
+                setLoading(false);
+            }
+        }, 600);
+    };
+
+    // Expose quickLogin ra ngoài cho AuthPage sử dụng
+    useEffect(() => {
+        if (setQuickLoginRef) {
+            setQuickLoginRef(quickLogin);
+        }
+    }, [setQuickLoginRef]);
+
+    // Login bằng Google (giữ nguyên logic cũ)
     const handleGoogleLogin = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             try {
                 if (!tokenResponse.access_token) {
-                    throw new Error('access_token is missing in tokenResponse');
+                    throw new Error('access_token is missing');
                 }
+
                 const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
                     headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
                 });
@@ -74,30 +116,29 @@ const Login = () => {
     });
 
     const redirectBasedOnRole = (role) => {
-        switch (role) {
-            case 'admin':
-                navigate('/dashboard');
-                break;
-            case 'user':
-            default:
-                navigate('/dashboard');
-                break;
+        if (role === 'admin') {
+            navigate('/dashboard');
+        } else {
+            navigate('/dashboard'); // hoặc route khác nếu cần phân quyền
         }
     };
 
-    // 👇 Nếu đang redirect → hiện loader full màn hình
+    // Hiển thị loader khi đang redirect
     if (redirecting) {
         return <Loader />;
     }
+
+    // Ưu tiên hiển thị error từ bên ngoài (AuthPage), nếu không thì dùng error nội bộ
+    const displayError = externalError || error;
 
     return (
         <div className="login-container">
             <form className="form" onSubmit={handleLogin}>
                 <h2 style={{ textAlign: 'center', marginBottom: 20 }}>Đăng Nhập</h2>
 
-                {error && (
+                {displayError && (
                     <div style={{ color: 'red', marginBottom: 12, textAlign: 'center' }}>
-                        {error}
+                        {displayError}
                     </div>
                 )}
 
@@ -139,7 +180,11 @@ const Login = () => {
                 <p className="p line">Or With</p>
 
                 <div className="flex-row" style={{ justifyContent: 'center' }}>
-                    <button type="button" className="btn google" onClick={() => handleGoogleLogin()}>
+                    <button
+                        type="button"
+                        className="btn google"
+                        onClick={() => handleGoogleLogin()}
+                    >
                         Google
                     </button>
                 </div>

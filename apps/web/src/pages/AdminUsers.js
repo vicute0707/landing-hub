@@ -49,10 +49,7 @@ const AdminUser = () => {
             const res = await userApi.getAll();
             setUsers(res.data || []);
         } catch (err) {
-            const msg =
-                err.response?.data?.message ||
-                err.message ||
-                'Không thể tải danh sách người dùng';
+            const msg = err.response?.data?.message || err.message || 'Không thể tải danh sách người dùng';
             toast.error(msg);
             console.error('Load users failed:', err.response || err);
         } finally {
@@ -96,6 +93,26 @@ const AdminUser = () => {
         }
     };
 
+    // 🔒 Hàm khóa / mở khóa tài khoản
+    const handleToggleDisable = async (id, currentStatus) => {
+        if (id === user.userId) {
+            toast.warning('Không thể khóa tài khoản admin đang đăng nhập!');
+            return;
+        }
+
+        const action = currentStatus ? 'mở khóa' : 'khóa';
+        if (!window.confirm(`Bạn có chắc muốn ${action} tài khoản này?`)) return;
+
+        try {
+            await userApi.toggleDisable(id); // API mới anh sẽ note bên dưới
+            toast.success(`Đã ${action} tài khoản thành công`);
+            loadUsers();
+        } catch (err) {
+            const msg = err.response?.data?.message || 'Lỗi khi thay đổi trạng thái tài khoản';
+            toast.error(msg);
+        }
+    };
+
     if (loading && users.length === 0) return <DogLoader />;
 
     return (
@@ -109,7 +126,7 @@ const AdminUser = () => {
                             <span className="icon-wrapper">👥</span>
                             <div>
                                 <h1>Quản lý tài khoản</h1>
-                                <p>Thêm mới, chỉnh sửa và quản lý tất cả người dùng trong hệ thống.</p>
+                                <p>Thêm mới, chỉnh sửa, khóa/mở khóa và quản lý tất cả người dùng trong hệ thống.</p>
                             </div>
                         </div>
                     </div>
@@ -136,17 +153,11 @@ const AdminUser = () => {
                                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                             />
                         )}
-                        <select
-                            value={form.role}
-                            onChange={(e) => setForm({ ...form, role: e.target.value })}
-                        >
+                        <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
-                        <select
-                            value={form.subscription}
-                            onChange={(e) => setForm({ ...form, subscription: e.target.value })}
-                        >
+                        <select value={form.subscription} onChange={(e) => setForm({ ...form, subscription: e.target.value })}>
                             <option value="free">Free</option>
                             <option value="premium">Premium</option>
                         </select>
@@ -167,9 +178,10 @@ const AdminUser = () => {
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Gói</th>
+                                    <th>Trạng thái</th>
                                     <th>Ngày tạo</th>
                                     <th>Đăng nhập cuối</th>
-                                    <th>Số lần đăng nhập</th>
+                                    <th>Số lần ĐN</th>
                                     <th>Hành động</th>
                                 </tr>
                                 </thead>
@@ -179,14 +191,15 @@ const AdminUser = () => {
                                         <td>{u.name}</td>
                                         <td>{u.email}</td>
                                         <td>
-                                            <span className={`role-badge ${u.role}`}>
-                                                {u.role}
-                                            </span>
+                                            <span className={`role-badge ${u.role}`}>{u.role}</span>
                                         </td>
                                         <td>
-                                            <span className={`sub-badge ${u.subscription}`}>
-                                                {u.subscription}
-                                            </span>
+                                            <span className={`sub-badge ${u.subscription}`}>{u.subscription}</span>
+                                        </td>
+                                        <td>
+                        <span className={`status-badge ${u.isDisabled ? 'disabled' : 'active'}`}>
+                          {u.isDisabled ? 'Bị khóa' : 'Hoạt động'}
+                        </span>
                                         </td>
                                         <td>{new Date(u.createdAt).toLocaleDateString('vi-VN')}</td>
                                         <td>
@@ -197,9 +210,7 @@ const AdminUser = () => {
                                                         {new Date(u.last_login).toLocaleTimeString('vi-VN')}
                                                     </div>
                                                     {u.last_login_ip && (
-                                                        <div style={{ color: '#999', fontSize: '10px' }}>
-                                                            IP: {u.last_login_ip}
-                                                        </div>
+                                                        <div style={{ color: '#999', fontSize: '10px' }}>IP: {u.last_login_ip}</div>
                                                     )}
                                                 </div>
                                             ) : (
@@ -207,9 +218,7 @@ const AdminUser = () => {
                                             )}
                                         </td>
                                         <td>
-                                            <span className="login-count-badge">
-                                                {u.login_count || 0}
-                                            </span>
+                                            <span className="login-count-badge">{u.login_count || 0}</span>
                                         </td>
                                         <td className="action-cell">
                                             <button className="btn-edit" onClick={() => handleEdit(u)}>
@@ -217,6 +226,12 @@ const AdminUser = () => {
                                             </button>
                                             <button className="btn-delete" onClick={() => handleDelete(u._id)}>
                                                 Xóa
+                                            </button>
+                                            <button
+                                                className={`btn-toggle-disable ${u.isDisabled ? 'btn-enable' : 'btn-disable'}`}
+                                                onClick={() => handleToggleDisable(u._id, u.isDisabled)}
+                                            >
+                                                {u.isDisabled ? 'Mở khóa' : 'Khóa'}
                                             </button>
                                         </td>
                                     </tr>

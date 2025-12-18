@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
     last_login: { type: Date, default: null },
     login_count: { type: Number, default: 0 },
     last_login_ip: { type: String, default: null },
+    isDisabled: {
+        type: Boolean,
+        default: false
+    },
 });
 
 // Middleware để hash password chỉ khi password tồn tại và được sửa đổi

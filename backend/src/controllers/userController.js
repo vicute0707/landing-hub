@@ -49,3 +49,21 @@ exports.updateUserInfo = async (req, res) => {
         res.status(500).json({ msg: 'Server error' });
     }
 };
+exports.toggleUserDisable = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Không cho khóa admin chính mình (tùy chọn)
+        if (user.role === 'admin') {
+            return res.status(400).json({ message: 'Không thể khóa tài khoản admin' });
+        }
+
+        user.isDisabled = !user.isDisabled;
+        await user.save();
+
+        res.json({ message: 'Thay đổi trạng thái thành công', isDisabled: user.isDisabled });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error' });
+    }
+};

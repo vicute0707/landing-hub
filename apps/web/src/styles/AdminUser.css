@@ -498,3 +498,42 @@
     background: rgba(108, 92, 231, 0.3);
     border-radius: 4px;
 }
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.disabled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.btn-toggle-disable {
+    padding: 6px 10px;
+    font-size: 12px;
+    margin-left: 4px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-disable {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-enable {
+    background: #28a745;
+    color: white;
+}
+
+.btn-toggle-disable:hover {
+    opacity: 0.9;
+}

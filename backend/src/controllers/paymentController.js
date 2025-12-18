@@ -1365,3 +1365,19 @@ exports.getRefundRequestsAdmin = async (req, res) => {
         res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách yêu cầu hoàn tiền', error: error.message });
     }
 };
+exports.queryMomoStatus = async (req, res) => {
+    const { orderId } = req.params;
+    const transaction = await Transaction.findById(orderId);
+    if (!transaction) return res.status(404).json({ success: false });
+
+    const requestId = orderId; // vì em dùng requestId = orderId
+    const queryResult = await momoService.queryTransaction(orderId, requestId);
+
+    if (queryResult.success && queryResult.data.resultCode === 0) {
+        // Force process nếu MoMo confirm success
+        await paymentService.processPaymentSuccess(orderId, queryResult.data);
+        return res.json({ success: true, status: 'COMPLETED' });
+    }
+
+    res.json({ success: true, momoStatus: queryResult.data });
+};

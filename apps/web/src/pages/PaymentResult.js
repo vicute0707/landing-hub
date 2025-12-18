@@ -15,8 +15,7 @@ const PaymentResult = () => {
     const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
     const transaction_id = searchParams.get('transaction_id');
     const status = searchParams.get('status');
-
-    const MAX_POLL_COUNT = 30; // Poll for max 1 minute (30 * 2 seconds)
+    const MAX_POLL_COUNT = 120; // Poll for max 1 minute (30 * 2 seconds)
     const POLL_INTERVAL = 2000; // Poll every 2 seconds
 
     useEffect(() => {

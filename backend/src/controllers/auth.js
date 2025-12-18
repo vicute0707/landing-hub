@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ msg: errors.array()[0].msg });
-
+    if (user.isDisabled) return res.status(403).json({ msg: 'Tài khoản của bạn đã bị khóa' });
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
