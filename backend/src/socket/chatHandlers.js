@@ -506,7 +506,57 @@ function initChatHandlers(io, socket) {
             roomId
         });
     });
+    /**
+     * Admin gửi tin nhắn realtime (QUAN TRỌNG NHẤT - SỬA CHỖ NÀY ĐỂ USER THẤY TIN NHẮN ADMIN)
+     */
+    socket.on('send_message', async (data) => {
+        try {
+            const { roomId, message } = data;
 
+            if (!message || !message.trim()) {
+                return socket.emit('error', { message: 'Tin nhắn không được để trống' });
+            }
+
+            // Kiểm tra admin có quyền gửi trong room này không
+            const room = await ChatRoom.findOne({
+                _id: roomId,
+                admin_id: userId
+            });
+
+            if (!room) {
+                return socket.emit('error', { message: 'Bạn chưa nhận hỗ trợ room này' });
+            }
+
+            // Tạo tin nhắn admin
+            const newMessage = new ChatMessage({
+                room_id: roomId,
+                sender_id: userId,
+                sender_type: 'admin',
+                message: message.trim()
+            });
+            await newMessage.save();
+
+            // Cập nhật thời gian room
+            room.last_message_at = new Date();
+            await room.save();
+
+            // Gửi realtime cho tất cả trong room (bao gồm user)
+            io.to(`chat_${roomId}`).emit('new_message', {
+                id: newMessage._id,
+                room_id: roomId,
+                sender_type: 'admin',
+                sender_id: userId,
+                sender_name: 'Admin',
+                message: newMessage.message,
+                created_at: newMessage.createdAt
+            });
+
+            console.log(`📨 Admin ${userId} gửi tin nhắn thành công đến room ${roomId}`);
+        } catch (error) {
+            console.error('Lỗi khi admin gửi tin nhắn:', error);
+            socket.emit('error', { message: 'Không thể gửi tin nhắn' });
+        }
+    });
     /**
      * Disconnect
      */
