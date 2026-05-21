@@ -180,5 +180,7 @@ Qua quá trình xây dựng Landing Hub, tôi đã tích lũy được:
 > Tôi hiểu sản phẩm website không chỉ là code — mà là **giải pháp giúp doanh nghiệp tăng doanh thu**. Đó chính xác là góc nhìn tôi mang đến khi tư vấn khách hàng.
 
 ---
-
+Document online : 
+![Docs.png](docs/Docs.png)
+---
 *© 2025 Landing Hub · IUH Software Engineering Capstone Project*
